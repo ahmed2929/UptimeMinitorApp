@@ -9,12 +9,12 @@ const {
 } = require("../../../utils/ResponseHelpers");
 const mail = require("../../../config/MailConfig");
 
-const {GenerateToken,GenerateRandomHash} =require("../../../utils/HelperFunctions")
+const {GenerateToken,GenerateRandomCode} =require("../../../utils/HelperFunctions")
 
 
 // Signup
 exports.signUp = async (req, res) => {
-  console.log("singup runns")
+ 
   try {
     // get user with email
     const user = await User.findOne({
@@ -27,7 +27,7 @@ exports.signUp = async (req, res) => {
     }
     // generate VerifictionCode and VerifictionXpireDate for user .
     // VerifictionXpireDate after 24 hours
-    const VerifictionCode = await GenerateRandomHash(2);
+    const VerifictionCode = await GenerateRandomCode(2);
     const VerifictionXpireDate =  Date.now()  + 8.64e+7 ;
 
     const UserInfo={
@@ -57,9 +57,10 @@ exports.signUp = async (req, res) => {
 
     mail.sendMail(mailOptions, function (err, info) {
       if (err) {
-        throw new Error('email sending error ',err)
+        console.log(err)
+        throw new Error(err)
       } else {
-        console.log(info.response);
+        console.log(info);
       }
     });
 
@@ -104,38 +105,36 @@ exports.logIn = async (req, res) => {
   }
 };
 
-// Reset Forget Password
+
 exports.VerifyAccount = async (req, res) => {
   try {
     const {
       verfiycode,
-      token
     } = req.body;
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const id = decodedToken.id;
-
+    const {id} = req.id;
+    
     if (!id) {
      throw new Error('id is missing')
     }
 
-    const user = await User.findById(id.toString());
-
+    const user = await User.findById(id);
+   
      // check for if the code is correct and hasnt expired
-
-     if(user.verfiycode.toString()!==verfiycode.toString()){
+     if(user.VerifictionCode.toString()!==verfiycode.toString()){
+     
         return errorResMsg(res, 406, 'invalid code');
      }
-
-     if(user.VerifictionXpireDate().toString<=verfiycode.toString()){
+     
+     if(user.VerifictionXpireDate<=Date.now()){
         return errorResMsg(res, 406, 'code has been expired');
      }
      //activate user
     user.verified=true;
     await user.save();
-
-    return successResMsg(res, 200, token);
+    return successResMsg(res, 200, 'acount has been activated');
   } catch (err) {
+    console.log(err)
     return errorResMsg(res, 500, err);
   }
 };

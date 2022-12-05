@@ -23,12 +23,11 @@ exports.loginValidationRules = () => {
 
 
 
-exports.updateUserInfo = () => {
+exports.virifyAccount = () => {
     return [
-        body("ID").notEmpty().withMessage("ID is required"),
+        body("verfiycode").notEmpty().withMessage("verification code is required"),
     ]
 }
-
 
 exports.validate = (req, res, next) => {
     try {

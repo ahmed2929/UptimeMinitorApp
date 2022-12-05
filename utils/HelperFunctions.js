@@ -1,5 +1,6 @@
 const jwt=require('jsonwebtoken')
-
+const crypto = require('crypto');
+const bycript =require('bcrypt')
 // create user token
 
 const GenerateToken=(id)=>{
@@ -23,12 +24,12 @@ const GenerateToken=(id)=>{
   
 }
 
-const GenerateRandomHash=async(byte)=>{
+const GenerateRandomCode=async(byte)=>{
     try {
        const bytes=byte||2;
        const buf = crypto.randomBytes(bytes).toString('hex');
-            const hashedCode = await bycript.hash(buf,12)
-           return hashedCode;
+           
+           return buf;
 
 
     } catch (error) {
@@ -41,5 +42,5 @@ const GenerateRandomHash=async(byte)=>{
 
 module.exports={
     GenerateToken,
-    GenerateRandomHash
+    GenerateRandomCode
 }

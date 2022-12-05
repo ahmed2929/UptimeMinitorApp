@@ -1,6 +1,6 @@
 
 
-exports.welcomeMessage = (VerifictionCode) => {
+exports.verifyAccount = (VerifictionCode) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
