@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../../../DB/Schema/User");
 const jwt = require("jsonwebtoken");
 const messages = require("../../../Messages/index")
+const {SendEmailToUser} =require("../../../utils/HelperFunctions")
 
 const {
   successResMsg,
@@ -47,22 +48,7 @@ exports.signUp = async (req, res) => {
 
     const VerifictionMessage = messages.verifyAccount(VerifictionCode);
 
-    // send mail
-    const mailOptions = {
-      from: process.env.EmailSender,
-      to: newUser.email,
-      subject: "Account Verification",
-      html: VerifictionMessage,
-    };
-
-    mail.sendMail(mailOptions, function (err, info) {
-      if (err) {
-        console.log(err)
-        throw new Error(err)
-      } else {
-        console.log(info);
-      }
-    });
+    await SendEmailToUser(newUser.email,VerifictionMessage)
 
     // return succesfull response
     return successResMsg(res, 201, data);
@@ -139,55 +125,3 @@ exports.VerifyAccount = async (req, res) => {
   }
 };
 
-// Reset Password
-exports.resetPassword = async (req, res) => {
-  try {
-    const {
-      oldPassword,
-      newPassword
-    } = req.body;
-
-    const token = req.headers.authorization.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const id = decodedToken.id;
-
-    const user = await User.findOne({
-      _id: id,
-    }).select("+password");
-
-    if (!user || !(await user.correctPassword(oldPassword, user.password))) {
-      return errorResMsg(res, 401, "Incorrect password");
-    }
-
-    const password = await bcrypt.hash(newPassword, 12);
-
-    const updatedUser = await User.findByIdAndUpdate(
-      id, {
-      password,
-    }, {
-      new: true,
-    }
-    );
-
-    const resetSucces = messages.resetSucess(updatedUser.director[0].fullName)
-
-    // send mail
-    const mailOptions = {
-      from: '"RONZL" <admin@ronzl.com>',
-      to: updatedUser.email,
-      subject: "Password Reset",
-      html: resetSucces,
-    };
-
-    mail.sendMail(mailOptions, function (err, info) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(info.response);
-      }
-    });
-    return successResMsg(res, 200, updatedUser);
-  } catch (err) {
-    return errorResMsg(res, 500, err);
-  }
-};

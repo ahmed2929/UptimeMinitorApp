@@ -1,8 +1,11 @@
 const { workerData,Worker } = require("worker_threads")
-const {PrepareCheckRequest,pingToSingleServer,GenerateReportData}=require("../utils/HelperFunctions")
+const {PrepareCheckRequest,pingToSingleServer,GenerateReportData,SendEmailToUser,sendWebhook,getUserEmailFromId}=require("../utils/HelperFunctions")
 const Report =require('../DB/Schema/Report');
 const CheckData = JSON.parse(workerData);
 const {ConnetToDB, CloseDBConnection} =require("../DB/Server/index")
+const eventEmiter =require("../config/EventHandler")
+const messages =require("../Messages/index")
+
 ConnetToDB()
 
 const JobRun =async(check)=>{
@@ -21,6 +24,19 @@ const JobRun =async(check)=>{
             // check for data change
             if(report.status!==GenerateReportData.status){
                 // notify the user
+              GeneratedReportData.owner=CheckData.owner
+              GeneratedReportData.url=CheckData.url
+
+
+                // const email=await getUserEmailFromId(CheckData.owner)
+                // const StatusChangeMessage = await messages.StatusChange(CheckData.status); 
+                //  SendEmailToUser(email,StatusChangeMessage)
+                // if(CheckData.webhook){
+                // await sendWebhook(CheckData.webhook,`system status chaned to ${CheckData.status}`)
+                //}
+
+                eventEmiter.emit("StateChanged",GeneratedReportData)
+
             }
 
             //set data
@@ -35,11 +51,10 @@ const JobRun =async(check)=>{
             report.history=GeneratedReportData.history
             
             await report.save()
-            process.exit();
-
+          
             } catch (error) {
                 console.log(error)
-                process.exit();
+               
                 
             }
           

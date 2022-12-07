@@ -4,6 +4,8 @@ const bycript =require('bcrypt')
 const axios =require('../config/axios');
 const https = require("https");
 const { response } = require('express');
+const User = require('../DB/Schema/User');
+const mail =require("../config/MailConfig")
 
 
 const pingToSingleServer =async(url,config)=>{
@@ -139,11 +141,50 @@ const GenerateReportData=(report,ServerResponse,CheckData)=>{
 
 }
 
+const sendWebhook=async(webhookUrl,msg)=>{
+   await axios.create()
+        .post(webhookUrl, { message: msg })
+}
+
+const getUserEmailFromId=async(id)=>{
+    const user =await User.findById(id).select('email')
+    return user.email;
+ }
+ 
+ const SendEmailToUser=async(email,message)=>{
+   
+    try {
+        const mailOptions = {
+            from: process.env.EmailSender,
+            to: email,
+            subject: "app status change",
+            html: message,
+          };
+      
+         await mail.sendMail(mailOptions, function (err, info) {
+            if (err) {
+              console.log(err)
+              throw new Error(err)
+            } else {
+           
+              console.log(info);
+            }
+          });
+    } catch (error) {
+        console.log(error)
+    }
+    
+ }
+
+ 
 
 module.exports={
     GenerateToken,
     GenerateRandomCode,
     pingToSingleServer,
     PrepareCheckRequest,
-    GenerateReportData
+    GenerateReportData,
+    sendWebhook,
+    getUserEmailFromId,
+    SendEmailToUser
 }

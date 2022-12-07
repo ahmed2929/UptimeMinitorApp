@@ -1,7 +1,10 @@
 const EventEmitter = require("events");
 const {ChecksRuner} =require("../Monitor/index")
-console.log("global ob from event handler ",global.CheckIntervals)
-
+const  mail = require("../config/MailConfig");
+const {StatusChange} =require("../Messages/index")
+const {sendWebhook} =require("../utils/HelperFunctions")
+const messages =require("../Messages/index");
+const {getUserEmailFromId,SendEmailToUser} =require("../utils/HelperFunctions")
 const eventEmitter = new EventEmitter();
 eventEmitter.on("CheckCreated", async(check) => {
     console.log("event runs")
@@ -38,5 +41,23 @@ eventEmitter.on("CheckCreated", async(check) => {
     clearInterval(IntervalObj.interval);
     
   });  
+
+
+  eventEmitter.on("StateChanged", async (data) => {
+   
+    // sending email
+    const email=await getUserEmailFromId(data.owner)
+    const StatusChangeMessage = messages.StatusChange(data.status,data.url); 
+    await SendEmailToUser(email,StatusChangeMessage)
+    if(data.webhook){
+      await sendWebhook(data.webhook,`system status chaned to ${data.status}`)
+    }
+    
+
+
+    
+  });  
+
+  
 
   module.exports = eventEmitter;
