@@ -1,7 +1,8 @@
 const {
     body,
     param,
-    validationResult
+    validationResult,
+    check
 } = require('express-validator');
 
 exports.signUpValidationRules = () => {
@@ -12,6 +13,7 @@ exports.signUpValidationRules = () => {
         }).withMessage("Password must have at least 5 characters"),
     ]
 }
+
 
 
 exports.loginValidationRules = () => {
@@ -26,6 +28,74 @@ exports.loginValidationRules = () => {
 exports.virifyAccount = () => {
     return [
         body("verfiycode").notEmpty().withMessage("verification code is required"),
+    ]
+}
+
+exports.CreateCheck = () => {
+    return [
+        body("name").notEmpty().withMessage("name is required"),
+        body("url").notEmpty().isURL().withMessage("url is required"),
+        body("protocol").isIn(['http','https','TCP']),
+        body("ignoreSSL").isBoolean(),
+        body("name").optional().isString(),
+        body("path").optional().isString(),
+        body("port").optional().isInt({ min: 0, max: 65535 }),
+        body("webhook").optional().isURL(),
+        body("timeout").optional().isNumeric(),
+        body("interval").optional().isNumeric(),
+        body("threshold").optional().isNumeric(),
+        body("authentication").optional().isObject(),
+        body("httpHeaders").optional().isObject(),
+        body("assert").optional().isObject(),
+        check("assert.status").optional().isNumeric(),
+        body("tags").optional().isArray(),
+        
+    ]
+}
+
+exports.EditCheck = () => {
+    return [
+        body("CheckID").notEmpty().isMongoId(),
+        body("name").optional().isString(),
+        body("protocol").optional().isIn(['http','https','TCP']),
+        body("path").optional().isString(),
+        body("port").optional().isInt({ min: 0, max: 65535 }),
+        body("webhook").optional().isURL(),
+        body("timeout").optional().isNumeric(),
+        body("interval").optional().isNumeric(),
+        body("threshold").optional().isNumeric(),
+        body("authentication").optional().isObject(),
+        body("httpHeaders").optional().isObject(),
+        body("assert").optional().isObject(),
+        check("assert.status").optional().isNumeric(),
+        body("ignoreSSL").optional().isBoolean(),
+        body("tags").optional().isArray(),
+        
+
+        
+
+        
+        
+
+
+       
+        
+    ]
+}
+
+exports.DeleteCheck = () => {
+    return [
+        body("CheckID").notEmpty().withMessage("CheckID is required"),
+       
+        
+    ]
+}
+
+exports.ReportCheck = () => {
+    return [
+        body("ReportID").notEmpty().withMessage("ReportID is required"),
+       
+        
     ]
 }
 

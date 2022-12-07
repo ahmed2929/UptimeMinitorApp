@@ -9,6 +9,8 @@ const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
 
 const Authontication=require('../routes/authontication')
+const CheckRoutes =require("../routes/checks")
+const ReportRoutes =require("../routes/reports")
 
 
 module.exports=(app)=>{ 
@@ -65,6 +67,9 @@ app.get("/", (req, res) => {
   });
   
   app.use("/api/v1/auth", Authontication);
+  app.use("/api/v1/check", CheckRoutes);
+  app.use("/api/v1/report", ReportRoutes);
+
   
 
 
@@ -84,7 +89,10 @@ app.use((error,req,res,next)=>{
    const status    = error.statusCode || 500 ;
    const message   = error.message           ;
    const data      = error.data              ;
-   
+   if(status===500){
+    console.log(error)
+   return res.status(status).json({message:"internal server error",data:data});
+   }
    res.status(status).json({message:message,data:data});
 });
 

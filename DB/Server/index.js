@@ -23,6 +23,12 @@ const ConnetToDB =async()=>{
 
  
 }
+const CloseDBConnection=async ()=>{
+   await mongoose.connection.close()
+    console.log("db closed")
+
+}
 module.exports={
-    ConnetToDB
+    ConnetToDB,
+    CloseDBConnection
 }
