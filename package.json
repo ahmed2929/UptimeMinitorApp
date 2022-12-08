@@ -4,6 +4,7 @@
   "description": "",
   "main": "app",
   "scripts": {
+    "start":"node app",
     "test": "jest --watchAll --verbose tests/index.test.js"
   },
   "author": "ahmed khaled",
