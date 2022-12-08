@@ -18,6 +18,13 @@ Every time users make a new check or edit their old checks with a new interval c
 - it's easy to add a new notifications system since the notification functionality and the other app functionality are decoupled from each other. 
 - just impilemnt the function which handles sending the notifiction to (slack, pushover,..etc) and invoke it in the send notification event.
 
+## security consideration to defend the app from 
+- HTTP headers
+- brute attack
+- rate limiter for dos attacks
+- NoSQL query injection -Data Sanitization
+- HTTP parament pollution
+
 ## Features
 - restful APIs stateless design to consume the end-points.
 - CRUD operations for URL checks
