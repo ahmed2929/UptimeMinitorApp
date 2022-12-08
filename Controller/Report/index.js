@@ -30,7 +30,9 @@ exports.getReport = async(req, res, next) => {
           const reports = await Report.find()
         .populate('check','tags')
         .lean()
+        
         const filtedAray =reports.filter((elemet=>{
+          console.log(elemet)
           return elemet.check.tags.includes(tage) 
         }))
        return successResMsg(res,200,filtedAray)

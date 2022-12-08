@@ -99,7 +99,7 @@ exports.VerifyAccount = async (req, res) => {
     } = req.body;
 
     const {id} = req.id;
-    
+    console.log(verfiycode,id)
     if (!id) {
      throw new Error('id is missing')
     }
@@ -107,6 +107,13 @@ exports.VerifyAccount = async (req, res) => {
     const user = await User.findById(id);
    
      // check for if the code is correct and hasnt expired
+
+     if(!user){
+      return  errorResMsg(res, 406, 'user not exist');
+     }
+
+
+
      if(user.VerifictionCode.toString()!==verfiycode.toString()){
      
         return errorResMsg(res, 406, 'invalid code');

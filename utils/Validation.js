@@ -37,7 +37,6 @@ exports.CreateCheck = () => {
         body("url").notEmpty().isURL().withMessage("url is required"),
         body("protocol").isIn(['http','https','TCP']),
         body("ignoreSSL").isBoolean(),
-        body("name").optional().isString(),
         body("path").optional().isString(),
         body("port").optional().isInt({ min: 0, max: 65535 }),
         body("webhook").optional().isURL(),
