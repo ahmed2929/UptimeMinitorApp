@@ -3,9 +3,8 @@ const eventEmitter = require("../../config/EventHandler");
 const Check = require("../../DB/Schema/Check");
 const Report = require("../../DB/Schema/Report");
 const {errorResMsg,successResMsg} =require("../../utils/ResponseHelpers");
-const { findById, findByIdAndDelete } = require("../../DB/Schema/Check");
-const { check } = require("express-validator");
 const mongoose = require('mongoose');
+
 exports.CreateNewCheck =async (req, res, next) => {
     try {
         const check =await Check.findOne({
@@ -124,6 +123,7 @@ exports.getCheck = async(req, res, next) => {
   const CheckID=req.params.id;
   const userID =req.id.id;
   const tage =req.query.tage
+  console.log("from check",CheckID,userID,tage)
   if(CheckID!='all'&&!mongoose.Types.ObjectId.isValid(CheckID)){
     return errorResMsg(res,422,"invalid query") 
   }
