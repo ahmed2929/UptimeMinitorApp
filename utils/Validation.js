@@ -11,6 +11,11 @@ exports.signUpValidationRules = () => {
         body("password").notEmpty().isLength({
             min: 5
         }).withMessage("Password must have at least 5 characters"),
+        body("firstName").notEmpty().isLength({max:15}).withMessage("max length 15 characters"),
+        body("lastName").notEmpty().isLength({max:15}).withMessage("max length 15 characters"),
+        body("mobileNumber.countryCode").notEmpty().isLength({max:5}).withMessage("invalid country code"),
+        body("mobileNumber.phoneNumber").notEmpty().isLength({max:15}).isNumeric().withMessage("invalid phone number")
+
     ]
 }
 
@@ -31,72 +36,32 @@ exports.virifyAccount = () => {
     ]
 }
 
-exports.CreateCheck = () => {
+exports.SendRestPasswordCode = () => {
     return [
-        body("name").notEmpty().withMessage("name is required"),
-        body("url").notEmpty().isURL().withMessage("url is required"),
-        body("protocol").isIn(['http','https','TCP']),
-        body("ignoreSSL").isBoolean(),
-        body("path").optional().isString(),
-        body("port").optional().isInt({ min: 0, max: 65535 }),
-        body("webhook").optional().isURL(),
-        body("timeout").optional().isNumeric(),
-        body("interval").optional().isNumeric(),
-        body("threshold").optional().isNumeric(),
-        body("authentication").optional().isObject(),
-        body("httpHeaders").optional().isObject(),
-        body("assert").optional().isObject(),
-        check("assert.status").optional().isNumeric(),
-        body("tags").optional().isArray(),
+        body("email").notEmpty().isEmail().normalizeEmail().withMessage("invalid email")
+    ]
+}
+
+exports.GenerateResetPasswordToken = () => {
+    return [
+       
+        body("email").notEmpty().withMessage("email is required").isEmail().normalizeEmail().withMessage("invalid email"),
+        body("code").notEmpty().withMessage("code is required")
         
     ]
 }
 
-exports.EditCheck = () => {
+exports.restpassword = () => {
     return [
-        body("CheckID").notEmpty().isMongoId(),
-        body("name").optional().isString(),
-        body("protocol").optional().isIn(['http','https','TCP']),
-        body("path").optional().isString(),
-        body("port").optional().isInt({ min: 0, max: 65535 }),
-        body("webhook").optional().isURL(),
-        body("timeout").optional().isNumeric(),
-        body("interval").optional().isNumeric(),
-        body("threshold").optional().isNumeric(),
-        body("authentication").optional().isObject(),
-        body("httpHeaders").optional().isObject(),
-        body("assert").optional().isObject(),
-        check("assert.status").optional().isNumeric(),
-        body("ignoreSSL").optional().isBoolean(),
-        body("tags").optional().isArray(),
-        
-
-        
-
-        
-        
-
-
+        body("NewPassword").isLength({
+            min: 5
+        }).withMessage("Password must have at least 5 characters"),
        
         
     ]
 }
 
-exports.DeleteCheck = () => {
-    return [
-        body("CheckID").notEmpty().withMessage("CheckID is required"),
-       
-        
-    ]
-}
 
-exports.ReportCheck = () => {
-    return [
-        body("ReportID").notEmpty().withMessage("ReportID is required"),
-       
-        
-    ]
-}
 
 exports.validate = (req, res, next) => {
     try {

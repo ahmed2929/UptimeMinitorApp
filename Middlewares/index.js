@@ -7,15 +7,12 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
-
 const Authontication=require('../routes/authontication')
-const CheckRoutes =require("../routes/checks")
-const ReportRoutes =require("../routes/reports")
+
 
 
 module.exports=(app)=>{ 
    // general middlewares
-
    //HTTP headers
     app.use(helmet());
 
@@ -62,13 +59,11 @@ app.use(hpp());
 app.get("/", (req, res) => {
     res.status(200).json({
       status: "Success",
-      message: `Welcome to avilabilty motoring app read the docs`,
+      message: `Welcome to avilabilty read the docs`,
     });
   });
   
   app.use("/api/v1/auth", Authontication);
-  app.use("/api/v1/check", CheckRoutes);
-  app.use("/api/v1/report", ReportRoutes);
 
   
 
@@ -78,7 +73,7 @@ app.get("/", (req, res) => {
     app.all("*", (req, res, next) => {
     return res.status(404).json({
       status: "Error 404",
-      message: `Page not found. Can't find ${req.originalUrl} on this server`,
+      message: `path not found. Can't find ${req.originalUrl} on this server`,
     });
     });
    

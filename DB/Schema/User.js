@@ -4,6 +4,15 @@ const Schema = mongoose.Schema;
 
 
 var userSchema = new Schema({
+  firstName:{
+    type:String,
+    required:true,
+
+  },
+  lastName:{
+    type:String,
+    required:true,
+  },
   email: {
     type: String,
     trim: true,
@@ -28,7 +37,24 @@ var userSchema = new Schema({
   },
   VerifictionXpireDate:{
     type:Date
-  }
+  },
+  mobileNumber:{
+    countryCode:{
+      type:String,
+      required:true,
+    },
+    phoneNumber:{
+      type:String,
+      required:true
+    }
+  },
+  RestPasswordCode:{
+    type:String
+  },
+  ResetPasswordXpireDate:{
+    type:Date
+  },
+
  
  
 },{ timestamps: true });
