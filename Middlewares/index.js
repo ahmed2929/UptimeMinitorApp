@@ -8,6 +8,7 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
 const Authontication=require('../routes/authontication')
+const General=require('../routes/general')
 const i18next =require("i18next")
 const i18nextMiddleware = require("i18next-http-middleware");
 const Backend = require("i18next-fs-backend");
@@ -82,7 +83,7 @@ app.get("/", (req, res) => {
   });
   
   app.use("/api/v1/auth", Authontication);
-
+  app.use("/api/v1/general",General);
   
 
 

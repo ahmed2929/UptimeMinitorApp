@@ -14,9 +14,7 @@ exports.ChangeUserDefultLang = async (req, res) => {
     const {lang}=req.body
     const {id} =req.id
     // get user with email
-    const user = await User.findById({
-    id
-    });
+    const user = await User.findById(id);
     user.lang=lang;
     await user.save()
 

@@ -30,7 +30,8 @@
     "Unauthorized":"Unauthorized",
     "lang_has_changed":"Language has been changed",
     "language_is_required":"language is required",
-    "language_is_invalid":"language is invalid"
+    "language_is_invalid":"language is invalid",
+    "email_is_already_taken_Or_phone":"email is already taken or phone"
 
 
     

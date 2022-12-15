@@ -71,12 +71,12 @@ exports.verifyAccount_AR = (VerifictionCode) => {
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">VerifictionCode</p>
+        <p style="margin:0; font-size:20px ">كود التفعيل</p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
             
-        your verifiction code is : ${VerifictionCode}
+        ${VerifictionCode} : كود التفعيل
         
         </p>
         
@@ -95,7 +95,7 @@ exports.forgetMessage_AR = ( code) => {
 	<div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
 		
 		<p style="margin:0; font-size:20px ">Logo</p>
-		<h3 style="color:white; padding-top:30px; padding-bottom:20px; font-size:20px; margin:0; font-weight: bold;"> Dont worry, we all forget sometimes</h3>
+		<h3 style="color:white; padding-top:30px; padding-bottom:20px; font-size:20px; margin:0; font-weight: bold;">اعادة تعين كلمة المرور</h3>
 		
 		<hr style="color:white"/>
 		
@@ -122,7 +122,7 @@ exports.resetSucess_AR = (name) => {
 		
 		
 		
-		<p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">Hi ${name}, You have successfully updated your password, if you did not make this change, please contact us.</p>
+		<p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">تم اعادة تعين كلمة المرور الخاصة بك بنجاح ${name}مرحبا </p>
 		
 		
 		

@@ -20,7 +20,7 @@ exports.signUp = async (req, res) => {
 
     // check if user exists and return error if user already exists
     if (user) {
-      return errorResMsg(res, 423, req.t("email_is_already_taken"));
+      return errorResMsg(res, 423, req.t("email_is_already_taken_Or_phone"));
     }
     // generate VerifictionCode and VerifictionXpireDate for user .
     // VerifictionXpireDate after 24 hours
@@ -104,7 +104,7 @@ exports.SendRestPasswordCode= async (req, res) => {
   
     const {email} = req.body;
     if (!email) {
-      return  errorResMsg(res, 406, req.r("Email_is_required"));
+      return  errorResMsg(res, 406, req.t("Email_is_required"));
     }
 
     const user = await User.findOne({email:email});
@@ -130,7 +130,7 @@ exports.SendRestPasswordCode= async (req, res) => {
 
    
      
-    return successResMsg(res, 200, req.r("rest_password_code_has_been_sent"));
+    return successResMsg(res, 200, req.t("rest_password_code_has_been_sent"));
   } catch (err) {
     console.log(err)
     return errorResMsg(res, 500, err);

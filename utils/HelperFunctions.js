@@ -80,7 +80,7 @@ const getUserEmailFromId=async(id)=>{
         const mailOptions = {
             from: process.env.EmailSender,
             to: email,
-            subject: "auth task",
+            subject: "voithy",
             html: message,
           };
       

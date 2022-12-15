@@ -55,7 +55,7 @@ exports.GenerateResetPasswordToken = () => {
 
 exports.restpassword = () => {
     return [
-        body("password").notEmpty().withMessage("Password_is_required").isLength({
+        body("NewPassword").notEmpty().withMessage("Password_is_required").isLength({
             min: 5
         }).withMessage("Password_is_too_short")
        
@@ -66,7 +66,7 @@ exports.restpassword = () => {
 
 exports.changeLanguage=()=>{
     return [
-        body("language").notEmpty().withMessage("language_is_required").isLength({max:2}).withMessage("language_is_invalid")
+        body("lang").notEmpty().withMessage("language_is_required").isLength({max:2}).withMessage("language_is_invalid")
     ]
 }
 
