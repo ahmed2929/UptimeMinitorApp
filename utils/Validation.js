@@ -64,6 +64,12 @@ exports.restpassword = () => {
 }
 
 
+exports.changeLanguage=()=>{
+    return [
+        body("language").notEmpty().withMessage("language_is_required").isLength({max:2}).withMessage("language_is_invalid")
+    ]
+}
+
 
 exports.validate = (req, res, next) => {
     try {
