@@ -14,9 +14,9 @@ exports.signUp = async (req, res) => {
  
   try {
     // get user with email
-    const user = await User.findOne({
-      email: req.body.email,
-    });
+    const user = await User.findOne(
+      { "$or": [ { email: req.body.email }, { 'mobileNumber.phoneNumber':req.body.mobileNumber.phoneNumber} ] }
+    );
 
     // check if user exists and return error if user already exists
     if (user) {
