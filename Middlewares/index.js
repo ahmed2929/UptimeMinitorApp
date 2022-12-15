@@ -78,7 +78,7 @@ app.use(hpp());
 app.get("/", (req, res) => {
     res.status(200).json({
       status: "Success",
-      message: `Welcome to avilabilty read the docs`,
+      message: `Welcome to voithy read the docs`,
     });
   });
   
