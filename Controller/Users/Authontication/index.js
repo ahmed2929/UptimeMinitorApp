@@ -20,7 +20,7 @@ exports.signUp = async (req, res) => {
 
     // check if user exists and return error if user already exists
     if (user) {
-      return errorResMsg(res, 423, "This user already exists");
+      return errorResMsg(res, 423, req.t("email_is_already_taken"));
     }
     // generate VerifictionCode and VerifictionXpireDate for user .
     // VerifictionXpireDate after 24 hours
@@ -73,7 +73,7 @@ exports.logIn = async (req, res) => {
     // check if user exists and if the password is correct
     if (!user || !(await user.correctPassword(password, user.password))) {
       // return error message if password is wrong
-      return errorResMsg(res, 401, "Incorrect email or password");
+      return errorResMsg(res, 401, req.t("Incorrect_email_or_password"));
     }
 
     // create user token
@@ -98,13 +98,13 @@ exports.SendRestPasswordCode= async (req, res) => {
   
     const {email} = req.body;
     if (!email) {
-      return  errorResMsg(res, 406, 'email is missing');
+      return  errorResMsg(res, 406, req.r("Email_is_required"));
     }
 
     const user = await User.findOne({email:email});
 
      if(!user){
-      return  errorResMsg(res, 406, 'user not exist');
+      return  errorResMsg(res, 406, req.t('user_is_not_found'));
      }
 
      const RestPasswordCode = await GenerateRandomCode(2);
@@ -118,7 +118,7 @@ exports.SendRestPasswordCode= async (req, res) => {
 
     await SendEmailToUser(user.email,ForgetPasswordMessage)
      
-    return successResMsg(res, 200, 'activation code has been sent');
+    return successResMsg(res, 200, req.r("rest_password_code_has_been_sent"));
   } catch (err) {
     console.log(err)
     return errorResMsg(res, 500, err);
@@ -136,16 +136,16 @@ exports.GenerateAccessResetPasswordToken= async (req, res) => {
     })
 
     if(!user){
-      return errorResMsg(res, 406, 'user not found');
+      return errorResMsg(res, 406, req.t("user_is_not_found"));
     }
 
     if(user.RestPasswordCode.toString()!==code.toString()){
      
-      return errorResMsg(res, 406, 'invalid code');
+      return errorResMsg(res, 406, req.t("code_is_not_valid"));
    }
    
    if(user.ResetPasswordXpireDate<=Date.now()){
-      return errorResMsg(res, 406, 'code has been expired');
+      return errorResMsg(res, 406, req.t("code_is_expired"));
    }
 
    const token = GenerateToken(user._id)
@@ -173,14 +173,14 @@ exports.ResetPassword = async (req, res) => {
     const user = await User.findById(id);
    
      if(!user){
-      return  errorResMsg(res, 406, 'user not exist');
+      return  errorResMsg(res, 406, req.t("user_is_not_found"));
      }
 
     user.password=NewPassword
     await user.save();
     const resetSucess=messages.resetSucess(user.firstName)
     await SendEmailToUser(user.email,resetSucess)
-    return successResMsg(res, 200, {message:'password has been updated'});
+    return successResMsg(res, 200, {message:req.t("password_has_been_updated")});
   } catch (err) {
     console.log(err)
     return errorResMsg(res, 500, err);
@@ -204,23 +204,23 @@ exports.VerifyAccount = async (req, res) => {
      // check for if the code is correct and hasnt expired
 
      if(!user){
-      return  errorResMsg(res, 406, 'user not exist');
+      return  errorResMsg(res, 406, req.t("user_is_not_found"));
      }
 
 
 
      if(user.VerifictionCode.toString()!==verfiycode.toString()){
      
-        return errorResMsg(res, 406, 'invalid code');
+        return errorResMsg(res, 406, req.t("verifyCode_is_not_valid"));
      }
      
      if(user.VerifictionXpireDate<=Date.now()){
-        return errorResMsg(res, 406, 'code has been expired');
+        return errorResMsg(res, 406, 'verifyCode_is_expired');
      }
      //activate user
     user.verified=true;
     await user.save();
-    return successResMsg(res, 200, {message:'acount has been activated'});
+    return successResMsg(res, 200, {message:req.t("acount_has_been_activated")});
   } catch (err) {
     console.log(err)
     return errorResMsg(res, 500, err);
@@ -238,7 +238,11 @@ exports.ResendVirificationCode = async (req, res) => {
     const user = await User.findById(id);
 
      if(!user){
-      return  errorResMsg(res, 406, 'user not exist');
+      return  errorResMsg(res, 406, req.t("user_is_not_found"));
+     }
+
+     if(user.verified){
+      return  errorResMsg(res, 406, req.t("user_is_already_activated"));
      }
 
      const VerifictionCode = await GenerateRandomCode(2);
@@ -252,7 +256,7 @@ exports.ResendVirificationCode = async (req, res) => {
 
     await SendEmailToUser(user.email,VerifictionMessage)
      
-    return successResMsg(res, 200, {message:'activation code has been sent'});
+    return successResMsg(res, 200, {message:req.t("activation_code_has_been_sent")});
   } catch (err) {
     console.log(err)
     return errorResMsg(res, 500, err);
@@ -270,7 +274,7 @@ exports.GenerateAccessToken = async (req, res) => {
     // check if user exists and if the password is correct
     if (!user) {
       // return error message if user not found
-      return errorResMsg(res, 401, "user not found");
+      return errorResMsg(res, 401, req.t("user_is_not_found"));
     }
 
     // create user token

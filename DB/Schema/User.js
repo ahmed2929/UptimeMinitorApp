@@ -54,6 +54,10 @@ var userSchema = new Schema({
   ResetPasswordXpireDate:{
     type:Date
   },
+  lang:{
+    type:String,
+    default:"en"
+  }
 
  
  

@@ -80,7 +80,7 @@ const getUserEmailFromId=async(id)=>{
         const mailOptions = {
             from: process.env.EmailSender,
             to: email,
-            subject: "app status change",
+            subject: "auth task",
             html: message,
           };
       
@@ -89,7 +89,7 @@ const getUserEmailFromId=async(id)=>{
               console.log(err)
               throw new Error(err)
             } else {
-           
+                console.log("email sent")
             
             }
           });

@@ -9,7 +9,7 @@ exports.authorization = () => {
       
       if (!userID) {
         return res.status(401).json({
-          error: "Unauthorized",
+          error: req.t("Unauthorized"),
           status: "error",
         });
       } else {
@@ -18,7 +18,7 @@ exports.authorization = () => {
       }
     } catch {
       res.status(401).json({
-        error: "Unauthorized",
+        error: req.t("Unauthorized"),
         status: "error",
       });
     }
@@ -34,7 +34,7 @@ exports.authorizeRefreshToken = () => {
       
       if (!userID) {
         return res.status(401).json({
-          error: "Unauthorized",
+          error: req.t("Unauthorized"),
           status: "error",
         });
       } else {
@@ -43,7 +43,7 @@ exports.authorizeRefreshToken = () => {
       }
     } catch {
       res.status(401).json({
-        error: "Unauthorized",
+        error: req.t("Unauthorized"),
         status: "error",
       });
     }

@@ -8,11 +8,27 @@ const xss = require("xss-clean");
 const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
 const Authontication=require('../routes/authontication')
+const i18next =require("i18next")
+const i18nextMiddleware = require("i18next-http-middleware");
+const Backend = require("i18next-fs-backend");
 
+
+// set localiztion config
+i18next.use(Backend).use(i18nextMiddleware.LanguageDetector)
+.init({
+    fallbackLng: 'en',
+    preload: ['en', 'ar'],
+    ns: ['translation'],
+    defaultNS: 'translation',
+    backend: {
+        loadPath: path.join(__dirname, '../locales/{{lng}}/translation.json'),
+    }
+})
 
 
 module.exports=(app)=>{ 
    // general middlewares
+    app.use(bodyParser.json());
    //HTTP headers
     app.use(helmet());
 
@@ -52,7 +68,9 @@ app.use(xss());
 //HTTP parament pollution
 app.use(hpp());
  
- 
+
+//localization
+ app.use(i18nextMiddleware.handle(i18next))
 
 
 // set routes

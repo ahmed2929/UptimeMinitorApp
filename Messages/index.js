@@ -35,7 +35,7 @@ exports.forgetMessage = ( code) => {
 		
 		
 		<p style="color:white;padding-top:10px; padding-bottom:10px; line-height: 2em;">.</p>
-        <a style="text-decoration:none; color:blue;" ""> OTP : ${code}
+        <a style="text-decoration:none; color:white;" ""> OTP : ${code}
    
 		<p style="color:white;padding-top:10px; line-height: 2em; margin:0">Cheers,</p>
 		

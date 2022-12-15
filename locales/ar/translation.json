@@ -1,0 +1,24 @@
+{
+    "Email_is_required":"يرجي ادخال البريد الالكتروني",
+    "Email_is_not_valid":"البريد الالكتروني غير صحيح",
+    "Password_is_required":"كلمة المرور مطلوبه",
+    "Password_is_too_short":"كلمة المرور يجب ان تحتوي علي الاقل علي 5 احرف",
+    "firstName_max":"لا يمكن للاسم الاول ان يكون اكثر من 15 حرف",
+    "lastName_max":"لا يمكن للاسم الثاني ان يحتوي علي اكثر من 15 حرف",
+    "firstName_is_required":"الاسم الاول مطلوب",
+    "lastName_is_required":"الاسم الثاني مطلوب",
+    "country_code_invalid":"كود الدولة غير صحيح",
+    "phone_number_invalid":"رقم الهاتف غير صحيح",
+    "phone_number_is_required":"رقم الهاتف مطلوب",
+    "country_code_is_required":"كود الدولة مطلوب",
+    "verifyCode_is_required":"كود التفعيل مطلوب",
+    "verifyCode_is_not_valid":"كود التفعيل غير صحيح",
+    "verifyCode_is_expired":"انتهت صلاحية كود التفعيل",
+    "code":"الكود مطلوب",
+    "code_is_not_valid":"كود غير صحيح",
+    "code_is_expired":"انتهت صلاحية الكود",
+    "email_is_not_found":"البريد الالكتروني غير موجود",
+    "internal_server_error":"حدث خطاء ونحن نحاول اصلاحه في اقرب وقت"
+    
+
+}
