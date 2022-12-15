@@ -45,9 +45,15 @@ exports.signUp = async (req, res) => {
       refreshToken
     };
 
-    const VerifictionMessage = messages.verifyAccount(VerifictionCode);
+    if(newUser.lang==="en"){
+      const VerifictionMessage = messages.verifyAccount_EN(VerifictionCode);
+      await SendEmailToUser(newUser.email,VerifictionMessage)
+    }else{
+      const VerifictionMessage = messages.verifyAccount_AR(VerifictionCode);
+      await SendEmailToUser(newUser.email,VerifictionMessage)
+    }
 
-    await SendEmailToUser(newUser.email,VerifictionMessage)
+   
 
     // return succesfull response
     return successResMsg(res, 201, data);
@@ -109,14 +115,20 @@ exports.SendRestPasswordCode= async (req, res) => {
 
      const RestPasswordCode = await GenerateRandomCode(2);
      const ResetPasswordXpireDate =  Date.now()  + 8.64e+7 ;
-     const ForgetPasswordMessage = messages.forgetMessage(RestPasswordCode);
+     if(user.lang==="en"){
+      const ForgetPasswordMessage = messages.forgetMessage_EN(RestPasswordCode);
+      await SendEmailToUser(user.email,ForgetPasswordMessage)
+     }else{
+      const ForgetPasswordMessage = messages.forgetMessage_AR(RestPasswordCode);
+      await SendEmailToUser(user.email,ForgetPasswordMessage)
+     }
 
 
     user.RestPasswordCode=RestPasswordCode;
     user.ResetPasswordXpireDate=ResetPasswordXpireDate;
     await user.save();
 
-    await SendEmailToUser(user.email,ForgetPasswordMessage)
+   
      
     return successResMsg(res, 200, req.r("rest_password_code_has_been_sent"));
   } catch (err) {
@@ -178,8 +190,13 @@ exports.ResetPassword = async (req, res) => {
 
     user.password=NewPassword
     await user.save();
-    const resetSucess=messages.resetSucess(user.firstName)
-    await SendEmailToUser(user.email,resetSucess)
+    if(user.lang==="en"){
+      const resetSucess=messages.resetSucess_EN(user.firstName)
+      await SendEmailToUser(user.email,resetSucess)
+    }else{
+      const resetSucess=messages.resetSucess_AR(user.firstName)
+      await SendEmailToUser(user.email,resetSucess)
+    }
     return successResMsg(res, 200, {message:req.t("password_has_been_updated")});
   } catch (err) {
     console.log(err)
@@ -247,7 +264,7 @@ exports.ResendVirificationCode = async (req, res) => {
 
      const VerifictionCode = await GenerateRandomCode(2);
      const VerifictionXpireDate =  Date.now()  + 8.64e+7 ;
-     const VerifictionMessage = messages.verifyAccount(VerifictionCode);
+     const VerifictionMessage = messages.verifyAccount_EN(VerifictionCode);
 
 
     user.VerifictionCode=VerifictionCode;
