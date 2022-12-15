@@ -1,8 +1,0 @@
-{
-    "appService.zipIgnorePattern": [
-        "node_modules{,/**}",
-        ".vscode{,/**}"
-    ],
-    "appService.defaultWebAppToDeploy": "/subscriptions/9a9e9b58-f2fa-4b46-8853-6c591db8bde5/AppServices/subscriptions/9a9e9b58-f2fa-4b46-8853-6c591db8bde5/resourceGroups/voithyMVP-Dev-v1/providers/Microsoft.Web/sites/voithy-dev-v1",
-    "appService.deploySubpath": "."
-}
