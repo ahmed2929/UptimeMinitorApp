@@ -15,6 +15,10 @@ router.put(
     userController.ChangeUserDefultLang
 );
 
+router.get(
+    "/search",
+    userController.SerachForMed
+);
 
 
 
