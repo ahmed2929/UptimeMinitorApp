@@ -55,3 +55,23 @@ exports.SerachForMed = async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+exports.CreateNewMed = async (req, res) => {
+ 
+  try {
+
+    const {id} =req.id
+    const {name,description,strength,unit,quantity,instructions,condition,startDay,endDay,daysInterval,dosage,externalInfo}=req.body
+    // create new med
+    // create schduler 
+    // create report
+   
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("med_created")});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
