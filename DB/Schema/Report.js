@@ -16,7 +16,7 @@ var ReportSchema = new Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'Schduler'
   },
-  amout:{
+  amount:{
     type:Number
 
   },

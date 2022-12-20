@@ -7,55 +7,59 @@ var schduler = new Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'UserMedcation'
   },
-  user:{
+  User:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'User'
   },
-  startDay:{
-    type:Date
+  StartDate:{
+    type:Date,
+    default:() => Date.now()
+
   },
-  endDay:{
-    type:Date
+  EndDate:{
+    type:Date,
+    default:null
   },
 
-  asNeeded:{
+  AsNeeded:{
     type:Boolean,
     default:false
 
   },
-  everyDay:{
-    type:Boolean
+  ScheduleType:{
+    type:Number,
+    enum:[0,1,2,3], // 0: Days of week schedule , 1: As Needed  , 2: Every Day , 3: Days Interval
+    default:2
+  }
+  ,
+  
+  DaysInterval:{
+    type:Number,
+    default:null
   },
-  daysInterval:{
-    type:Number
-  },
-  spacifcDays:{
-    type:[{
-      type: String,
-    }]
-  },
-  dosage:{
-    type:[
+  DpacifcDays:{
+    type:[String],
+    default:null
+    },
+ 
+  dosage:
+    [
       {
         dose:{
-          amount:{
-            type:String
-          },
-          unit:{
-            type: String,
-          },
-          
-          strenth:{
-            type:String
-          }
-        } ,
+          type:Number,
+
+
+        },
         time:{
           type:Date
         }
 
       }
-    ]
-  }
+    ],
+    history:[{
+      type:Object
+    }]
+ 
 
  
  

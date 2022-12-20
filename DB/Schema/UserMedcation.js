@@ -34,7 +34,11 @@ var MedictionSchema = new Schema({
   condition:{
     type:String
   },
- 
+  type:{
+    type:String,
+    enum : ['pill','liquid','injection','inhaler','patch','implant','intrauterine device','suppository','topical','other'],
+    default: 'pill'
+  },
   Schduler:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Schduler'

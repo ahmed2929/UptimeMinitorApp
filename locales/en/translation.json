@@ -32,7 +32,9 @@
     "language_is_required":"language is required",
     "language_is_invalid":"language is invalid",
     "email_is_already_taken_Or_phone":"email is already taken or phone",
-    "Med_Recommendation_List_Has_Been_Created":"med list has been updated"
+    "Med_Recommendation_List_Has_Been_Created":"med list has been updated",
+    "med_created":"med has been created",
+    "Schdule_Updated":"Schdule Updated"
 
 
     

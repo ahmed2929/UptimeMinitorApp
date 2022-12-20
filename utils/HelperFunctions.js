@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const User = require('../DB/Schema/User');
 const mail =require("../config/MailConfig");
 const { match } = require('assert');
+const { BlobServiceClient } = require('@azure/storage-blob');
 
 
 
@@ -99,12 +100,64 @@ const getUserEmailFromId=async(id)=>{
     
  }
 
+ const UploadFileToAzureBlob=async(file)=>{
+    try {
+        const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AzureBlobConnectionString);
+        const containerName = process.env.AzureBlobContainerName;
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const blobName = +Date.now()+Math.random()+file.originalname
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        const uploadBlobResponse = await blockBlobClient.upload(file.buffer, file.buffer.length);
+        console.log(uploadBlobResponse)
+        const url = `https://medimages.blob.core.windows.net/${containerName}/${blobName}`;
+        
+
+        return url;
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+ }
  
+ const GenerateOccurances=async (UserID,MedId,SchdulerId,OccrurencePattern,startDate,endDate,OccurancesData)=>{
+
+    // write a function that will generate the occurance of the med
+    // based on the pattern and the start and end date
+    // the function will return an array of dates
+    // the array will be used to create the occurance in the database
+    // the function will be called in the create med route
+    // the function will be called in the update med route
+    // the function will be called in the update schduler route
+
+    const finalArrObj = [];
+    console.log(startDate,endDate)
+    while (startDate <= endDate ) {
+       
+        finalArrObj.push(
+            {
+                user:UserID,
+                Medication:MedId,
+                schduler:SchdulerId,
+                PlannedDateTime:new Date(startDate),
+                ...OccurancesData
+
+            }
+            
+            
+            );
+      startDate.setDate(startDate.getDate() + OccrurencePattern);
+    }
+
+    return finalArrObj;
+
+
+ }
 
 module.exports={
     GenerateToken,
     GenerateRandomCode,
     GenerateRefreshToken,
     getUserEmailFromId,
-    SendEmailToUser
+    SendEmailToUser,
+    UploadFileToAzureBlob
 }
