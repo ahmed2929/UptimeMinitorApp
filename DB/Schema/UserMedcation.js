@@ -17,7 +17,7 @@ var MedictionSchema = new Schema({
     type:String
   },
   strenth:{
-    type:String
+    type:Number
   },
   unit:{
       type: String,

@@ -4,7 +4,9 @@ const User = require('../DB/Schema/User');
 const mail =require("../config/MailConfig");
 const { match } = require('assert');
 const { BlobServiceClient } = require('@azure/storage-blob');
+const { resolve } = require('path');
 
+const DateTime =require("luxon")
 
 
 // create refresh token
@@ -129,29 +131,97 @@ const getUserEmailFromId=async(id)=>{
     // the function will be called in the update med route
     // the function will be called in the update schduler route
 
-    const finalArrObj = [];
-    console.log(startDate,endDate)
-    while (startDate <= endDate ) {
-       
-        finalArrObj.push(
-            {
-                user:UserID,
-                Medication:MedId,
-                schduler:SchdulerId,
-                PlannedDateTime:new Date(startDate),
-                ...OccurancesData
+    
+    return new Promise((resolve,reject)=>{
 
-            }
-            
-            
-            );
-      startDate.setDate(startDate.getDate() + OccrurencePattern);
-    }
+    //let startDate=  new Date(startdate).getTime()
 
-    return finalArrObj;
+        const finalArrObj =[]
+        let baseDate=new Date(startDate)
 
+        var endDayResultWithOneDay = new Date(endDate);
+        endDayResultWithOneDay.setDate(endDayResultWithOneDay.getDate() + 1);
+        endDate = endDayResultWithOneDay;
+
+        while (baseDate <= endDate ) {
+            finalArrObj.push(
+                {
+                    user:UserID,
+                    Medication:MedId,
+                    schduler:SchdulerId,
+                    PlannedDateTime:new Date(baseDate),
+                    ...OccurancesData
+    
+                }
+
+               
+
+                
+                );
+                var result = new Date(baseDate);
+                result.setDate(result.getDate() + OccrurencePattern);
+                baseDate = result;
+         
+        }
+        resolve(finalArrObj)
+    })
+   
 
  }
+
+
+ const GenerateOccurancesWithDays=async (UserID,MedId,SchdulerId,intervalDays,startDate,endDate,OccurancesData)=>{
+
+    // write a function that will generate the occurance of the med
+    // based on the pattern and the start and end date
+    // the function will return an array of dates
+    // the array will be used to create the occurance in the database
+    // the function will be called in the create med route
+    // the function will be called in the update med route
+    // the function will be called in the update schduler route
+
+    
+    return new Promise((resolve,reject)=>{
+
+    //let startDate=  new Date(startdate).getTime()
+
+        const finalArrObj =[]
+        let baseDate=new Date(startDate)
+
+        var endDayResultWithOneDay = new Date(endDate);
+        endDayResultWithOneDay.setDate(endDayResultWithOneDay.getDate() + 1);
+        endDate = endDayResultWithOneDay;
+
+        while (baseDate <= endDate ) {
+            const dayName=baseDate.toLocaleDateString('en', { weekday: 'long' })
+            const shouldAdded=intervalDays.includes(dayName)
+            if(shouldAdded){
+
+            finalArrObj.push(
+                {
+                    user:UserID,
+                    Medication:MedId,
+                    schduler:SchdulerId,
+                    PlannedDateTime:new Date(baseDate),
+                    ...OccurancesData
+    
+                }
+
+                );
+            }
+                var result = new Date(baseDate);
+                result.setDate(result.getDate() + 1);
+                baseDate = result;
+         
+        }
+        resolve(finalArrObj)
+    })
+   
+
+ }
+
+
+
 
 module.exports={
     GenerateToken,
@@ -159,5 +229,7 @@ module.exports={
     GenerateRefreshToken,
     getUserEmailFromId,
     SendEmailToUser,
-    UploadFileToAzureBlob
+    UploadFileToAzureBlob,
+    GenerateOccurances,
+    GenerateOccurancesWithDays
 }

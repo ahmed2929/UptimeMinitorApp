@@ -50,7 +50,7 @@ var schduler = new Schema({
 
 
         },
-        time:{
+        DateTime:{
           type:Date
         }
 
