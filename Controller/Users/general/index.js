@@ -13,6 +13,7 @@ const {
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 const { json } = require("body-parser");
+const console = require("console");
 
 
 
@@ -104,6 +105,15 @@ exports.CreateNewMed = async (req, res) => {
       type
 
     })
+    // generate medIfo snapshot
+    const MedInfo={
+      img,
+      strenth,
+      unit,
+      instructions,
+      condition,
+      type
+    }
     // create schduler 
     jsonSchduler=JSON.parse(Schduler)
 
@@ -117,7 +127,7 @@ exports.CreateNewMed = async (req, res) => {
 
     const newSchduler = new SchdulerSchema({
       medication:newMed._id,
-      user:id,
+      User:id,
       ...jsonSchduler
 
     })
@@ -184,7 +194,7 @@ exports.CreateNewMed = async (req, res) => {
       }
    
       
-      const newOccurances=await GenerateOccurances(id,newMed._id,newSchduler._id,OccrurencePattern,start,end,OccurancesData)
+      const newOccurances=await GenerateOccurances(id,newMed._id,MedInfo,newSchduler._id,OccrurencePattern,start,end,OccurancesData)
       occuraces.push(...newOccurances)
 
 
@@ -215,7 +225,7 @@ exports.CreateNewMed = async (req, res) => {
 
       const intervalDays=jsonSchduler.DpacifcDays
       
-      const newOccurances=await GenerateOccurancesWithDays(id,newMed._id,newSchduler._id,intervalDays,start,end,OccurancesData)
+      const newOccurances=await GenerateOccurancesWithDays(id,newMed._id,MedInfo,newSchduler._id,intervalDays,start,end,OccurancesData)
       occuraces.push(...newOccurances)
 
 
@@ -234,7 +244,6 @@ exports.CreateNewMed = async (req, res) => {
 
     // save med and schduler
 
- 
     newMed.Schduler=newSchduler._id
     await newSchduler.save()
     await newMed.save()
@@ -251,11 +260,28 @@ exports.CreateNewMed = async (req, res) => {
 };
 
 exports.EditMed=async (req, res) => {
- 
+
+  /** edit med and schdule api
+   * -this api sholud be called when user needs to edit med or its schdule
+   * -the caller must be the med creator or has a permission
+   * -medId and schdule id is required
+   * -that data to be edit
+   * ********************************
+   * logic
+   * ********************************
+   * 1- make sure that the caller is the med creator
+   * 2- make sure that the med id and shcdule id is valid
+   * 3- retrive the med and edit it 
+   * 4- retrive the schdule and edit it
+   * 5- edit all the future occurance if it changed
+   * 
+   * 
+   * 
+   */
   try {
 
     const {id} =req.id
-    const {
+    let {
       img,
       MedId,
       name,
@@ -276,12 +302,19 @@ exports.EditMed=async (req, res) => {
       }
       const oldMed=await UserMedcation.findById(MedId);
       if(!oldMed){
-        return errorResMsg(res, 404, req.t("schduler_not_found"));
+        return errorResMsg(res, 404, req.t("Medication_not_found"));
       }
+
+      // check if the caller is thas the permssion to edit
+      // for now the creator who has the right to edit
+
+
       if(oldMed.user.toString()!==id){
         return errorResMsg(res, 401, req.t("Unauthorized"));
       }
-      await UserMedcation.findOneAndUpdate(MedId,{
+
+      // edit medication
+     const editedMed= await UserMedcation.findOneAndUpdate(MedId,{
         img:img||oldMed.img,
         name:name||oldMed.name,
         strenth:strenth||oldMed.strenth,
@@ -291,23 +324,146 @@ exports.EditMed=async (req, res) => {
         instructions:instructions||oldMed.instructions,
         condition:condition||oldMed.condition,
         externalInfo:JSON.parse(externalInfo)||oldMed.externalInfo,
-        Schduler:JSON.parse(Schduler)||oldMed.Schduler,
         type:type||oldMed.type
       })
+      newMed=editedMed
+      // genrate MedInfo snapshot
+      const MedInfo={
+        img:editedMed.img,
+        strenth:editedMed.strenth,
+        unit:editedMed.unit,
+        instructions:editedMed.instructions,
+        condition:editedMed.condition,
+        type:editedMed.type
+
+      }
+      // if nod edit for schdule will return
+
+      if(!Schduler){
+        return successResMsg(res, 200, {message:req.t("Medication_updated")});
+      }
 
 
+
+     const SchdulerId=editedMed.Schduler._id
+
+      // edit schdule
     const OldSchduler = await SchdulerSchema.findById(SchdulerId)
     if(!OldSchduler){
       return errorResMsg(res, 404, req.t("schduler_not_found"));
     }
-    if(OldSchduler.user.toString()!==id){
+
+    // check if the caller is thas the permssion to edit (will be edited)
+    if(OldSchduler.User.toString()!==id){
       return errorResMsg(res, 401, req.t("Unauthorized"));
     }
+    console.log("schduler ",Schduler)
+    const jsonSchduler=JSON.parse(Schduler)
+
+
     // saved old schduler into history array and update the new one
-   await SchdulerSchema.findByIdAndUpdate(SchdulerId,{
-      ...SchdulerData,
+   const newSchduler=await SchdulerSchema.findByIdAndUpdate(SchdulerId,{
+      ...jsonSchduler,
       history:[...OldSchduler.history,OldSchduler]
     })
+
+    // delete all the future occurances
+   const deleted= await Occurance.deleteMany({Schduler:SchdulerId,PlannedDateTime:{$gte:new Date()}})
+    console.log("deleted",deleted) 
+   // create new occurances
+
+     // get get start and end date
+     let startDate=jsonSchduler.StartDate
+     let endDate=jsonSchduler.EndDate
+     let OccrurencePattern;
+     if(!startDate){
+       return errorResMsg(res, 400, req.t("start_date_required"));
+       
+     }
+   
+     // get schule senario 
+     if(!jsonSchduler.ScheduleType){
+       return errorResMsg(res, 400, req.t("schduler_type_required"));
+       
+     }
+     // get occurence pattern
+     // the fowllowing code must rurns in case 2 and 3 only
+     if(jsonSchduler.ScheduleType=='2'||jsonSchduler.ScheduleType=='3'){
+ 
+     //case every day
+     if(jsonSchduler.ScheduleType=='2'){ 
+       OccrurencePattern=1
+     }else if(jsonSchduler.ScheduleType=='3'){ //case days interval
+       OccrurencePattern=jsonSchduler.DaysInterval
+     }
+     // generate occurences data
+ 
+     const occuraces=[]
+     for(const doseElement of jsonSchduler.dosage){
+ 
+       const OccurancesData={
+         PlannedDose:doseElement.dose
+       }
+       const start=new Date(doseElement.DateTime)
+       
+       if(!jsonSchduler.EndDate){
+ 
+         var result = new Date(baseDate);
+         result.setMonth(result.getMonth() + 3);
+ 
+         end=result
+       }else{
+         end=new Date(jsonSchduler.EndDate)
+ 
+       }
+    
+       
+       const newOccurances=await GenerateOccurances(id,newMed._id,MedInfo,newSchduler._id,OccrurencePattern,start,end,OccurancesData)
+       occuraces.push(...newOccurances)
+ 
+ 
+     };
+ 
+     // write occurences to database
+     await Occurance.insertMany(occuraces)
+ 
+ 
+  
+     
+ 
+     }else if (jsonSchduler.ScheduleType=='0'){
+ 
+       // case user choose spacic days
+       const occuraces=[]
+     for(const doseElement of jsonSchduler.dosage){
+ 
+       const OccurancesData={
+         PlannedDose:doseElement.dose
+       }
+       const start=new Date(doseElement.DateTime)
+       
+      
+         end=new Date(jsonSchduler.EndDate)
+ 
+       
+ 
+       const intervalDays=jsonSchduler.DpacifcDays
+       
+       const newOccurances=await GenerateOccurancesWithDays(id,newMed._id,MedInfo,newSchduler._id,intervalDays,start,end,OccurancesData)
+       occuraces.push(...newOccurances)
+ 
+ 
+     };
+ 
+     // write occurences to database
+     await Occurance.insertMany(occuraces)
+ 
+ 
+     }
+
+
+
+
     
 
    
@@ -320,3 +476,271 @@ exports.EditMed=async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+exports.EditSingleDose=async (req, res) => {
+
+  /** edit singleDose
+   * -this api sholud be called when user needs to edit singleDose
+   * -the caller must be the med creator or has a permition
+   * -medId and schdule id is required
+   * - data to be edit
+   * ********************************
+   * logic
+   * ********************************
+   * 1- make sure that the caller is the med creator
+   * 2- make sure that the med id and shcdule id is valid
+   * 3- retrive the ocuurence and edit
+   * 
+   * 
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    let {
+    occuraceId,
+    MedInfo,
+    PlannedDateTime,
+    PlannedDose,
+    }=req.body
+
+    // check for permison
+    const oldOccurance=await Occurance.findById(occuraceId)
+    if(oldOccurance.user.toString()!==id){
+      return errorResMsg(res, 401, req.t("Unauthorized"));
+    }
+    // update 
+    oldOccurance.PlannedDateTime=PlannedDateTime||oldOccurance.PlannedDateTime
+    oldOccurance.PlannedDose=PlannedDose||oldOccurance.PlannedDose
+    oldOccurance.MedInfo={
+      strenth:MedInfo.strenth||oldOccurance.MedInfo.strenth,
+      unit:MedInfo.unit||oldOccurance.MedInfo.unit,
+      quantity:MedInfo.quantity||oldOccurance.MedInfo.quantity,
+      instructions:MedInfo.instructions||oldOccurance.MedInfo.instructions,
+      condition:MedInfo.condition||oldOccurance.MedInfo.condition,
+      type:MedInfo.type||oldOccurance.MedInfo.type,
+
+      
+    }
+    await oldOccurance.save()
+    
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Occurance_Updated")});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+exports.deletMedictionCycle=async (req, res) => {
+
+  /** delete all cycle
+   * -this api sholud be called when user needs to delete medicatation cycle
+   * -the caller must be the med creator
+   * -medId and schdule id is required
+   * -that data to be edit
+   * ********************************
+   * logic
+   * ********************************
+   * 1- make sure that the caller is the med creator
+   * 2- make sure that the med id and shcdule id is valid
+   * 3- flag the med and schduler as deleted
+   * 4- delete all the future doses
+   * 
+   * 
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    let {
+    MedId
+    }=req.body
+
+    // check for permison
+    const Medication=await UserMedcation.findById(MedId)
+    if(!Medication){
+      return errorResMsg(res, 400, req.t("Medication_not_found"));
+    }
+    if(Medication.user.toString()!==id){
+      return errorResMsg(res, 401, req.t("Unauthorized"));
+    }
+    const schduler =await SchdulerSchema.findOne({medication:MedId})
+
+    // delete all future occurences
+    await Occurance.deleteMany({Medication:MedId,PlannedDateTime:{$gt:new Date()}})
+
+    // update medication deleted flage
+    Medication.isDeleted=true;
+    schduler.isDeleted=true;
+
+    await Medication.save()
+    await schduler.save()
+
+    
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Medication_Cycle_Deleted")});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+exports.SuspendDoses=async (req, res) => {
+
+  /** suspend doses form date to date
+   * ********************************
+   * logic
+   * ********************************
+   * -1 retrive all occurences form date to date
+   * -2 flage it as suspended
+   * 
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    let {
+    SchdulerId,
+    StartDate,
+    EndDate
+    }=req.body
+
+    // check for permison
+    const schduler =await SchdulerSchema.findById(SchdulerId)
+    if(!schduler){
+      return errorResMsg(res, 400, req.t("Schduler_not_found"));
+    }
+    if(schduler.User.toString()!==id){
+      return errorResMsg(res, 401, req.t("Unauthorized"));
+    }
+    
+    //retrive all the occurences between two dates and mark them as suspended
+
+    await Occurance.updateMany({
+      Schduler:SchdulerId,
+      PlannedDateTime:{$gte:StartDate,$lte:EndDate},
+    
+    },{
+      isSuspended:true
+    })
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Dose_suspended")});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+exports.ChangeDoseStatus=async (req, res) => {
+
+  /** change dose status
+   * ********************************
+   * logic
+   * ********************************
+   * -1 get dose by id
+   * -2 change its status to the new one
+   * **********
+   *  0: Status mean it's not yet active (future dose), --defult
+   *  1: Status mean it's in Transit (time is here , not yet 60 mins passed), --server action
+   *  2: status code means it's taken. , --action by user
+   *  3: it's ignored (60 minutes passed no action) --server action
+   *  4: status means its rejected
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    let {
+    OccuranceId,
+    Status
+    }=req.body
+
+    // check for permison
+    const dose =await Occurance.findById(OccuranceId)
+    if(!dose){
+      return errorResMsg(res, 400, req.t("Dose_not_found"));
+    }
+    if(dose.user.toString()!==id){
+      return errorResMsg(res, 401, req.t("Unauthorized"));
+    } 
+    console.log(Status)
+    if(!(Status==2||Status==4)){
+      return errorResMsg(res, 400, req.t("Invalid_status"));
+    }
+
+    // edit quantaty
+    if(Status==2){
+      const Medication=await UserMedcation.findById(dose.Medication)
+      Medication.quantity=Medication.quantity-dose.PlannedDose
+      await Medication.save()
+    }
+    // change dose status
+    
+   dose.Status=Status
+    await dose.save()
+
+    
+
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Dose_Status_Changed")});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+
+exports.getDoses=async (req, res) => {
+
+  /** 
+   * return doses with a spacic date
+   * if no date is provided the defult is today
+   * the returned dosages must not be suspened 
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    let {
+    date
+    }=req.query
+
+    // get occurances which equal today
+    if(!date){
+      date=new Date()
+    }
+    const queryDate =new Date(+date)
+  
+     let nextDay=new Date(+date)
+    nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+    
+    console.log(nextDay,queryDate)
+
+    const doses =await Occurance.find({
+      user:id,
+      PlannedDateTime:{$gte:queryDate,$lt:nextDay},
+      isSuspended:false
+
+    }).select(
+      "PlannedDateTime PlannedDose Status Medication Schduler MedInfo"
+    )
+    
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+

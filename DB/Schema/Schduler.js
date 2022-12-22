@@ -58,7 +58,11 @@ var schduler = new Schema({
     ],
     history:[{
       type:Object
-    }]
+    }],
+    isDeleted:{
+      type:Boolean,
+      default:false
+    }
  
 
  

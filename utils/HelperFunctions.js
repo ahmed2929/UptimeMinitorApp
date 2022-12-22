@@ -121,7 +121,7 @@ const getUserEmailFromId=async(id)=>{
     }
  }
  
- const GenerateOccurances=async (UserID,MedId,SchdulerId,OccrurencePattern,startDate,endDate,OccurancesData)=>{
+ const GenerateOccurances=async (UserID,MedId,MedInfo,SchdulerId,OccrurencePattern,startDate,endDate,OccurancesData)=>{
 
     // write a function that will generate the occurance of the med
     // based on the pattern and the start and end date
@@ -148,7 +148,8 @@ const getUserEmailFromId=async(id)=>{
                 {
                     user:UserID,
                     Medication:MedId,
-                    schduler:SchdulerId,
+                    Schduler:SchdulerId,
+                    MedInfo:{...MedInfo},
                     PlannedDateTime:new Date(baseDate),
                     ...OccurancesData
     
@@ -201,7 +202,8 @@ const getUserEmailFromId=async(id)=>{
                 {
                     user:UserID,
                     Medication:MedId,
-                    schduler:SchdulerId,
+                    Schduler:SchdulerId,
+                    MedInfo:{...MedInfo},
                     PlannedDateTime:new Date(baseDate),
                     ...OccurancesData
     

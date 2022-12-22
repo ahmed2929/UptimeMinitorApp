@@ -15,10 +15,30 @@ router.post(
 );
 
 router.put(
-    "/edit/schduler",
+    "/edit/med",
+    upload.single("img"),
     IsAuth(),
-    userController.EditSchduler
+    userController.EditMed
 );
+
+router.put(
+    "/edit/dose",
+    IsAuth(),
+    userController.EditSingleDose
+);
+
+router.delete(
+    "/delete/midication/cycle",
+    IsAuth(),
+    userController.deletMedictionCycle
+);
+
+router.post(
+    "/suspend/dose",
+    IsAuth(),
+    userController.SuspendDoses
+);
+
 
 router.put(
     "/changeLanguage",
@@ -26,6 +46,18 @@ router.put(
     validation.validate,
     IsAuth(),
     userController.ChangeUserDefultLang
+);
+
+router.put(
+    "/change/dose/status",
+    IsAuth(),
+    userController.ChangeDoseStatus
+);
+
+router.get(
+    "/doses",
+    IsAuth(),
+    userController.getDoses
 );
 
 router.get(

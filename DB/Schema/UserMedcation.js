@@ -45,6 +45,10 @@ var MedictionSchema = new Schema({
   },
   externalInfo:{
     type:Object
+  },
+  isDeleted:{
+    type:Boolean,
+    default:false
   }
 
 

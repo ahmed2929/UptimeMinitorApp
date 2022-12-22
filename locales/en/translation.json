@@ -34,7 +34,15 @@
     "email_is_already_taken_Or_phone":"email is already taken or phone",
     "Med_Recommendation_List_Has_Been_Created":"med list has been updated",
     "med_created":"med has been created",
-    "Schdule_Updated":"Schdule Updated"
+    "Schdule_Updated":"Schdule Updated",
+    "Occurance_Updated":"Occurance_Updated",
+    "Medication_not_found":"Medication_not_found",
+    "Medication_Cycle_Deleted":"Medication_Cycle_Deleted",
+    "Schduler_not_found":"Schduler_not_found",
+    "Dose_suspended":"Dose_suspended",
+    "Dose_not_found" :"Dose_not_found",
+    "Dose_Status_Changed":"Dose_Status_Changed",
+    "Success":"Success"
 
 
     
