@@ -50,6 +50,8 @@ router.put(
 
 router.put(
     "/change/dose/status",
+    validation.ChangeDoseStatus(),
+    validation.validate,
     IsAuth(),
     userController.ChangeDoseStatus
 );

@@ -71,6 +71,25 @@ exports.changeLanguage=()=>{
 }
 
 
+
+exports.ChangeDoseStatus = () => {
+    return [
+        check("OccuranceId").isMongoId().withMessage("invalid_ID"),
+        check("Status")
+        .exists()  // Make sure the field exists
+        .isInt()  // Make sure it's an integer
+        .isIn([2, 4])  // Make sure it's equal to 2 or 4
+        .withMessage("status_is_invalid")
+       
+
+    ]
+}
+
+
+
+
+
+
 exports.validate = (req, res, next) => {
     try {
         const errors = validationResult(req)

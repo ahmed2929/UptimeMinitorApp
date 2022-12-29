@@ -42,7 +42,9 @@
     "Dose_suspended":"Dose_suspended",
     "Dose_not_found" :"Dose_not_found",
     "Dose_Status_Changed":"Dose_Status_Changed",
-    "Success":"Success"
+    "Success":"Success",
+    "invalid_ID":"invalid_ID",
+    "status_is_invalid":"status_is_invalid"
 
 
     
