@@ -171,7 +171,7 @@ const getUserEmailFromId=async(id)=>{
  }
 
 
- const GenerateOccurancesWithDays=async (UserID,MedId,SchdulerId,intervalDays,startDate,endDate,OccurancesData)=>{
+ const GenerateOccurancesWithDays=async (UserID,MedId,MedInfo,SchdulerId,intervalDays,startDate,endDate,OccurancesData)=>{
 
     // write a function that will generate the occurance of the med
     // based on the pattern and the start and end date
@@ -194,8 +194,13 @@ const getUserEmailFromId=async(id)=>{
         endDate = endDayResultWithOneDay;
 
         while (baseDate <= endDate ) {
+            console.log("while runs ",baseDate,endDate )
             const dayName=baseDate.toLocaleDateString('en', { weekday: 'long' })
             const shouldAdded=intervalDays.includes(dayName)
+            console.log(shouldAdded)
+            console.log("dayna,e",dayName)
+            console.log("intervalDays",intervalDays)
+            
             if(shouldAdded){
 
             finalArrObj.push(

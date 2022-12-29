@@ -37,7 +37,7 @@ var schduler = new Schema({
     type:Number,
     default:null
   },
-  DpacifcDays:{
+  SpacifcDays:{
     type:[String],
     default:null
     },

@@ -61,6 +61,14 @@ router.get(
 );
 
 router.get(
+    "/medications",
+    IsAuth(),
+    userController.getMedication
+);
+
+
+
+router.get(
     "/search",
     userController.SerachForMed
 );
@@ -68,3 +76,11 @@ router.get(
 
 
 module.exports = router;
+
+
+
+
+
+
+
+  

@@ -52,7 +52,7 @@ exports.SerachForMed = async (req, res) => {
      
       // autocomplete search ?
 
-      const regex = new RegExp(escapeRegex(req.query.name), 'gi');
+      const regex = new RegExp(escapeRegex(req.query.name), 'i');
       results = await MedRecommendation.find({
         $or:[{PackageName:regex},{GenericName:regex}]
        
@@ -86,8 +86,14 @@ exports.CreateNewMed = async (req, res) => {
       type
     }=req.body
 
-    // store the image
-    const img = await UploadFileToAzureBlob(req.file)
+    console.log("create runs ",req.body)
+
+    let img
+    // store the image to aure
+    if(req.file){
+       img = await UploadFileToAzureBlob(req.file)
+    }
+    
    
 
     // create new med
@@ -112,7 +118,8 @@ exports.CreateNewMed = async (req, res) => {
       unit,
       instructions,
       condition,
-      type
+      type,
+      name,
     }
     // create schduler 
     jsonSchduler=JSON.parse(Schduler)
@@ -170,7 +177,7 @@ exports.CreateNewMed = async (req, res) => {
     if(jsonSchduler.ScheduleType=='2'){ 
       OccrurencePattern=1
     }else if(jsonSchduler.ScheduleType=='3'){ //case days interval
-      OccrurencePattern=jsonSchduler.DaysInterval
+      OccrurencePattern= Number(jsonSchduler.DaysInterval)
     }
     // generate occurences data
 
@@ -223,7 +230,7 @@ exports.CreateNewMed = async (req, res) => {
 
       
 
-      const intervalDays=jsonSchduler.DpacifcDays
+      const intervalDays=jsonSchduler.SpecificDays
       
       const newOccurances=await GenerateOccurancesWithDays(id,newMed._id,MedInfo,newSchduler._id,intervalDays,start,end,OccurancesData)
       occuraces.push(...newOccurances)
@@ -248,9 +255,25 @@ exports.CreateNewMed = async (req, res) => {
     await newSchduler.save()
     await newMed.save()
 
-   
+   const responseData={
+    img,
+    strenth,
+    unit,
+    instructions,
+    condition,
+    type,
+    name,
+    quantity,
+    description,
+    _id:newMed._id,
+    Schduler:{
+      _id:newSchduler._id,
+      ...jsonSchduler
+    }
+
+   }
     // return succesfull response
-    return successResMsg(res, 200, {message:req.t("med_created")});
+    return successResMsg(res, 200, {message:req.t("med_created"),data:responseData});
     
   } catch (err) {
     // return error response
@@ -334,7 +357,8 @@ exports.EditMed=async (req, res) => {
         unit:editedMed.unit,
         instructions:editedMed.instructions,
         condition:editedMed.condition,
-        type:editedMed.type
+        type:editedMed.type,
+        name:editedMed.name,
 
       }
       // if nod edit for schdule will return
@@ -447,7 +471,7 @@ exports.EditMed=async (req, res) => {
  
        
  
-       const intervalDays=jsonSchduler.DpacifcDays
+       const intervalDays=jsonSchduler.SpecificDays
        
        const newOccurances=await GenerateOccurancesWithDays(id,newMed._id,MedInfo,newSchduler._id,intervalDays,start,end,OccurancesData)
        occuraces.push(...newOccurances)
@@ -482,7 +506,7 @@ exports.EditSingleDose=async (req, res) => {
   /** edit singleDose
    * -this api sholud be called when user needs to edit singleDose
    * -the caller must be the med creator or has a permition
-   * -medId and schdule id is required
+   * occuraceId is required
    * - data to be edit
    * ********************************
    * logic
@@ -519,6 +543,7 @@ exports.EditSingleDose=async (req, res) => {
       instructions:MedInfo.instructions||oldOccurance.MedInfo.instructions,
       condition:MedInfo.condition||oldOccurance.MedInfo.condition,
       type:MedInfo.type||oldOccurance.MedInfo.type,
+      name:MedInfo.name||oldOccurance.MedInfo.name,
 
       
     }
@@ -704,7 +729,7 @@ exports.getDoses=async (req, res) => {
   /** 
    * return doses with a spacic date
    * if no date is provided the defult is today
-   * the returned dosages must not be suspened 
+   * returns not suspended dosages
    * 
    */
   try {
@@ -731,7 +756,7 @@ exports.getDoses=async (req, res) => {
       isSuspended:false
 
     }).select(
-      "PlannedDateTime PlannedDose Status Medication Schduler MedInfo"
+      "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id"
     )
     
     // return succesfull response
@@ -744,3 +769,27 @@ exports.getDoses=async (req, res) => {
   }
 };
 
+exports.getMedication=async (req, res) => {
+
+  /** 
+   *return all user mediction 
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    const Medication =await UserMedcation.find({
+      user:id,
+
+    })
+    .populate("Schduler")
+    
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Success"),data:Medication});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
