@@ -133,7 +133,233 @@ exports.SuspendDoseFromDateToDate = () => {
     ]
 }
 
+exports.EditSingleDoseValidation = () => {
+    return [
+     // Validate the occurrenceId field
+     check('occuraceId')
+     .exists()  // Make sure the field exists
+     .isMongoId()
+     .withMessage("invalid_ID"), // Make sure it's a valid Mongoose ID
 
+   // Make the MedInfo field optional
+   check('MedInfo')
+     .optional()  // The field is optional
+     .custom((value) => {
+       // Validate the MedInfo field if it's present
+       if (value) {
+         // Make the properties of the MedInfo object optional
+         check('MedInfo.unit').optional(),
+         check('MedInfo.instructions').optional(),
+         check('MedInfo.condition').optional(),
+         check('MedInfo.type').optional(),
+         check('MedInfo.name').optional(),
+
+         check('MedInfo.strenth')
+           .optional()
+           .isInt()
+           .custom((strenth) => {
+            console.log(strenth)
+             if(strenth){
+                 if (strenth < 1) {
+                     throw new Error('strenth must be greater than 0');
+                   }
+             }
+             
+             return true;
+           })
+           
+         // Validate the quantity field if it's present
+         check('MedInfo.quantity')
+           .optional()
+           .isInt()
+           .custom((quantity) => {
+             if (quantity < 1) {
+               throw new Error('Quantity must be greater than 0');
+             }
+             return true;
+           })
+       }
+       return true;
+     }).withMessage("validation_faild_in_MedInfo"),
+
+   // Make the PlannedDateTime field optional
+   check('PlannedDateTime')
+     .optional()  // The field is optional
+     .isNumeric()  // Make sure it's a numeric value
+     .isInt()
+     .withMessage("invalid_date"),  // Make sure it's valid date
+// Make the PlannedDose field optional
+check('PlannedDose')
+  .optional()  // The field is optional
+  .isInt()
+  .custom((PlannedDose) => {
+    console.log(PlannedDose)
+    if(PlannedDose<1){
+        if (PlannedDose <1) {
+            throw new Error('PlannedDose must be greater than 0');
+          }
+    }
+   
+    return true;
+  }).withMessage("invalid_dose")
+
+
+    ]
+}
+
+exports.CreateNewMed = () => {
+    return [
+        // Validate the name field
+ check('name')
+ .optional()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the type field
+check('type')
+ .exists()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the strenth field
+check('strenth')
+ .exists()  // Make sure the field exists
+ .isInt()  // Make sure it's an integer
+ .custom((strenth) => {
+   if (strenth < 1) {
+     throw new Error('strenth must be greater than 1 or equals');
+   }
+   return true;
+ }),
+
+// Validate the unit field
+check('unit')
+ .exists()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the quantity field
+check('quantity')
+ .exists()  // Make sure the field exists
+ .isInt()  // Make sure it's an integer
+ .custom((quantity) => {
+   if (quantity < 1) {
+     throw new Error('quantity must be greater than or equals 1');
+   }
+   return true;
+ }),
+
+// Validate the instructions field
+check('instructions')
+ .exists()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the condition field
+check('condition')
+ .exists()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the Schduler field
+
+check('Schduler')
+    .exists()
+    .withMessage("Schduler missed")  // Make sure the field exists
+    // .custom((Schduler) => {
+    //     //console.log(Schduler)
+    //   // Validate the StartDate field
+    //   check('Schduler.StartDate')
+    //     .exists()  // Make sure the field exists
+    //     .isInt()  // Make sure it's an integer
+    //     .custom((StartDate) => {
+    //       if (StartDate <= 0) {
+    //         throw new Error('StartDate must be a positive integer');
+    //       }
+    //       return true;
+    //     })
+
+    //   // Validate the EndDate field
+    //   check('Schduler.EndDate')
+    //     .exists()  // Make sure the field exists
+    //     .isInt()  // Make sure it's an integer
+    //     .custom((EndDate) => {
+    //       if (EndDate <= 0) {
+    //         throw new Error('EndDate must be a positive integer');
+    //       }
+    //       return true;
+    //     }),
+
+   
+
+    //   // Validate the ScheduleType field
+    //   check('Schduler.ScheduleType')
+    //     .exists()  // Make sure the field exists
+    //     .isString()  // Make sure it's a string
+    //     .custom((ScheduleType) => {
+    //         console.log(ScheduleType)
+    //       if (ScheduleType !== "0" && ScheduleType !== "1"&& ScheduleType !== "2"&& ScheduleType !== "3") {
+    //         throw new Error('Invalid ScheduleType');
+    //       }
+    //       return true;
+    //     }),
+
+    //   // Validate the DaysInterval field if the ScheduleType is "1"
+    //   check('Schduler.DaysInterval')
+    //     .optional()  // The field is optional
+    //     .isInt()  // Make sure it's an integer
+    //     .custom((DaysInterval, { req }) => {
+    //       if (req.body.Schduler.ScheduleType === "1" && (!DaysInterval || DaysInterval < 2)) {
+    //         throw new Error('DaysInterval must be a positive integer');
+    //       }
+    //       return true;
+    //     }),
+
+    //   // Validate the SpecificDays field if the ScheduleType is "0"
+    //   check('Schduler.SpecificDays')
+    //   .optional()  // The field is optional
+    //   .isArray()  // Make sure it's an array
+    //   .custom((SpecificDays, { req }) => {
+    //     if (req.body.Schduler.ScheduleType === "0" && (!SpecificDays || SpecificDays.length === 0)) {
+    //       throw new Error('SpecificDays must not be empty');
+    //     }
+    //     return true;
+    //   }),
+    //   check('Schduler.dosage')
+    //   .exists()  // Make sure the field exists
+    //   .isArray()  // Make sure it's an array
+    //   .custom((dosage) => {
+    //     if(dosage.length>0){
+    //          // Validate each element of the dosage array
+    //     for (let i = 0; i < dosage.length; i++) {
+    //         // Validate the DateTime field
+    //         check(`Schduler.dosage[${i}].DateTime`)
+    //           .exists()  // Make sure the field exists
+    //           .isInt()  // Make sure it's an integer
+    //           .custom((DateTime) => {
+    //             if (DateTime < 1) {
+    //               throw new Error('DateTime must be a positive integer');
+    //             }
+    //             return true;
+    //           })
+    //       }
+    //     }
+       
+
+    //     return true;
+    //   })
+
+      
+      
+    
+    // })
+
+    ]
+}
+
+
+
+ 
 
 
 

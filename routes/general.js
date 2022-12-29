@@ -10,6 +10,8 @@ const upload =require("../config/multerConfig")
 router.post(
     "/create/new/med",
     upload.single("img"),
+    validation.CreateNewMed(),
+    validation.validate,
     IsAuth(),
     userController.CreateNewMed
 );
@@ -23,6 +25,8 @@ router.put(
 
 router.put(
     "/edit/dose",
+    validation.EditSingleDoseValidation(),
+    validation.validate,
     IsAuth(),
     userController.EditSingleDose
 );

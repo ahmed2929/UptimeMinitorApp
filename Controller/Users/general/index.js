@@ -124,6 +124,73 @@ exports.CreateNewMed = async (req, res) => {
     // create schduler 
     jsonSchduler=JSON.parse(Schduler)
 
+    // validate schdule data
+    if(!jsonSchduler.StartDate){
+      return errorResMsg(res, 400, req.t("start_date_required"));
+    }
+    // check if StartDate in the past 
+    const DateTime = new Date()
+    if((+jsonSchduler.StartDate)<DateTime.getTime()){
+      return errorResMsg(res, 400, req.t("start_date_in_the_past"));
+    }
+    if(jsonSchduler.ScheduleType!="1"&&jsonSchduler.ScheduleType!="2"&&
+      jsonSchduler.ScheduleType!="3"&&jsonSchduler.ScheduleType!="0"){
+        return errorResMsg(res, 400, req.t("invalid_schedule_type"));
+      }
+
+    if(jsonSchduler.EndDate){
+      if((+jsonSchduler.EndDate)<DateTime.getTime()){
+        return errorResMsg(res, 400, req.t("end_date_in_the_past"));
+      }
+
+      if((+jsonSchduler.EndDate)<(+jsonSchduler.StartDate)){
+        return errorResMsg(res, 400, req.t("end_date_before_start_date"));
+      }
+
+
+    }
+// validate dose if its not as needed
+    if(jsonSchduler.ScheduleType!="1"){
+      if(!jsonSchduler.dosage){
+        return errorResMsg(res, 400, req.t("no_dosage_provided"));
+      }
+      if(jsonSchduler.dosage.length===0){
+        return errorResMsg(res, 400, req.t("no_dosage_provided"));
+      }
+      jsonSchduler.dosage.forEach(dose => {
+
+        if(dose.dose<1){
+          return errorResMsg(res, 400, req.t("invalid_dose"));
+        }
+        if(+(dose.DateTime)<DateTime.getTime()){
+          return errorResMsg(res, 400, req.t("dose_date_in_the_past"));
+        }
+
+      });
+
+    }
+    // validate specific days if its not as needed
+    if(jsonSchduler.ScheduleType=="0"){
+      if(!jsonSchduler.SpecificDays){
+        return errorResMsg(res, 400, req.t("no_specific_days_provided"));
+      }
+      if(jsonSchduler.SpecificDays.length===0){
+        return errorResMsg(res, 400, req.t("no_specific_days_provided"));
+      }
+
+    }
+    // validate occurence pattern if its not as needed
+    if(jsonSchduler.ScheduleType=="3"){
+      if(!jsonSchduler.DaysInterval){
+        return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
+      }
+      if(jsonSchduler.DaysInterval<2){
+        return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
+      }
+
+    }
+
+
     if(!jsonSchduler.EndDate){
       var result = new Date(jsonSchduler.StartDate);
       result.setMonth(result.getMonth() + 3);
@@ -323,6 +390,9 @@ exports.EditMed=async (req, res) => {
        // store the image
     img = await UploadFileToAzureBlob(req.file)
       }
+      if(!MedId){
+        return errorResMsg(res, 400, req.t("Medication_id_required"));
+      }
       const oldMed=await UserMedcation.findById(MedId);
       if(!oldMed){
         return errorResMsg(res, 404, req.t("Medication_not_found"));
@@ -383,6 +453,83 @@ exports.EditMed=async (req, res) => {
     }
     console.log("schduler ",Schduler)
     const jsonSchduler=JSON.parse(Schduler)
+
+
+
+    // validate schdule data
+    // check if StartDate in the past 
+    const DateTime = new Date()
+    if((+jsonSchduler.StartDate)<DateTime.getTime()){
+      return errorResMsg(res, 400, req.t("start_date_in_the_past"));
+    }
+
+    // validate schdule if exist
+
+    if(jsonSchduler.ScheduleType){
+      if(jsonSchduler.ScheduleType!="1"&&jsonSchduler.ScheduleType!="2"&&
+      jsonSchduler.ScheduleType!="3"&&jsonSchduler.ScheduleType!="0"){
+        return errorResMsg(res, 400, req.t("invalid_schedule_type"));
+      }
+    }
+
+  
+
+    if(jsonSchduler.EndDate){
+      if((+jsonSchduler.EndDate)<DateTime.getTime()){
+        return errorResMsg(res, 400, req.t("end_date_in_the_past"));
+      }
+
+      if((+jsonSchduler.EndDate)<(+OldSchduler.StartDate)){
+        return errorResMsg(res, 400, req.t("end_date_before_start_date"));
+      }
+
+
+    }
+// validate dose if its not as needed
+    if(jsonSchduler.ScheduleType){
+      if(jsonSchduler.ScheduleType!="1"){
+        if(!jsonSchduler.dosage){
+          return errorResMsg(res, 400, req.t("no_dosage_provided"));
+        }
+        if(jsonSchduler.dosage.length===0){
+          return errorResMsg(res, 400, req.t("no_dosage_provided"));
+        }
+        jsonSchduler.dosage.forEach(dose => {
+  
+          if(dose.dose<1){
+            return errorResMsg(res, 400, req.t("invalid_dose"));
+          }
+          if(+(dose.DateTime)<DateTime.getTime()){
+            return errorResMsg(res, 400, req.t("dose_date_in_the_past"));
+          }
+  
+        });
+  
+      }
+
+
+    // validate specific days if its not as needed
+    if(jsonSchduler.ScheduleType=="0"){
+      if(!jsonSchduler.SpecificDays){
+        return errorResMsg(res, 400, req.t("no_specific_days_provided"));
+      }
+      if(jsonSchduler.SpecificDays.length===0){
+        return errorResMsg(res, 400, req.t("no_specific_days_provided"));
+      }
+
+    }
+    // validate occurence pattern if its not as needed
+    if(jsonSchduler.ScheduleType=="3"){
+      if(!jsonSchduler.DaysInterval){
+        return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
+      }
+      if(jsonSchduler.DaysInterval<2){
+        return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
+      }
+
+    }
+    }
+   
 
 
     // saved old schduler into history array and update the new one
