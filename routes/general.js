@@ -35,6 +35,8 @@ router.delete(
 
 router.post(
     "/suspend/dose",
+    validation.SuspendDoseFromDateToDate(),
+    validation.validate,
     IsAuth(),
     userController.SuspendDoses
 );

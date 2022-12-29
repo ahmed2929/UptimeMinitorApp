@@ -85,6 +85,53 @@ exports.ChangeDoseStatus = () => {
     ]
 }
 
+exports.SuspendDoseFromDateToDate = () => {
+    return [
+        check("SchdulerId").isMongoId().withMessage("invalid_ID"),
+        check("StartDate")
+        .exists()  // Make sure the field exists
+        .isNumeric()  // Make sure it's a numeric value
+        .isInt()  // Make sure it's an integer
+        .custom((value) => {
+          // Check if the value is in the future
+          const now = Date.now();
+          const StartDateValue=new Date(+value).getTime()
+          if (StartDateValue <= now) {
+            console.log("invalid_start_date")
+
+            return false
+          }
+          return true;
+        })
+        .withMessage("invalid_start_date"),
+        check("EndDate")
+        .exists()  // Make sure the field exists
+        .isNumeric()  // Make sure it's a numeric value
+        .isInt()  // Make sure it's an integer
+        .custom((value, { req }) => {
+            // Check if the value is in the future
+            const now = Date.now();
+            const EndDateValue=new Date(+value).getTime()
+            if (EndDateValue <= now) {
+                throw new Error('End date must be in the future');
+               
+            }
+
+            const startDate = req.body.StartDate;
+            console.log(startDate,value)
+                if (+value <= +startDate) {
+                    
+                    throw new Error('End date must be greater than start date');
+                }
+                return true;
+
+            
+        })
+        .withMessage("invalid_end_date")
+       
+
+    ]
+}
 
 
 
