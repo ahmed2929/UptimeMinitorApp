@@ -1,0 +1,165 @@
+CareCircle
+
+As a registered user
+
+I want to add a new person (registered or non-registered user) to my profile connected profile.
+
+There is currently only one application role.
+
+Patient Basic level
+
+Caregiver/Physician Relationships
+
+To provide flexibility for users of this application with special needs, there mu be a mechanism for other users ("Caregivers") to access the records of "Patients". The role of "Caregiver" exists only conceptually, In that a normal us ("Patient") becomes a "Caregiver" when a relationship is defined between the and another patient.
+
+Option 1: Simple Relationships (Also Known As: "Caregiver Access")
+
+With this method, every user Is a Patient. Each Patient has read/write access to his own records.
+
+Each "Patient" can grant read or read/write access to other users in what is known as a "Caregiver Relationship" or "Caregiver Access". This does not limit the access of the original Patient.
+
+Option 2: Advanced Relationships
+
+A relationship exists between a parent user, and a child user. The child user
+
+relates to a parent user in one of four ways: 1. Child user is a Patient. Caregiver is granting read-only access to the
+
+patient's own medications/schedules but is managing them on behalf of
+
+the patient.
+
+2. Child user is a Patients. Caregiver is granting read/write access to the patient's own medications/schedules, allowing the patient to manage them in addition to the caregiver.
+CareCircle
+
+3. Child user is a Caregiver. Patient is granting Read-Only access to a caregiver.
+
+4. Child user is a Caregiver+. Patient is granting read/write access to a caregiver, usually to assist in managing medications/schedules.
+
+Example Relationships
+
+These are examples of how patients and caregivers can use the system. Each situation is dependent on the patients' and caregivers' abilities and responsibilities.
+
+1. Scenario 1- Single Patient
+
+This scenario is the simplest, a patient signs up with the system to assist with administering his or her own medicine.
+
+2. Scenario 2. Responsible Caregiver, Multiple Hands-off Patients
+
+This scenario includes a responsible caregiver (in-home nurse, concerned family member, etc.) oversees the administering of the medicine. The caregiver signs up with the system, and will create accounts for each patient, creating "Patient" relationships for each person. Each patient has access to the system to view Information but cannot make changes to schedules. The caregiver is given the responsibility of ensuring the schedule of the drugs is correct.
+
+3. Scenario 3-Responsible Patient, Responsible Caregiver
+
+In this scenario, the patient takes responsibility for the inputting of the drugs and scheduling. In addition, a second user (typically a spouse or relative) has access to the system to assist the patient. In this case, the "Patient" signs up with the system, and creates an account for the caregiver, as well as a relationship with the caregiver as "Caregiver" or "Caregiver+" depending on if they caregiver should have write access as well.
+
+My Dependents falls under 3 categories:
+
+1 My Close Dependent (I will be their Data Owner): Patient who is under medication and I am responsible for their medication and their healthcare profile. Example: Young kids, disabled patient/elderly who are unable to do it for themselves. I can create, change, view. Share and export (with ather Date Maintainer/Viewer) and delete their profile.
+CareCircle
+
+2. My Distant Dependent (I will be their Data Owner): Patient who is under medication and I am responsible for setting up their medication, but I am not living with them. Remote management is required to track their adherence. Example: parent who lives In another house. 3. My Inviting Dependent (Data Maintainer): Patient who is under
+
+medication and invited me to track their medication (partially/fully). My
+
+role is to view and update their medication and receive notification and
+
+reports So that I will be able to track his/her medication doses and:
+
+Add/edit medication regimens.
+
+- Mark their doses as taken / missed/snooze.
+
+- View their adherence report.
+
+- Receive notification when they miss doses.
+
+- Receive updates when they take a medication.
+
+Receive notification when they are short/run out of medicine
+
+4- My Inviting Dependent (Data Viewer): Patient who is under medication and invited me to view and track their medication (partially/fully). My role is to view their medication and receive notifications, reports, and updates
+
+So that I will be able to track his/her medication doses and:
+
+- View their adherence report
+
+- Receive notification when they miss doses
+
+- Receive updates when they take a medication
+
+Receive notification when they are short/run out of medicine
+
+Acceptanc e Criteria
+
+easy to use accessibility features for visually impaired and old users (different design)
+
+Quick intuitive process
+
+From Home Screen with My Profile icon.
+
+I press my profile icon and I click on "Add Medi Friend
+
+Then I select either:
+
+-Dependent
+
+-Caregiver
+
+Then I can select one of 2 Scenarios:
+
+Registered User
+
+Unregistered User
+
+Scenario 1: Adding a Registered User as Dependent: (ex: Parent/Spouse) User selects "Registered User"
+CareCircle
+
+Enter user's registered email address and/or mobile phone number The Dependent will receive a notification to accept the user as Caregiver
+
+The dependent will select that the user is either a Viewer or Maintainer.
+
+The dependent will generate a code (6 digits numeric code) that he will
+
+need to share with the caregiver to enter it to be able to become a caregiver.
+
+The User will enter the code and press "Verify" to be able to view Dependent's profile. The user will be able to add a nickname to the dependent.
+
+The dependent then will see the caregiver in his/her Caregiver list and click on it to add medication to be shared with Caregiver If dependent selected user as "Viewer", User now will see and view only the dependent's profile with shared medication and will receive notification and alarms about:
+
+o Missed Medication (after 30 mins of its time) Low stock of a medication.
+
+o Dashboard with summary and history of medication adherence.
+
+If Dependent selected User as "Maintainer" the user will be able to view
+
+and update:
+
+o Missed Medication (after 30 mins of its time) o Low stock of a medication.
+
+o Dashboard with summary and history of medication adherence. o Edit Medication stock
+
+o Edit Medication schedule Edit Medication Dose Notification (mark as taken / ignored/
+
+Snooze)
+
+Scenario 2: Adding Non-Registered User (e.x: Child/Parent who's in need to be
+
+taken care of):
+
+In this Scenario, User is the "Data Owner" of the Dependent's profile.
+
+User to select "not-registered"
+
+"Create Profile User Story to start.
+
+User to enter Dependent's Information (First & Last name
+
+ame/Gender/Age.
+
+/Blood Type/email/phone/ photo) User now can see Dependent's profile User now can start adding medication and schedules to dependent's
+
+profile.
+
+User now can Share Dependent's profile to: Caregiver as Maintainer/Viewer (will become secondary
+
+caregives along with User) o Nonregistered Application user to become the User of the profile (Maintainer) (Example: created the profile for a patient and then sent a sharing link/code to the patient's device to login and see
+their profile/medication). User in this case can add medication/ respond to medication's alert, update medication stock/view dashboard and reports/Share profile with others as Caregivers)

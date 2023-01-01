@@ -49,6 +49,10 @@ var OccurancesSchema = new Schema({
   isSuspended:{
     type:Boolean,
     default:false
+  },
+  ProfileID:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Profile'
   }
 
  

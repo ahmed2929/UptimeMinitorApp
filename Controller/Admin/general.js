@@ -11,11 +11,12 @@ const {
 // add medRecommendation
 exports.AddMedRecommendation = async (req, res) => {
   try {
-    
-    const file = xlsx.readFile(req.file.path,{
-        cellDates:true
-    });
-    
+            // Convert the buffer to a typed array
+        const buffer = Buffer.from(req.file.buffer);
+        const typedArray = new Uint8Array(buffer);
+
+        const file = xlsx.read(typedArray, { type: 'array', cellDates: true });
+
 
     const ws = file.Sheets["Drugs"]
   

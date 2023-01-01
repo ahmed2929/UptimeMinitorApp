@@ -1,4 +1,6 @@
 const User = require("../../../DB/Schema/User");
+const Profile = require("../../../DB/Schema/Profile");
+const Permission = require("../../../DB/Schema/Permissions");
 const messages = require("../../../Messages/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
 const {
@@ -44,6 +46,22 @@ exports.signUp = async (req, res) => {
     }
 
     const newUser = await User.create(UserInfo);
+    const newProfile =await Profile.create({
+      Owner:{
+        User:newUser._id
+      }
+      
+
+    })
+    newUser.profile=newProfile._id
+
+    const newPermission =await Permission.create({
+      User:newUser._id,
+      Profile:newProfile._id
+   
+    })
+
+    await newUser.save()
     // create user token
     const token = GenerateToken(newUser._id);
     const refreshToken = GenerateRefreshToken(newUser._id);
@@ -58,7 +76,8 @@ exports.signUp = async (req, res) => {
         lastName:req.body.lastName,
         email:req.body.email,
         lang:req.body.lang||"en",
-        verified:newUser.verified||false
+        verified:newUser.verified||false,
+        profile:newProfile._id
         
       }
    
@@ -122,7 +141,8 @@ exports.logIn = async (req, res) => {
         lastName:user.lastName,
         email:user.email,
         lang:user.lang,
-        verified:user.verified
+        verified:user.verified,
+        profile:user.profile
         
       }
     };

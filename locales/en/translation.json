@@ -55,7 +55,8 @@
     "end_date_before_start_date":"end_date_before_start_date",
     "no_dosage_provided":"no_dosage_provided",
     "no_specific_days_provided":"no_specific_days_provided",
-    "invalid_occurence_pattern":"invalid_occurence_pattern"
+    "invalid_occurence_pattern":"invalid_occurence_pattern",
+    "symtom_created":"symtom_created"
     
 
 

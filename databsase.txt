@@ -1,0 +1,22 @@
+Collection: users
+
+_id (ObjectId): Unique identifier for the user
+name (string): Full name of the user
+email (string): Email address of the user
+password (string): Hashed password of the user
+role (string): Role of the user (either "patient" or "caregiver")
+
+Collection: relationships
+
+_id (ObjectId): Unique identifier for the relationship
+parent (ObjectId): ObjectId of the parent user in the relationship
+child (ObjectId): ObjectId of the child user in the relationship
+type (string): Type of the relationship (either "patient", "caregiver", "caregiver+", "data_owner", or "data_maintainer")
+
+Collection: profiles
+_id (ObjectId): Unique identifier for the profile
+user (ObjectId): ObjectId of the user associated with the profile
+medication (array): Array of medications for the user
+schedules (array): Array of schedules for the user's medications
+reports (array): Array of reports for the user's medication adherence
+

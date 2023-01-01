@@ -1,20 +1,17 @@
 const User = require("../../../DB/Schema/User");
 const MedRecommendation = require("../../../DB/Schema/MedRecommendation");
 const SchdulerSchema = require("../../../DB/Schema/Schduler");
-const Report = require("../../../DB/Schema/Report");
 const UserMedcation = require("../../../DB/Schema/UserMedcation");
 const {UploadFileToAzureBlob,GenerateOccurances,GenerateOccurancesWithDays} =require("../../../utils/HelperFunctions")
-const DateTime =require("luxon")
-const fs = require('fs');
 const Occurance = require("../../../DB/Schema/Occurances");
 const mongoose = require("mongoose");
 const {
   successResMsg,
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
-const { json } = require("body-parser");
-const console = require("console");
-
+const Symptom = require("../../../DB/Schema/Symptoms");
+const Profile = require("../../../DB/Schema/Profile")
+const Permissions = require("../../../DB/Schema/Permissions")
 
 
 
@@ -83,11 +80,47 @@ exports.CreateNewMed = async (req, res) => {
       condition,
       externalInfo,
       Schduler,
-      type
+      type,
+      ProfileID,
     }=req.body
 
-    console.log("create runs ",req.body)
-
+     /*
+    
+    check permission will only allow if the id is the Owner id 
+    and has a write permission Or
+     in Viewers array and has write permission ?
+    
+    */
+     const profile =await Profile.findById(ProfileID)
+     if(!profile){
+       return errorResMsg(res, 400, req.t("Profile_not_found"));
+     }
+ 
+     const permissions=await Permissions.findOne({
+       Profile:ProfileID,
+     })
+     if(!permissions){
+       return errorResMsg(res, 400, req.t("Permisson_not_found"));
+      }
+ 
+     // check if the user is the owner and has write permission or has a write permission
+ 
+     if(profile.Owner.User.toString()!==id){
+       // check if the user is in viewers array and CanWriteMeds is true
+       const hasWritePermissonToSymtoms=profile.Viewers.find((viewer)=>{
+         return viewer.User.toString()===id&&viewer.CanWriteMeds
+       })
+ 
+       if(!hasWritePermissonToSymtoms){
+         return errorResMsg(res, 401, req.t("Unauthorized"));
+       }
+       
+     }
+     if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+       return errorResMsg(res, 401, req.t("Unauthorized"));
+     }
+ 
+   
     let img
     // store the image to aure
     if(req.file){
@@ -108,7 +141,8 @@ exports.CreateNewMed = async (req, res) => {
       instructions,
       condition,
       externalInfo:JSON.parse(externalInfo),
-      type
+      type,
+      ProfileID
 
     })
     // generate medIfo snapshot
@@ -120,6 +154,7 @@ exports.CreateNewMed = async (req, res) => {
       condition,
       type,
       name,
+      ProfileID
     }
     // create schduler 
     jsonSchduler=JSON.parse(Schduler)
@@ -203,6 +238,8 @@ exports.CreateNewMed = async (req, res) => {
       medication:newMed._id,
       User:id,
       ...jsonSchduler
+      ,
+      ProfileID
 
     })
 
@@ -252,7 +289,8 @@ exports.CreateNewMed = async (req, res) => {
     for(const doseElement of jsonSchduler.dosage){
 
       const OccurancesData={
-        PlannedDose:doseElement.dose
+        PlannedDose:doseElement.dose,
+        ProfileID
       }
       const start=new Date(doseElement.DateTime)
       
@@ -288,7 +326,8 @@ exports.CreateNewMed = async (req, res) => {
     for(const doseElement of jsonSchduler.dosage){
 
       const OccurancesData={
-        PlannedDose:doseElement.dose
+        PlannedDose:doseElement.dose,
+        ProfileID
       }
       const start=new Date(doseElement.DateTime)
       
@@ -322,6 +361,35 @@ exports.CreateNewMed = async (req, res) => {
     await newSchduler.save()
     await newMed.save()
 
+      // who has the right to view that symtom
+    // symtom creator
+    // profile owner
+    // profile viewers
+    permissions.Medcations.push({
+      Med:newMed._id,
+      User:id,
+    })
+    // profile owner
+    permissions.Symptoms.push({
+      Med:newMed._id,
+      User:profile.Owner.User._id,
+    })
+    // profile viewers
+    profile.Viewers.forEach((viewer)=>{
+      permissions.Symptoms.push({
+        Symptom:newMed._id,
+        User:viewer.User._id,
+        Permissions:{
+          write:viewer.CanWriteMeds
+        }
+      })
+    })
+  
+    await permissions.save()
+
+
+
+
    const responseData={
     img,
     strenth,
@@ -336,7 +404,8 @@ exports.CreateNewMed = async (req, res) => {
     Schduler:{
       _id:newSchduler._id,
       ...jsonSchduler
-    }
+    },
+    ProfileID
 
    }
     // return succesfull response
@@ -573,7 +642,8 @@ exports.EditMed=async (req, res) => {
      for(const doseElement of jsonSchduler.dosage){
  
        const OccurancesData={
-         PlannedDose:doseElement.dose
+         PlannedDose:doseElement.dose,
+         ProfileID
        }
        const start=new Date(doseElement.DateTime)
        
@@ -609,7 +679,8 @@ exports.EditMed=async (req, res) => {
      for(const doseElement of jsonSchduler.dosage){
  
        const OccurancesData={
-         PlannedDose:doseElement.dose
+         PlannedDose:doseElement.dose,
+          ProfileID
        }
        const start=new Date(doseElement.DateTime)
        
@@ -933,6 +1004,126 @@ exports.getMedication=async (req, res) => {
     
     // return succesfull response
     return successResMsg(res, 200, {message:req.t("Success"),data:Medication});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+
+exports.CreateSymtom = async (req, res) => {
+ 
+  try {
+
+    const {id} =req.id
+    const {
+      ProfileID,
+      Type,
+      Description,
+      Severity,
+      StartedIn,
+    }=req.body
+    /*
+    
+    check permission will only allow if the id is the Owner id 
+    and has a write permission Or
+     in Viewers array and has write permission ?
+    
+    */
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    const permissions=await Permissions.findOne({
+      Profile:ProfileID,
+    })
+    if(!permissions){
+      return errorResMsg(res, 400, req.t("Permisson_not_found"));
+     }
+
+    // check if the user is the owner and has write permission or has a write permission
+
+    if(profile.Owner.User.toString()!==id){
+      // check if the user is in viewers array and CanWriteSymptoms is true
+      const hasWritePermissonToSymtoms=profile.Viewers.find((viewer)=>{
+        return viewer.User.toString()===id&&viewer.CanWriteSymptoms
+      })
+
+      if(!hasWritePermissonToSymtoms){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+      
+    }
+    if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      return errorResMsg(res, 401, req.t("Unauthorized"));
+    }
+
+
+
+    let img
+    // store the image to aure
+    if(req.files.img[0]){
+       img = await UploadFileToAzureBlob(req.files.img[0])
+    }
+    // store voice record to auzre
+    let voice
+    if(req.files.voice[0]){
+      voice = await UploadFileToAzureBlob(req.files.voice[0])
+    }
+   
+
+    // create new Symtom
+    const newSymton = new Symptom({
+      img,
+      Profile:ProfileID,
+      User:id,
+      Type,
+      Description,
+      Severity,
+      StartedIn,
+      VoiceRecord:voice
+
+    })
+    await newSymton.save()
+    // who has the right to view that symtom
+    // symtom creator
+    // profile owner
+    // profile viewers
+    permissions.Symptoms.push({
+      Symptom:newSymton._id,
+      User:id,
+    })
+    // profile owner
+    permissions.Symptoms.push({
+      Symptom:newSymton._id,
+      User:profile.Owner.User._id,
+    })
+    // profile viewers
+    profile.Viewers.forEach((viewer)=>{
+      permissions.Symptoms.push({
+        Symptom:newSymton._id,
+        User:viewer.User._id,
+        Permissions:{
+          write:viewer.CanWriteSymptoms
+        }
+      })
+    })
+  
+    await permissions.save()
+    const responseData={
+      img:newSymton.img,
+      voice,
+      Severity,
+      Type,
+      Description,
+      StartedIn,
+      
+    }
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("symtom_created"),data:responseData});
     
   } catch (err) {
     // return error response

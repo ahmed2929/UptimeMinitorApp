@@ -62,6 +62,10 @@ var schduler = new Schema({
     isDeleted:{
       type:Boolean,
       default:false
+    },
+    ProfileID:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'Profile'
     }
  
 

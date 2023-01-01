@@ -58,6 +58,10 @@ var userSchema = new Schema({
   lang:{
     type:String,
     default:"en"
+  },
+  profile:{
+    type:Schema.Types.ObjectId,
+    ref:"Profile"
   }
 
  

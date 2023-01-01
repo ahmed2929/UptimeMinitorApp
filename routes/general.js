@@ -81,6 +81,13 @@ router.get(
     userController.SerachForMed
 );
 
+router.post(
+    "/create/new/symtom",
+    upload.fields([{name:"img",maxCount:1},{name:"voice",maxCount:1}]),
+    IsAuth(),
+    userController.CreateSymtom
+);
+
 
 
 module.exports = router;
