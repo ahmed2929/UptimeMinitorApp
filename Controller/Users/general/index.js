@@ -107,11 +107,11 @@ exports.CreateNewMed = async (req, res) => {
  
      if(profile.Owner.User.toString()!==id){
        // check if the user is in viewers array and CanWriteMeds is true
-       const hasWritePermissonToSymtoms=profile.Viewers.find((viewer)=>{
+       const hasWritePermissonToMeds=profile.Viewers.find((viewer)=>{
          return viewer.User.toString()===id&&viewer.CanWriteMeds
        })
  
-       if(!hasWritePermissonToSymtoms){
+       if(!hasWritePermissonToMeds){
          return errorResMsg(res, 401, req.t("Unauthorized"));
        }
        
@@ -365,25 +365,28 @@ exports.CreateNewMed = async (req, res) => {
     // symtom creator
     // profile owner
     // profile viewers
-    permissions.Medcations.push({
-      Med:newMed._id,
-      User:id,
-    })
-    // profile owner
-    permissions.Symptoms.push({
-      Med:newMed._id,
-      User:profile.Owner.User._id,
-    })
-    // profile viewers
+    // permissions.Medcations.push({
+    //   Med:newMed._id,
+    //   User:id,
+    // })
+    // // profile owner
+    // permissions.Medcations.push({
+    //   Med:newMed._id,
+    //   User:profile.Owner.User._id,
+    // })
+ 
     profile.Viewers.forEach((viewer)=>{
-      permissions.Symptoms.push({
-        Symptom:newMed._id,
+      permissions.Medcations.push({
+        Med:newMed._id,
         User:viewer.User._id,
         Permissions:{
-          write:viewer.CanWriteMeds
+          write:viewer.CanWriteSymptoms
         }
       })
     })
+  
+
+
   
     await permissions.save()
 
@@ -1092,15 +1095,15 @@ exports.CreateSymtom = async (req, res) => {
     // symtom creator
     // profile owner
     // profile viewers
-    permissions.Symptoms.push({
-      Symptom:newSymton._id,
-      User:id,
-    })
-    // profile owner
-    permissions.Symptoms.push({
-      Symptom:newSymton._id,
-      User:profile.Owner.User._id,
-    })
+    // permissions.Symptoms.push({
+    //   Symptom:newSymton._id,
+    //   User:id,
+    // })
+    // // profile owner
+    // permissions.Symptoms.push({
+    //   Symptom:newSymton._id,
+    //   User:profile.Owner.User._id,
+    // })
     // profile viewers
     profile.Viewers.forEach((viewer)=>{
       permissions.Symptoms.push({

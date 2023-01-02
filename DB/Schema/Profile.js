@@ -9,7 +9,7 @@ var ProfileSchema = new Schema({
     required:true,
 
   },
-  Owner:{
+  Owner:{ // the profile master
     User:{
         type:Schema.Types.ObjectId,
         ref:"User",
@@ -25,14 +25,18 @@ var ProfileSchema = new Schema({
         }
     }
   },
-    Dependents:{
-        type:[{
-            Profiles:{
+    Dependents:[{
+    
+            Profile:{
                 type:Schema.Types.ObjectId,
                 ref:"Profile",
+            },
+            AccountType:{ //type 0 normal user , type 1 dependent with no phone
+                type:Number,
+                required:true
             }
-        }]
-    },
+     
+}],
     Viewers:[{
         User:{
             type:Schema.Types.ObjectId,
@@ -50,7 +54,44 @@ var ProfileSchema = new Schema({
             type:Boolean,
             default:true
         }
-    }]
+    }],
+    sentInvitations:[{
+        Profile:{
+            type:Schema.Types.ObjectId,
+            ref:"Profile",
+        },
+        AccountType:{
+             //type 0 normal user , type 1 dependent with no phone, 2 caregiver
+            type:Number,
+            required:true
+            },
+            Status:{
+                // 0 pending , 1 accepted , 2 rejected
+                type:Number,
+                default:0
+            }
+
+    }],
+    receivedInvitations:[{
+        Profile:{
+            type:Schema.Types.ObjectId,
+            ref:"Profile",
+        },
+        AccountType:{
+                //type 0 normal user , type 1 dependent with no phone, 2 caregiver
+            type:Number,
+            required:true
+        },
+        Status:{
+            // 0 pending , 1 accepted , 2 rejected
+            type:Number,
+            default:0
+        }
+    }],
+    temp:{
+        type:Boolean,
+        default:false
+    }
 
  
  

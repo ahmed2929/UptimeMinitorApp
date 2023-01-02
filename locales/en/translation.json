@@ -56,7 +56,15 @@
     "no_dosage_provided":"no_dosage_provided",
     "no_specific_days_provided":"no_specific_days_provided",
     "invalid_occurence_pattern":"invalid_occurence_pattern",
-    "symtom_created":"symtom_created"
+    "symtom_created":"symtom_created",
+    "depenentA_created":"depenentA_created",
+    "user_already_dependent":"user_already_dependent",
+    "user_already_viewer":"user_already_viewer",
+    "user_already_owner":"user_already_owner",
+    "invitation_sent":"invitation_sent",
+    "user_is_not_active":"user_is_not_active",
+    "invitation_sent_before":"invitation_sent_before",
+    "depenentB_created":"depenentB_created"
     
 
 

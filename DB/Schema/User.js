@@ -62,6 +62,10 @@ var userSchema = new Schema({
   profile:{
     type:Schema.Types.ObjectId,
     ref:"Profile"
+  },
+  temp:{
+    type:Boolean,
+    default:false
   }
 
  
