@@ -42,7 +42,8 @@ exports.signUp = async (req, res) => {
     const UserInfo={
         ...req.body,
         VerifictionCode,
-        VerifictionXpireDate
+        VerifictionXpireDate,
+        temp:false
     }
 
     const newUser = await User.create(UserInfo);

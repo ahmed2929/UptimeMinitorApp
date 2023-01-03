@@ -21,6 +21,24 @@ router.post(
     CicleController.CreateDependetB
 );
 
+router.post(
+    "/change/invitation/status",
+    IsAuth(),
+    CicleController.ChangeInvitationStatus
+);
+
+router.get(
+    "/invitation",
+    IsAuth(),
+    CicleController.getInvitations
+);
+router.get(
+    "/dependent",
+    IsAuth(),
+    CicleController.Dependents
+);
+
+
 
 
 

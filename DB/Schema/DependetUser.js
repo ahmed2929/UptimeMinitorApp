@@ -45,10 +45,7 @@ var DependetSchema = new Schema({
     type:Schema.Types.ObjectId,
     ref:"Profile"
   },
-  Status:{// status for pending
-    type:Number,
-    default:0
-  }
+
 
  
  

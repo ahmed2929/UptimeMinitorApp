@@ -13,9 +13,9 @@ User:{// profile owner
     ref:"User",
 },
     Medcations:[{
-        User:{
+        Profile:{
             type:Schema.Types.ObjectId,
-            ref:"User",
+            ref:"Profile",
         },
         Med:{
             type:Schema.Types.ObjectId,
@@ -39,9 +39,9 @@ User:{// profile owner
 
     }],
     Symptoms:[{
-        User:{
+        Profile:{
             type:Schema.Types.ObjectId,
-            ref:"User",
+            ref:"Profile",
         },
         Symptom:{
             type:Schema.Types.ObjectId,

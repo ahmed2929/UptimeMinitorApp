@@ -33,14 +33,18 @@ var ProfileSchema = new Schema({
             },
             AccountType:{ //type 0 normal user , type 1 dependent with no phone
                 type:Number,
-                required:true
+                default:0
+            },
+            Dependent:{
+                type:Schema.Types.ObjectId,
+                ref:"Dependent",
             }
      
 }],
     Viewers:[{
-        User:{
+       Profile:{
             type:Schema.Types.ObjectId,
-            ref:"User",
+            ref:"Profile",
         },
         Permissions:{
             type:Schema.Types.ObjectId,
@@ -53,39 +57,10 @@ var ProfileSchema = new Schema({
         CanWriteSymptoms:{
             type:Boolean,
             default:true
-        }
-    }],
-    sentInvitations:[{
-        Profile:{
-            type:Schema.Types.ObjectId,
-            ref:"Profile",
         },
-        AccountType:{
-             //type 0 normal user , type 1 dependent with no phone, 2 caregiver
-            type:Number,
-            required:true
-            },
-            Status:{
-                // 0 pending , 1 accepted , 2 rejected
-                type:Number,
-                default:0
-            }
-
-    }],
-    receivedInvitations:[{
-        Profile:{
-            type:Schema.Types.ObjectId,
-            ref:"Profile",
-        },
-        AccountType:{
-                //type 0 normal user , type 1 dependent with no phone, 2 caregiver
-            type:Number,
-            required:true
-        },
-        Status:{
-            // 0 pending , 1 accepted , 2 rejected
-            type:Number,
-            default:0
+        notify:{
+            type:Boolean,
+            default:true
         }
     }],
     temp:{
