@@ -64,7 +64,8 @@
     "invitation_sent":"invitation_sent",
     "user_is_not_active":"user_is_not_active",
     "invitation_sent_before":"invitation_sent_before",
-    "depenentB_created":"depenentB_created"
+    "depenentB_created":"depenentB_created",
+    "caregiver_not_registered":"caregiver_not_registered"
     
 
 

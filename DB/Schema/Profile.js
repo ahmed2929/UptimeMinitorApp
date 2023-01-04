@@ -3,12 +3,6 @@ const Schema = mongoose.Schema;
 
 
 var ProfileSchema = new Schema({
-    AccountType:{ //type 0 normal user , type 1 dependent with no phone
-    type:Number,
-    default:0,
-    required:true,
-
-  },
   Owner:{ // the profile master
     User:{
         type:Schema.Types.ObjectId,
@@ -42,26 +36,15 @@ var ProfileSchema = new Schema({
      
 }],
     Viewers:[{
-       Profile:{
+        viewer:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Viewer"
+        },
+        Dependent:{
             type:Schema.Types.ObjectId,
-            ref:"Profile",
-        },
-        Permissions:{
-            type:Schema.Types.ObjectId,
-            ref:"Permission",
-        },
-        CanWriteMeds:{
-            type:Boolean,
-            default:true
-        },
-        CanWriteSymptoms:{
-            type:Boolean,
-            default:true
-        },
-        notify:{
-            type:Boolean,
-            default:true
+            ref:"Dependent",
         }
+   
     }],
     temp:{
         type:Boolean,

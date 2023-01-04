@@ -4,6 +4,7 @@ const SchdulerSchema = require("../../../DB/Schema/Schduler");
 const UserMedcation = require("../../../DB/Schema/UserMedcation");
 const {UploadFileToAzureBlob,GenerateOccurances,GenerateOccurancesWithDays} =require("../../../utils/HelperFunctions")
 const Occurance = require("../../../DB/Schema/Occurances");
+const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
 const {
   successResMsg,
@@ -11,7 +12,8 @@ const {
 } = require("../../../utils/ResponseHelpers");
 const Symptom = require("../../../DB/Schema/Symptoms");
 const Profile = require("../../../DB/Schema/Profile")
-const Permissions = require("../../../DB/Schema/Permissions")
+const Permissions = require("../../../DB/Schema/Permissions");
+const { findById } = require("../../../DB/Schema/User");
 
 
 
@@ -87,35 +89,41 @@ exports.CreateNewMed = async (req, res) => {
      /*
     
     check permission will only allow if the id is the Owner id 
-    and has a write permission Or
-     in Viewers array and has write permission ?
+    and has a addMed permission
     
     */
      const profile =await Profile.findById(ProfileID)
      if(!profile){
        return errorResMsg(res, 400, req.t("Profile_not_found"));
      }
- 
-     const permissions=await Permissions.findOne({
-       Profile:ProfileID,
+
+     // get the viewer permissions
+     const viewerProfile =await Profile.findOne({
+     "Owner.User":id
      })
-     if(!permissions){
-       return errorResMsg(res, 400, req.t("Permisson_not_found"));
-      }
- 
-     // check if the user is the owner and has write permission or has a write permission
+     
+     if(!viewerProfile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+     }
+
+     const viewer =await Viewer.findOne({
+      ViewerProfile:viewerProfile._id,
+      DependentProfile:ProfileID
+     })
+
+      
+     // check if the user is the owner and has write permission or can add meds
  
      if(profile.Owner.User.toString()!==id){
-       // check if the user is in viewers array and CanWriteMeds is true
-       const hasWritePermissonToMeds=profile.Viewers.find((viewer)=>{
-         return viewer.User.toString()===id&&viewer.CanWriteMeds
-       })
+       // check if the user has add med permission
+       const hasAddMedPermissonToMeds=viewer.CanAddMeds;
  
-       if(!hasWritePermissonToMeds){
+       if(!hasAddMedPermissonToMeds){
          return errorResMsg(res, 401, req.t("Unauthorized"));
        }
        
      }
+     //case the owner dont has write permission
      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
        return errorResMsg(res, 401, req.t("Unauthorized"));
      }
@@ -142,7 +150,8 @@ exports.CreateNewMed = async (req, res) => {
       condition,
       externalInfo:JSON.parse(externalInfo),
       type,
-      ProfileID
+      ProfileID,
+      CreatorProfile:viewerProfile._id
 
     })
     // generate medIfo snapshot
@@ -154,7 +163,8 @@ exports.CreateNewMed = async (req, res) => {
       condition,
       type,
       name,
-      ProfileID
+      ProfileID,
+      CreatorProfile:viewerProfile._id
     }
     // create schduler 
     jsonSchduler=JSON.parse(Schduler)
@@ -239,7 +249,8 @@ exports.CreateNewMed = async (req, res) => {
       User:id,
       ...jsonSchduler
       ,
-      ProfileID
+      ProfileID,
+      CreatorProfile:viewerProfile._id
 
     })
 
@@ -327,7 +338,8 @@ exports.CreateNewMed = async (req, res) => {
 
       const OccurancesData={
         PlannedDose:doseElement.dose,
-        ProfileID
+        ProfileID,
+        CreatorProfile:viewerProfile._id
       }
       const start=new Date(doseElement.DateTime)
       
@@ -361,34 +373,22 @@ exports.CreateNewMed = async (req, res) => {
     await newSchduler.save()
     await newMed.save()
 
-      // who has the right to view that symtom
-    // symtom creator
-    // profile owner
-    // profile viewers
-    // permissions.Medcations.push({
-    //   Med:newMed._id,
-    //   User:id,
-    // })
-    // // profile owner
-    // permissions.Medcations.push({
-    //   Med:newMed._id,
-    //   User:profile.Owner.User._id,
-    // })
- 
-    profile.Viewers.forEach((viewer)=>{
-      permissions.Medcations.push({
+     // give the med creator full access for that med
+     // if the med creator is the parent make refil and doses true
+     if(profile.Owner.User==id){
+      viewer.CanReadSpacificMeds.push({
         Med:newMed._id,
-        User:viewer.User._id,
-        Permissions:{
-          write:viewer.CanWriteSymptoms
-        }
-      })
-    })
-  
-
-
-  
-    await permissions.save()
+        Refil:true,
+        Doses:true
+       })
+     }else{
+      viewer.CanReadSpacificMeds.push({
+        Med:newMed._id
+       })
+     }
+   
+    
+    await viewer.save()
 
 
 
@@ -455,8 +455,57 @@ exports.EditMed=async (req, res) => {
       condition,
       externalInfo,
       Schduler,
-      type
+      type,
+      ProfileID
     }=req.body
+
+
+     /*
+    
+    check permission 
+    
+    */
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    // get the viewer permissions
+    const viewerProfile =await Profile.findOne({
+    "Owner.User":id
+    })
+    
+    if(!viewerProfile){
+       return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    const viewer =await Viewer.findOne({
+     ViewerProfile:viewerProfile._id,
+     DependentProfile:ProfileID
+    })
+    // check if the user is the owner and has write permission or can add meds
+
+    if(profile.Owner.User.toString()!==id){
+      // check if the user has add med permission
+      const hasWritePermissonToAllMeds=viewer.CanWriteMeds;
+      // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
+      const hasWritePermissonToThatMed=viewer.CanReadSpacificMeds.find((med)=>{
+        if(med.Med.toString()===MedId.toString()){
+          return med.CanWrite
+        }
+      }) 
+      if(!(hasWritePermissonToAllMeds||hasWritePermissonToThatMed)){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+      
+    }
+    //case the owner dont has write permission
+    if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      return errorResMsg(res, 401, req.t("Unauthorized"));
+    }
+
+
+
 
     if(req.file){
        // store the image
@@ -489,7 +538,8 @@ exports.EditMed=async (req, res) => {
         instructions:instructions||oldMed.instructions,
         condition:condition||oldMed.condition,
         externalInfo:JSON.parse(externalInfo)||oldMed.externalInfo,
-        type:type||oldMed.type
+        type:type||oldMed.type,
+        EditedBy:viewerProfile._id
       })
       newMed=editedMed
       // genrate MedInfo snapshot
@@ -501,6 +551,8 @@ exports.EditMed=async (req, res) => {
         condition:editedMed.condition,
         type:editedMed.type,
         name:editedMed.name,
+        EditedBy:viewerProfile._id,
+        CreatorProfile:editedMed.CreatorProfile
 
       }
       // if nod edit for schdule will return

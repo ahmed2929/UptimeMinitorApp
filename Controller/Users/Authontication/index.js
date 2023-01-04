@@ -56,11 +56,7 @@ exports.signUp = async (req, res) => {
     })
     newUser.profile=newProfile._id
 
-    const newPermission =await Permission.create({
-      User:newUser._id,
-      Profile:newProfile._id
-   
-    })
+ 
 
     await newUser.save()
     // create user token

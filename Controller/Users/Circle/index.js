@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const Dependent = require("../../../DB/Schema/DependetUser");
 const Invetation =require("../../../DB/Schema/invitations")
 const User = require("../../../DB/Schema/User");
+const Viewer =require("../../../DB/Schema/Viewers")
 const messages = require("../../../Messages/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
 const {
@@ -14,7 +15,8 @@ const {
 } = require("../../../utils/ResponseHelpers");
 const Symptom = require("../../../DB/Schema/Symptoms");
 const Profile = require("../../../DB/Schema/Profile")
-const Permissions = require("../../../DB/Schema/Permissions")
+const Permissions = require("../../../DB/Schema/Permissions");
+const { populate } = require("../../../DB/Schema/Schduler");
 
 exports.CreateDependetA = async (req, res) => {
  
@@ -93,7 +95,11 @@ exports.CreateDependetA = async (req, res) => {
             MasterProfile:ProfileID,
             Status:1
         })
-
+        // create new viewer for the depenent user
+        const newViewer = new Viewer({
+            ViewerProfile:ProfileID,
+            
+        })
        // create a new profile for depenent user
          const newProfile = new Profile({
             Owner:{
@@ -105,19 +111,15 @@ exports.CreateDependetA = async (req, res) => {
             },
             AccountType:1,
             Viewers:[{
-                Profile:ProfileID,
+                viewer:newViewer._id,
+                Dependent:newDependent._id
 
             }]
-         }) 
-         // create new permissions for the depenent user
-    //         const newPermissions = new Permissions({
-    //             Profile:newProfile._id,
-    //             User:id,
-    //         })
-    //  // link perissons to profile to user
-    //     newProfile.Viewers[0].Permissions = newPermissions._id
-    //     // link profile to depenent user
-    //     newDependent.DependentProfile = newProfile._id
+         })
+         // link profile to viewer
+            newViewer.DependentProfile = newProfile._id 
+
+       
 
         // link profile to user
         profile.Dependents.push({
@@ -128,7 +130,7 @@ exports.CreateDependetA = async (req, res) => {
         // save all the data
         await newDependent.save()
         await newProfile.save()
-    //    await newPermissions.save()
+        await newViewer.save()
         await profile.save()
     
         const responseData ={
@@ -327,12 +329,6 @@ exports.CreateDependetA = async (req, res) => {
                         Write:true,
                     }
                 },
-                AccountType:0,
-                receivedInvitations:[{
-                    Profile:ProfileID,
-                    AccountType:2,
-
-                }],
                 temp:true
             })
             // create a new dependent user
@@ -468,13 +464,21 @@ exports.CreateDependetA = async (req, res) => {
                 Profile:dependentProfile._id,
                 Dependent: invetation.dependent
             })
+            // create a new viewer for the master profile
+            const newViewer = new Viewer({
+                ViewerProfile:masterProfile._id,
+                DependentProfile:dependentProfile._id
+            })
             // add the master to the dependent profile
             dependentProfile.Viewers.push({
-                Profile:masterProfile._id,
+                Dependent:invetation.dependent._id,
+                viewer:newViewer._id
+
             })
             await dependentProfile.save()
             await masterProfile.save()
             await invetation.save()
+            await newViewer.save()
             // return accept confirmation
             return successResMsg(res, 200, {message:req.t("invitation_accepted")});
 
@@ -591,6 +595,298 @@ exports.CreateDependetA = async (req, res) => {
         ]
         // return succesfull response
         return successResMsg(res, 200, {message:req.t("dependent"),data:responseData});
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  }; 
+
+
+  exports.AddCareGiver = async (req, res) => {
+ 
+    try {
+  
+      const {id} =req.id
+      const {
+        ProfileID,
+        email,
+        phoneNumber,
+        countryCode,
+        permissions
+        
+       
+      }=req.body
+      /**
+       * case 3
+       * -1 user access this api to add a caregiver
+       * -2 user should provide care giver mobile or email
+       * -3 if the care giver already exist send him inviation
+       * -4 if he doesnt exist create him a new profile and send him inviation
+       */
+        // check if the user has a profile
+        const profile = await Profile.findById(ProfileID).populate("Owner.User")
+        if(!profile){
+            return errorResMsg(res, 400, req.t("profile_not_found"));
+        }
+        // check if the user if the user is the owner of that profile
+        if(profile.Owner.User._id.toString() !== id){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+
+        // check for  email and mobile if it provided
+        const mobileNumber={
+            phoneNumber:phoneNumber,
+            countryCode:countryCode
+        }
+        if(!(email||mobileNumber.phoneNumber)){
+            return errorResMsg(res, 400, req.t("email_or_mobile_required"));
+        }
+
+          
+        const user = await User.findOne(
+            { "$or": [ { email: email }, { 'mobileNumber.phoneNumber':phoneNumber} ] }
+          );
+            // if the invitation is sent before return 
+            
+          // if no user found return 
+          if (!user) {
+            return errorResMsg(res, 400, req.t("caregiver_not_registered"));
+
+        }
+        
+            /**
+             * user alreay exists
+             * send notification to that user
+             */
+            // get user profile 
+            const CareGiverprofile = await Profile.findById(user.profile).populate("Owner.User")
+            if(!CareGiverprofile){
+                return errorResMsg(res, 400, req.t("profile_not_found"));
+            }
+            //check if the invitation sent before
+
+            const invetation =await Invetation.find({
+                From:ProfileID,
+                To:CareGiverprofile._id,
+            })
+
+            if(invetation.length>0){
+                return errorResMsg(res, 400, req.t("invitation_sent_before"));
+            }
+            //create dependent user
+            const newDependentUser = new Dependent({
+                firstName:user.firstName,
+                lastName:user.lastName,
+                nickName:'',
+                email:email,
+                mobileNumber:{
+                    countryCode:countryCode,
+                    phoneNumber:phoneNumber
+                },
+                MasterProfile:CareGiverprofile._id,
+                DependentProfile:ProfileID,
+                AccountType:2,
+                img:user.img,
+               
+            })
+            let CanReadSpacificMeds;
+            if(permissions.CanReadAllMeds){
+                CanReadSpacificMeds=null
+            }else{
+                CanReadSpacificMeds=permissions.CanReadSpacificMeds
+            }
+            // create new invitation
+            const newInvetation = new Invetation({
+                From:ProfileID,
+                To:CareGiverprofile._id,
+                Status:0,
+                dependent:newDependentUser._id,
+                permissions:{
+                   ... permissions,
+                   CanReadSpacificMeds,
+                },
+                AccountType:2
+
+            })
+
+            // save all the data
+            await newDependentUser.save()
+            await newInvetation.save()
+
+            // send notification to the user
+
+            if(CareGiverprofile.Owner.User.lang==="en"){
+                const Invitation = messages.InvetationSentToExistentCareGiverUser_EN(profile.Owner.User.firstName,user.firstName);
+                await SendEmailToUser(email,Invitation)
+               }else{
+                const Invitation = messages.InvetationSentToExistentCareGiverUser_AR(RestPasswordCode,profile.Owner.User.firstName,user.firstName);
+                await SendEmailToUser(email,Invitation)
+               }
+          
+
+            const responseData ={
+                CareGiverProfileID:CareGiverprofile._id,
+                firstName:user.firstName,
+                lastName:user.lastName,
+                nickName:user.nickName,
+                email:user.email,
+                phoneNumber:user.mobileNumber.phoneNumber,
+                countryCode:user.mobileNumber.countryCode,
+                img:user.img,
+                AccountType:2,
+                Status:0
+            }
+            return successResMsg(res, 200, {message:req.t("invitation_sent"),data:responseData});
+       
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };  
+
+  exports.ChangeInvitationStatusToAcceptDependent = async (req, res) => {
+    /**
+       * accept or reject invitation
+       *
+       */
+ 
+    try {
+  
+      const {id} =req.id
+      const {
+        ProfileID,
+        Status,//0 pending , 1 confirmied ,2 rejected
+        invetationID
+
+        
+       
+      }=req.body
+        // get the invitation
+        const invetation = await Invetation.findById(invetationID)
+        if(!invetation){
+            return errorResMsg(res, 400, req.t("invetation_not_found"));
+        }
+        // get the caregiver profile
+        const CareGiverProfile = await Profile.findById(mongoose.Types.ObjectId(invetation.To))
+        if(!CareGiverProfile){
+            return errorResMsg(res, 400, req.t("profile_not_found"));
+        }
+        // get the dependetProfile
+        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invetation.From))
+        if(CareGiverProfile.Owner.User.toString()!=id){
+            return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
+
+        }
+        if(ProfileID.toString()!=invetation.To.toString()){
+            return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
+
+        }
+        // change the inviation status............................................................
+        //rejection case
+        if(Status===2){
+            invetation.Status=2;
+            await invetation.save()
+            // return reject confirmation
+
+            return successResMsg(res, 200, {message:req.t("invitation_rejected")});
+
+        }
+        //acceptance case
+        if(Status===1){
+            invetation.Status=1;
+            
+            // add the dependent to the master profile
+            CareGiverProfile.Dependents.push({
+                Profile:dependentProfile._id,
+                Dependent: invetation.dependent
+            })
+            //get careGiver permissions
+            const permissions = {
+               ... invetation.permissions
+            }
+            // create new viewer
+            const newViewer = new Viewer({
+                ViewerProfile:CareGiverProfile._id,
+                DependentProfile:dependentProfile._id,
+                ...permissions
+
+            })
+            // add the master to the dependent profile
+            dependentProfile.Viewers.push({
+                viewer:newViewer._id,
+                Dependent:invetation.dependent
+
+            })
+            // save all the data
+            await newViewer.save()
+            await dependentProfile.save()
+            await CareGiverProfile.save()
+            await invetation.save()
+            // return accept confirmation
+            return successResMsg(res, 200, {message:req.t("invitation_accepted")});
+
+       
+        }
+
+        // return error response
+        return errorResMsg(res, 400, req.t("invalid_invitation_status"));
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  }; 
+
+  exports.CareGiver = async (req, res) => {
+    /**
+       * get the user dependnts 
+       */
+ 
+    try {
+  
+      const {id} =req.id
+      const {
+        ProfileID,
+       
+      }=req.query
+        // make sure that the api consumer is authorized
+        if(!mongoose.isValidObjectId(ProfileID)){
+            return errorResMsg(res, 400, req.t("invalid_profile_id"));
+        }
+        const profile = await Profile.findById(ProfileID).populate({
+            path: 'Viewers.viewer',
+            select: 'ViewerProfile',
+            populate: {
+                path: 'ViewerProfile',
+                select:'User',
+                populate:{
+                    path:'Owner.User',
+                    select:'firstName lastName nickName img email mobileNumber'
+                }
+            }
+            
+          })
+        if(!profile){
+            return errorResMsg(res, 400, req.t("profile_not_found"));
+        }
+        if(profile.Owner.User._id.toString()!=id){
+            return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+        }
+       
+        // get user profile dependents
+        
+
+
+        responseData=[
+            ...profile.Viewers
+        ]
+        // return succesfull response
+        return successResMsg(res, 200, {message:req.t("caregivers"),data:responseData});
       
     } catch (err) {
       // return error response

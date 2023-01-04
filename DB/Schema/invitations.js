@@ -18,6 +18,35 @@ var InvitationsSchema = new Schema({
     dependent:{
         type:Schema.Types.ObjectId,
         ref:"Dependent",
+    },
+    permissions:{
+        CanWriteMeds:{
+            type:Boolean,
+            default:true,
+        },
+        CanReadDoses:{
+            type:Boolean,
+            default:true,
+        },
+        CanReadRefil:{
+            type:Boolean,
+            default:true,
+        },
+        CanReadAllMeds:{
+            type:Boolean,
+            default:true,
+        },
+        CanReadSideEffect:{
+            type:Boolean,
+            default:true,
+        },
+        CanReadSpacificMeds:[{
+            type:Schema.Types.ObjectId,
+            ref:"Medication",
+        }]
+    },
+    AccountType:{
+        type:Number
     }
 
  

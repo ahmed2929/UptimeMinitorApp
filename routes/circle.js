@@ -27,6 +27,18 @@ router.post(
     CicleController.ChangeInvitationStatus
 );
 
+router.post(
+    "/add/caregiver",
+    IsAuth(),
+    CicleController.AddCareGiver
+);
+
+router.post(
+    "/change/dependent/request",
+    IsAuth(),
+    CicleController.ChangeInvitationStatusToAcceptDependent
+);
+
 router.get(
     "/invitation",
     IsAuth(),
@@ -37,7 +49,11 @@ router.get(
     IsAuth(),
     CicleController.Dependents
 );
-
+router.get(
+    "/caregiver",
+    IsAuth(),
+    CicleController.CareGiver
+);
 
 
 

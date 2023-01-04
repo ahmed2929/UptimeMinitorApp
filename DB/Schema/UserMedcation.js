@@ -53,6 +53,14 @@ var MedictionSchema = new Schema({
   ProfileID:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Profile'
+  },
+  CreatorProfile:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Profile'
+  },
+  EditedBy:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Profile'
   }
 
 

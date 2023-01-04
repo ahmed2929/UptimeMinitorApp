@@ -1,3 +1,47 @@
+exports.InvetationSentToExistentCareGiverUser_EN = (invetationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+       
+`}
+
+
+exports.InvetationSentToExistentCareGiverUser_AR = (invetationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+       
+`}
+
+
+
+
 exports.InvetationSentToExistentDependentUser_EN = (invetationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
@@ -80,6 +124,55 @@ exports.InvetationSentToDependent_AR= (otp,invetationFrom,userName) => {
 </div>
          `
 }
+
+
+
+
+exports.InvetationSentToCareGiver_EN = (otp,invetationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        your one time password is : ${otp}
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+         `
+}
+
+
+exports.InvetationSentToCareGiver_AR = (otp,invetationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        your one time password is : ${otp}
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+         `
+}
+
+
+
 
 exports.verifyAccount_EN = (VerifictionCode) => {
 	return `

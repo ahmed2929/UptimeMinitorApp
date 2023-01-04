@@ -53,6 +53,10 @@ var OccurancesSchema = new Schema({
   ProfileID:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Profile'
+  },
+  CreatorProfile:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Profile'
   }
 
  
