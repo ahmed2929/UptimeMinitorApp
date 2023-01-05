@@ -37,6 +37,10 @@ var SymtomsSchema = new Schema({
   isDeleted:{
     type:Boolean,
     default:false
+  },
+  CreatorProfile:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Profile'
   }
 
 

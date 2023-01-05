@@ -30,6 +30,10 @@ var ViewerSchema = new Schema({
         type:Boolean,
         default:true,
     },
+    CanWriteSymtoms:{
+        type:Boolean,
+        default:false,
+    },
     CanAddMeds:{
         type:Boolean,
         default:true,
@@ -65,6 +69,10 @@ var ViewerSchema = new Schema({
         }
         
     }],
+    CanWriteDoses:{
+        type:Boolean,
+        default:false,
+    },
     notify:{
         type:Boolean,
         default:true

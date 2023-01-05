@@ -65,7 +65,10 @@
     "user_is_not_active":"user_is_not_active",
     "invitation_sent_before":"invitation_sent_before",
     "depenentB_created":"depenentB_created",
-    "caregiver_not_registered":"caregiver_not_registered"
+    "caregiver_not_registered":"caregiver_not_registered",
+    "invitation_status_changed_before":"invitation_status_changed_before",
+    "registration_successful":"registration successful",
+    "Please_Verify_Your_Account":"Please_Verify_Your_Account"
     
 
 

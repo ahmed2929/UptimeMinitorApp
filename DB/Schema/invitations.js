@@ -40,10 +40,49 @@ var InvitationsSchema = new Schema({
             type:Boolean,
             default:true,
         },
+        CanWriteSymtoms:{
+            type:Boolean,
+            default:false,
+        },
+        CanAddMeds:{
+            type:Boolean,
+            default:true,
+        },
         CanReadSpacificMeds:[{
-            type:Schema.Types.ObjectId,
-            ref:"Medication",
-        }]
+            Med:{
+                type:Schema.Types.ObjectId,
+                 ref:"Medication",
+            },
+            CanRead:{
+                type:Boolean,
+                default:true,
+            },
+            CanWrite:{
+                type:Boolean,
+                default:true,
+            },
+            CanReadDoses:{
+                type:Boolean,
+                default:true,
+            },
+            CanReadRefil:{
+                type:Boolean,
+                default:true,
+            },
+            CanWriteRefil:{
+                type:Boolean,
+                default:false,
+            },
+            CanWriteDoses:{
+                type:Boolean,
+                default:false,
+            }
+            
+        }],
+        CanWriteDoses:{
+            type:Boolean,
+            default:false,
+        },
     },
     AccountType:{
         type:Number

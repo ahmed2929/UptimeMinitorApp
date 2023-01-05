@@ -98,6 +98,8 @@ exports.CreateDependetA = async (req, res) => {
         // create new viewer for the depenent user
         const newViewer = new Viewer({
             ViewerProfile:ProfileID,
+            CanWriteDoses:true,
+            CanWriteSymtoms:true
             
         })
        // create a new profile for depenent user
@@ -446,6 +448,9 @@ exports.CreateDependetA = async (req, res) => {
         }
       
         // change the inviation status............................................................
+        if(invetation.Status!=0){
+            return errorResMsg(res, 400, req.t("invitation_status_changed_before"));
+        }
         //rejection case
         if(Status===2){
             invetation.Status=2;
@@ -578,7 +583,7 @@ exports.CreateDependetA = async (req, res) => {
         if(!mongoose.isValidObjectId(ProfileID)){
             return errorResMsg(res, 400, req.t("invalid_profile_id"));
         }
-        const profile = await Profile.findById(ProfileID).populate("Dependents.Dependent")
+        const profile = await Profile.findById(ProfileID).populate("Dependents.Profile.Owner.User")
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
@@ -784,6 +789,9 @@ exports.CreateDependetA = async (req, res) => {
         if(ProfileID.toString()!=invetation.To.toString()){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
+        }
+        if(invetation.Status!=0){
+            return errorResMsg(res, 400, req.t("invitation_status_changed_before"));
         }
         // change the inviation status............................................................
         //rejection case

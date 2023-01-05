@@ -88,6 +88,13 @@ router.post(
     userController.CreateSymtom
 );
 
+router.get(
+    "/symtoms",
+    IsAuth(),
+    userController.getSymtoms
+);
+
+
 
 
 module.exports = router;

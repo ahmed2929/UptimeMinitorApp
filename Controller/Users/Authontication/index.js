@@ -65,20 +65,20 @@ exports.signUp = async (req, res) => {
     
 
     // create data to be returned
-    const data = {
-      token,
-      refreshToken,
-      user:{
-        firstName:req.body.firstName,
-        lastName:req.body.lastName,
-        email:req.body.email,
-        lang:req.body.lang||"en",
-        verified:newUser.verified||false,
-        profile:newProfile._id
+    // const data = {
+    //   token,
+    //   refreshToken,
+    //   user:{
+    //     firstName:req.body.firstName,
+    //     lastName:req.body.lastName,
+    //     email:req.body.email,
+    //     lang:req.body.lang||"en",
+    //     verified:newUser.verified||false,
+    //     profile:newProfile._id
         
-      }
+    //   }
    
-    };
+    // };
 
     if(newUser.lang==="en"){
       const VerifictionMessage = messages.verifyAccount_EN(VerifictionCode);
@@ -91,7 +91,7 @@ exports.signUp = async (req, res) => {
    
 
     // return succesfull response
-    return successResMsg(res, 201, data);
+    return successResMsg(res, 201, req.t("registration_successful"));
   } catch (err) {
     // return error response
     console.log(err)
@@ -119,7 +119,9 @@ exports.logIn = async (req, res) => {
     const user = await User.findOne({
       email,
     }).select("+password");
-
+    if(user.verified===false){
+      return errorResMsg(res, 401, req.t("Please_Verify_Your_Account"));
+    }
     // check if user exists and if the password is correct
     if (!user || !(await user.correctPassword(password, user.password))) {
       // return error message if password is wrong
@@ -293,15 +295,13 @@ exports.VerifyAccount = async (req, res) => {
   try {
     const {
       verfiycode,
+      email
     } = req.body;
   
-    const {id} = req.id;
-    
-    if (!id) {
-     throw new Error('id is missing')
+    if(!email){
+      return  errorResMsg(res, 406, req.t("Email_is_required"));
     }
-
-    const user = await User.findById(id);
+    const user = await User.findOne({email:email});
    
      // check for if the code is correct and hasnt expired
 
@@ -338,12 +338,13 @@ exports.VerifyAccount = async (req, res) => {
 exports.ResendVirificationCode = async (req, res) => {
   try {
   
-    const {id} = req.id;
-    if (!id) {
-     next(new Error('id is missing'))
+    const {email} = req.body;
+    if (!email) {
+      return    errorResMsg(res, 406, req.t("Email_is_required"));
+
     }
 
-    const user = await User.findById(id);
+    const user = await User.findOne({email:email});
 
      if(!user){
       return  errorResMsg(res, 406, req.t("user_is_not_found"));

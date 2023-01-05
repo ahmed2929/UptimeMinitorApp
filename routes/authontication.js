@@ -24,13 +24,11 @@ router.post(
     "/verifyaccount",
     validation.virifyAccount(),
     validation.validate,
-    IsAuth(),
     userController.VerifyAccount
 );
 
 router.post(
     "/resend/activation/code",
-    IsAuth(),
     userController.ResendVirificationCode
 );
 
