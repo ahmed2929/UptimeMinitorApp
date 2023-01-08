@@ -127,7 +127,8 @@ exports.CreateDependetA = async (req, res) => {
         profile.Dependents.push({
             Profile:newProfile._id,
             AccountType:1,
-            Dependent:newDependent._id
+            Dependent:newDependent._id,
+            viewer:newViewer._id
         })
         // save all the data
         await newDependent.save()
@@ -318,6 +319,7 @@ exports.CreateDependetA = async (req, res) => {
                     phoneNumber:phoneNumber
                 },
                 temp:true,
+                ShouldRestPassword:true
 
 
 
@@ -354,7 +356,7 @@ exports.CreateDependetA = async (req, res) => {
             // add rest password code and its expiration date
 
               //send notifications
-               const RestPasswordCode = await GenerateRandomCode(2);
+               const RestPasswordCode = await GenerateRandomCode(4);
                const ResetPasswordXpireDate =  Date.now()  + 8.64e+7 ;
                if(newUser.lang==="en"){
                 const Invitation = messages.InvetationSentToDependent_EN(RestPasswordCode,profile.Owner.User.firstName,firstName);
@@ -365,7 +367,7 @@ exports.CreateDependetA = async (req, res) => {
                }
           
           
-               newUser.RestPasswordCode=RestPasswordCode;
+               newUser.password=RestPasswordCode
                newUser.ResetPasswordXpireDate=ResetPasswordXpireDate;
 
                // register the invitation
@@ -464,15 +466,17 @@ exports.CreateDependetA = async (req, res) => {
         if(Status===1){
             invetation.Status=1;
             
-            // add the dependent to the master profile
-            masterProfile.Dependents.push({
-                Profile:dependentProfile._id,
-                Dependent: invetation.dependent
-            })
+           
             // create a new viewer for the master profile
             const newViewer = new Viewer({
                 ViewerProfile:masterProfile._id,
                 DependentProfile:dependentProfile._id
+            })
+             // add the dependent to the master profile
+             masterProfile.Dependents.push({
+                Profile:dependentProfile._id,
+                Dependent: invetation.dependent,
+                viewer:newViewer._id
             })
             // add the master to the dependent profile
             dependentProfile.Viewers.push({
@@ -583,7 +587,13 @@ exports.CreateDependetA = async (req, res) => {
         if(!mongoose.isValidObjectId(ProfileID)){
             return errorResMsg(res, 400, req.t("invalid_profile_id"));
         }
-        const profile = await Profile.findById(ProfileID).populate("Dependents.Profile.Owner.User")
+        const profile = await Profile.findById(ProfileID).populate({
+            path:"Dependents.Dependent",
+           
+          
+        }).populate({
+            path:"Dependents.viewer",
+        })
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
@@ -591,9 +601,6 @@ exports.CreateDependetA = async (req, res) => {
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
        
-        // get user profile dependents
-        
-
 
         responseData=[
             ...profile.Dependents

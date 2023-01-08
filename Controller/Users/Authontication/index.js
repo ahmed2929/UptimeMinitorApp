@@ -143,7 +143,8 @@ exports.logIn = async (req, res) => {
         verified:user.verified,
         profile:user.profile
         
-      }
+      },
+      ShouldRestPassword:user.ShouldRestPassword
     };
     // return succesfull response
     return successResMsg(res, 200, data);
@@ -276,6 +277,7 @@ exports.ResetPassword = async (req, res) => {
      }
 
     user.password=NewPassword
+    user.ShouldRestPassword=false
     await user.save();
     if(user.lang==="en"){
       const resetSucess=messages.resetSucess_EN(user.firstName)

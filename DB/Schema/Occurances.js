@@ -39,7 +39,10 @@ var OccurancesSchema = new Schema({
     instructions:{type:String},
     condition:{type:String},
     type:{type:String},
-    name:{type:String}
+    name:{type:String},
+    SchudleType:{
+      type:String,
+    }
   },
   Status:{
     type:Number,

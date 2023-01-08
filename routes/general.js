@@ -94,6 +94,19 @@ router.get(
     userController.getSymtoms
 );
 
+router.get(
+    "/report",
+    IsAuth(),
+    userController.getReport
+);
+
+router.get(
+    "/single/med/report",
+    IsAuth(),
+    userController.getReportSingleMed
+);
+
+
 
 
 

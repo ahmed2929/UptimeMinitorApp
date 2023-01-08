@@ -169,7 +169,8 @@ exports.CreateNewMed = async (req, res) => {
       type,
       name,
       ProfileID,
-      CreatorProfile:viewerProfile._id
+      CreatorProfile:viewerProfile._id,
+      SchudleType:JSON.parse(Schduler).ScheduleType,
     }
     // create schduler 
     jsonSchduler=JSON.parse(Schduler)
@@ -179,7 +180,10 @@ exports.CreateNewMed = async (req, res) => {
       return errorResMsg(res, 400, req.t("start_date_required"));
     }
     // check if StartDate in the past 
-    const DateTime = new Date()
+    
+    let DateTime = new Date()
+    DateTime.setDate(DateTime.getDate() - 1);
+    console.log(DateTime , new Date(+jsonSchduler.StartDate))
     if((+jsonSchduler.StartDate)<DateTime.getTime()){
       return errorResMsg(res, 400, req.t("start_date_in_the_past"));
     }
@@ -566,7 +570,8 @@ exports.EditMed=async (req, res) => {
         type:editedMed.type,
         name:editedMed.name,
         EditedBy:viewerProfile._id,
-        CreatorProfile:editedMed.CreatorProfile
+        CreatorProfile:editedMed.CreatorProfile,
+       
 
       }
       // if nod edit for schdule will return
@@ -589,7 +594,7 @@ exports.EditMed=async (req, res) => {
     console.log("schduler ",Schduler)
     const jsonSchduler=JSON.parse(Schduler)
 
-
+    MedInfo.ScheduleType= jsonSchduler.ScheduleType
 
     // validate schdule data
     // check if StartDate in the past 
@@ -885,7 +890,7 @@ exports.EditSingleDose=async (req, res) => {
       condition:MedInfo.condition||oldOccurance.MedInfo.condition,
       type:MedInfo.type||oldOccurance.MedInfo.type,
       name:MedInfo.name||oldOccurance.MedInfo.name,
-
+      ScheduleType:MedInfo.ScheduleType||oldOccurance.MedInfo.ScheduleType,
       
     }
     oldOccurance.EditedBy=viewerProfile._id
@@ -1540,8 +1545,7 @@ exports.getSymtoms=async (req, res) => {
   try {
 
     const {id} =req.id
-    const {ProfileID}=req.query
-
+    const {ProfileID,StartDate,EndDate}=req.query
 
              /*
     
@@ -1558,7 +1562,6 @@ exports.getSymtoms=async (req, res) => {
     const viewerProfile =await Profile.findOne({
     "Owner.User":id
     })
-    
     if(!viewerProfile){
        return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
@@ -1592,8 +1595,20 @@ exports.getSymtoms=async (req, res) => {
   // case general permission
   if(hasGeneralReadPermissions){
     const symptoms =await Symptom.find({
-      ProfileID
+      ProfileID,
+      CreatedAt:{
+        $gte:StartDate,
+        $lte:EndDate
+      },
+      isDeleted:false
 
+    }).populate({
+      path:"CreatorProfile",
+      select:"firstName lastName img",
+      populate:{
+        path:"Owner.User",
+        select:"firstName lastName img"
+      }
     })
    
     
@@ -1613,3 +1628,366 @@ exports.getSymtoms=async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+exports.getReport=async (req, res) => {
+
+  /** 
+   *return all user mediction 
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    const {ProfileID,StartDate,EndDate}=req.query
+
+
+             /*
+    
+    check permission 
+    
+    */
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    // get the viewer permissions
+    const viewerProfile =await Profile.findOne({
+    "Owner.User":id
+    })
+    
+    if(!viewerProfile){
+       return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    const viewer =await Viewer.findOne({
+     ViewerProfile:viewerProfile._id,
+     DependentProfile:ProfileID
+    })
+
+    if(!viewer&&profile.Owner.User.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    // check if the user is the owner and has write permission or can add meds
+      //case the owner dont has write permission
+      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+      let hasGeneralReadPermissions;
+      let hasSpacificReadPermissions;
+      if(profile.Owner.User.toString()===id){
+        hasGeneralReadPermissions=true
+      }else{
+         hasGeneralReadPermissions=viewer.CanReadDoses;
+         hasSpacificReadPermissions=viewer.CanReadSpacificMeds.map(elem=>{
+          if(elem.CanReadDoses){
+            return elem.Med
+          }
+        });
+      }
+    
+  
+   
+ 
+
+  // case general permission
+  if(hasGeneralReadPermissions){
+     // case spacific permission
+     const doses =await Occurance.aggregate([{
+       $match:{
+         ProfileID: mongoose.Types.ObjectId(ProfileID),
+         PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
+         isSuspended:false,
+        
+       }
+     },
+     
+        {
+          $group: {
+           _id: {
+             Medication: '$Medication',
+           },
+           confirmed: {
+             $sum: {
+               $cond: {
+                 if: { $eq: ['$Status', 2] },
+                 then: 1,
+                 else: 0
+               }
+             }
+           },
+           rejected: {
+             $sum: {
+               $cond: {
+                 if: { $eq: ['$Status', 4] },
+                 then: 1,
+                 else: 0
+               }
+             }
+           },
+           ignored: {
+            $sum: {
+              $cond: {
+                if: { $eq: ['$Status', 3] },
+                then: 1,
+                else: 0
+              }
+            }
+          },
+           other: {
+             $sum: {
+               $cond: {
+                 if: { $in: ['$Status', [0,1]] },
+                 then: 1,
+                 else: 0
+               }
+             }
+           },
+           total: { $sum: 1 },
+         
+     }
+       }
+ 
+     ])
+ 
+     const responseData=[];
+ 
+     for (const elem of doses) {
+       const med =await UserMedcation.findById(elem._id.Medication).select("name img unit strenth")
+       responseData.push({
+         med:med,
+         confirmed:elem.confirmed,
+         rejected:elem.rejected,
+         other:elem.other,
+         total:elem.total,
+          ignored:elem.ignored
+       })
+     }
+ 
+  
+     // return succesfull response
+     return successResMsg(res, 200, {message:req.t("Success"),data:responseData});
+
+  }else if(hasSpacificReadPermissions.length>0){
+    // case spacific permission
+    ids = hasSpacificReadPermissions.map(function(el) { return mongoose.Types.ObjectId(el) })
+
+    const doses =await Occurance.aggregate([{
+      $match:{
+        ProfileID: mongoose.Types.ObjectId(ProfileID),
+        PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
+        Medication:{$in:ids},
+        isSuspended:false,
+      }
+    },
+    
+    
+       {
+         $group: {
+          _id: {
+            Medication: '$Medication',
+          },
+          confirmed: {
+            $sum: {
+              $cond: {
+                if: { $eq: ['$Status', 2] },
+                then: 1,
+                else: 0
+              }
+            }
+          },
+          rejected: {
+            $sum: {
+              $cond: {
+                if: { $eq: ['$Status', 4] },
+                then: 1,
+                else: 0
+              }
+            }
+          },
+          ignored: {
+            $sum: {
+              $cond: {
+                if: { $eq: ['$Status', 3] },
+                then: 1,
+                else: 0
+              }
+            }
+          },
+          other: {
+            $sum: {
+              $cond: {
+                if: { $in: ['$Status', [0,1]] },
+                then: 1,
+                else: 0
+              }
+            }
+          },
+          total: { $sum: 1 },
+        
+    }
+      }
+
+    ])
+
+    const responseData=[];
+
+    for (const elem of doses) {
+      const med =await UserMedcation.findById(elem._id.Medication).select("name img unit strenth")
+      responseData.push({
+        med:med,
+        confirmed:elem.confirmed,
+        rejected:elem.rejected,
+        other:elem.other,
+        total:elem.total,
+        ignored:elem.ignored
+      })
+    }
+
+ 
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Success"),data:responseData});
+  }else{
+    return errorResMsg(res, 401, req.t("Unauthorized"));
+  }
+
+    
+   
+   
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+exports.getReportSingleMed=async (req, res) => {
+
+  /** 
+   *return all user mediction 
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    const {ProfileID,StartDate,EndDate,MedID}=req.query
+
+
+             /*
+    
+    check permission 
+    
+    */
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    // get the viewer permissions
+    const viewerProfile =await Profile.findOne({
+    "Owner.User":id
+    })
+    
+    if(!viewerProfile){
+       return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    const viewer =await Viewer.findOne({
+     ViewerProfile:viewerProfile._id,
+     DependentProfile:ProfileID
+    })
+
+    if(!viewer&&profile.Owner.User.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    // check if the user is the owner and has write permission or can add meds
+      //case the owner dont has write permission
+      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+      let hasGeneralReadPermissions;
+      let hasSpacificReadPermissions;
+      if(profile.Owner.User.toString()===id){
+        hasGeneralReadPermissions=true
+      }else{
+         hasGeneralReadPermissions=viewer.CanReadDoses;
+         hasSpacificReadPermissions=viewer.CanReadSpacificMeds.map(elem=>{
+          if(elem.CanReadDoses){
+            return elem.Med.toString()
+          }
+        });
+      }
+    
+  
+ 
+
+  // case general permission
+  if(hasGeneralReadPermissions){
+     // case spacific permission
+     const doses =await Occurance.find({
+  
+         ProfileID: mongoose.Types.ObjectId(ProfileID),
+         PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
+          Medication:mongoose.Types.ObjectId(MedID)
+     }).populate(
+     {
+        path:"Medication",
+        select:"name img unit strenth type"
+     }
+     ).select("-MedInfo")
+     
+    
+ 
+  
+     // return succesfull response
+     return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+
+  }else if(hasSpacificReadPermissions.length>0){
+
+     // if the MedID is not in hasSpacificReadPermissions array return unauzorized
+  if(!hasSpacificReadPermissions.includes(MedID)){
+    return errorResMsg(res, 401, req.t("Unauthorized"));
+  }
+  
+
+
+     const doses =await Occurance.find({
+  
+      ProfileID: mongoose.Types.ObjectId(ProfileID),
+      PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
+       Medication:mongoose.Types.ObjectId(MedID),
+       isSuspended:false
+  }).populate(
+  {
+     path:"Medication",
+     select:"name img unit strenth type"
+  }
+  ).select("Medication PlannedDateTime PlannedDose Status ProfileID")
+  
+ 
+
+
+  // return succesfull response
+  return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+    
+
+    // return succesfull response
+    return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+  }else{
+    return errorResMsg(res, 401, req.t("Unauthorized"));
+  }
+
+    
+   
+   
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+

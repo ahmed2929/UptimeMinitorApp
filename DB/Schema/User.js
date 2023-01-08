@@ -66,6 +66,10 @@ var userSchema = new Schema({
   temp:{
     type:Boolean,
     default:false
+  },
+  ShouldRestPassword:{
+    type:Boolean,
+    default:false
   }
 
  

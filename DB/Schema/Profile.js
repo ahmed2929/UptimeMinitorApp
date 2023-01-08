@@ -32,6 +32,10 @@ var ProfileSchema = new Schema({
             Dependent:{
                 type:Schema.Types.ObjectId,
                 ref:"Dependent",
+            },
+            viewer:{
+                type:Schema.Types.ObjectId,
+                ref:"Viewer",
             }
      
 }],
