@@ -76,12 +76,24 @@ app.use(hpp());
 
 
 // set routes
+app.use((req,res,next)=>{
+  // log request info and its body data ?
+  console.log("request info ",req.method,req.url)
+  console.log("request body ",req.body)
+  console.log("request params ",req.params)
+  console.log("request query ",req.query)
+  console.log("request headers ",req.headers)
+  
+
+  next();
+})
 app.get("/", (req, res) => {
     res.status(200).json({
       status: "Success",
       message: `Welcome to voithy read the docs`,
     });
   });
+
   
   app.use("/api/v1/auth", Authontication);
   app.use("/api/v1/general",General);

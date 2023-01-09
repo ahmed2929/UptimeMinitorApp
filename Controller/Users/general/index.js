@@ -182,7 +182,7 @@ exports.CreateNewMed = async (req, res) => {
     // check if StartDate in the past 
     
     let DateTime = new Date()
-    DateTime.setDate(DateTime.getDate() - 1);
+    //DateTime.setDate(DateTime.getDate() - 1);
     console.log(DateTime , new Date(+jsonSchduler.StartDate))
     if((+jsonSchduler.StartDate)<DateTime.getTime()){
       return errorResMsg(res, 400, req.t("start_date_in_the_past"));
@@ -1235,7 +1235,8 @@ exports.getDoses=async (req, res) => {
     const {id} =req.id
     let {
     date,
-    ProfileID
+    ProfileID,
+    EndDate
     }=req.query
 
              /*
@@ -1291,9 +1292,13 @@ exports.getDoses=async (req, res) => {
       date=new Date()
     }
     const queryDate =new Date(+date)
-  
-     let nextDay=new Date(+date)
-    nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+    let nextDay
+    if(!EndDate){
+      nextDay=new Date(+date)
+      nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+      }else{
+      nextDay=EndDate
+      }
     
     // case has a general read permissions
     if(hasGeneralReadPermissions){
@@ -1497,12 +1502,12 @@ exports.CreateSymtom = async (req, res) => {
 
     let img
     // store the image to aure
-    if(req.files.img[0]){
+    if(req.files.img&&req.files.img[0]){
        img = await UploadFileToAzureBlob(req.files.img[0])
     }
     // store voice record to auzre
     let voice
-    if(req.files.voice[0]){
+    if(req.files.voice&&req.files.voice[0]){
       voice = await UploadFileToAzureBlob(req.files.voice[0])
     }
    
@@ -1546,7 +1551,7 @@ exports.getSymtoms=async (req, res) => {
 
     const {id} =req.id
     const {ProfileID,StartDate,EndDate}=req.query
-
+    console.log(ProfileID)
              /*
     
     check permission 
@@ -1595,10 +1600,10 @@ exports.getSymtoms=async (req, res) => {
   // case general permission
   if(hasGeneralReadPermissions){
     const symptoms =await Symptom.find({
-      ProfileID,
-      CreatedAt:{
-        $gte:StartDate,
-        $lte:EndDate
+      Profile:ProfileID,
+      StartedIn:{
+        $gte:new Date(+StartDate),
+        $lte:new Date (+EndDate)
       },
       isDeleted:false
 

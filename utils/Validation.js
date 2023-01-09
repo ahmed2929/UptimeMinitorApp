@@ -373,7 +373,6 @@ exports.validate = (req, res, next) => {
         errors.array().map(err => extractedErrors.push({
             [err.param]: req.t(err.msg)
         }))
-
         return res.status(422).json({
             errors: extractedErrors,
         })
