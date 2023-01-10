@@ -119,6 +119,9 @@ exports.logIn = async (req, res) => {
     const user = await User.findOne({
       email,
     }).select("+password");
+    if(!user){
+      return errorResMsg(res, 401, req.t("User_not_found"));
+    }
     if(user.verified===false){
       return errorResMsg(res, 401, req.t("Please_Verify_Your_Account"));
     }

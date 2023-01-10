@@ -3,7 +3,7 @@ exports.InvetationSentToExistentCareGiverUser_EN = (invetationFrom,userName) => 
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to be a caregiver to him </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -47,7 +47,7 @@ exports.InvetationSentToExistentDependentUser_EN = (invetationFrom,userName) => 
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to be your caregiver </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -93,7 +93,7 @@ exports.InvetationSentToDependent_EN = (otp,invetationFrom,userName) => {
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
             
-        your one time password is : ${otp}
+        your password is : ${otp}
         
         </p>
         
@@ -138,7 +138,7 @@ exports.InvetationSentToCareGiver_EN = (otp,invetationFrom,userName) => {
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
             
-        your one time password is : ${otp}
+        your  password is : ${otp}
         
         </p>
         

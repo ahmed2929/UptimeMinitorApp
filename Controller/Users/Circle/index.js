@@ -265,7 +265,8 @@ exports.CreateDependetA = async (req, res) => {
                 From:ProfileID,
                 To:userprofile._id,
                 Status:0,
-                dependent:newDependentUser._id
+                dependent:newDependentUser._id,
+                AccountType:1,
 
             })
 
@@ -319,7 +320,8 @@ exports.CreateDependetA = async (req, res) => {
                     phoneNumber:phoneNumber
                 },
                 temp:true,
-                ShouldRestPassword:true
+                ShouldRestPassword:true,
+                verified:true
 
 
 
@@ -356,8 +358,10 @@ exports.CreateDependetA = async (req, res) => {
             // add rest password code and its expiration date
 
               //send notifications
-               const RestPasswordCode = await GenerateRandomCode(4);
+               let RestPasswordCode = await GenerateRandomCode(6);
+               let RestPasswordCode2= await GenerateRandomCode(6)
                const ResetPasswordXpireDate =  Date.now()  + 8.64e+7 ;
+               RestPasswordCode+=RestPasswordCode2;
                if(newUser.lang==="en"){
                 const Invitation = messages.InvetationSentToDependent_EN(RestPasswordCode,profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,Invitation)
@@ -376,7 +380,8 @@ exports.CreateDependetA = async (req, res) => {
                 From:ProfileID,
                 To:newUserProfile._id,
                 Status:0,
-                dependent:newDependentUser._id
+                dependent:newDependentUser._id,
+                AccountType:1,
 
             })
                  
@@ -548,10 +553,21 @@ exports.CreateDependetA = async (req, res) => {
                 Status:Status||{ $exists:true}
             }).populate("dependent")
         }else if(recieved&&!sent){
+            console.log("recieved will run")
             invetations = await Invetation.find({
                 To:ProfileID,
                 Status:Status||{ $exists:true}
-            }).populate("dependent")
+            }).populate({
+                path:"From",
+                select :'Owner.User',
+                populate:{
+                    path:"Owner.User",
+                    select:'firstName lastName email'
+                }
+            }).populate({
+                path:"permissions.CanReadSpacificMeds.Med",
+                select:'name'
+            })
         }else{
             invetations = await Invetation.find({
                 $or:[{From:ProfileID},{To:ProfileID}],

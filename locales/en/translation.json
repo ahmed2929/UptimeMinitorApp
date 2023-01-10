@@ -68,7 +68,8 @@
     "caregiver_not_registered":"caregiver_not_registered",
     "invitation_status_changed_before":"invitation_status_changed_before",
     "registration_successful":"registration successful",
-    "Please_Verify_Your_Account":"Please_Verify_Your_Account"
+    "Please_Verify_Your_Account":"Please_Verify_Your_Account",
+    "User_not_found":"User_not_found"
     
 
 

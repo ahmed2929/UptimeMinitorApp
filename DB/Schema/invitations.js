@@ -51,7 +51,7 @@ var InvitationsSchema = new Schema({
         CanReadSpacificMeds:[{
             Med:{
                 type:Schema.Types.ObjectId,
-                 ref:"Medication",
+                 ref:"UserMedcation",
             },
             CanRead:{
                 type:Boolean,
@@ -85,7 +85,8 @@ var InvitationsSchema = new Schema({
         },
     },
     AccountType:{
-        type:Number
+        type:Number, // 2 if the recevier will be a caregiver 1 for dependent
+        default:1
     }
 
  
