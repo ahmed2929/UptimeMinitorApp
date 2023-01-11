@@ -32,7 +32,7 @@ var ViewerSchema = new Schema({
     },
     CanWriteSymtoms:{
         type:Boolean,
-        default:false,
+        default:true,
     },
     CanAddMeds:{
         type:Boolean,

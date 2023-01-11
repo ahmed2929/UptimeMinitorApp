@@ -29,6 +29,8 @@ router.post(
 
 router.post(
     "/resend/activation/code",
+    validation.resendAcctivationCodeValidationRules(),
+    validation.validate,
     userController.ResendVirificationCode
 );
 

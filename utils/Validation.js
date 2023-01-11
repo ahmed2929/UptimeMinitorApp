@@ -30,11 +30,19 @@ exports.loginValidationRules = () => {
     ]
 }
 
+exports.resendAcctivationCodeValidationRules = () => {
+    return [
+        body("email").notEmpty().withMessage("Email_is_required").isEmail().withMessage("Email_is_not_valid").normalizeEmail().withMessage("Email_is_required")
+    ]
+}
+
 
 
 exports.virifyAccount = () => {
     return [
         body("verfiycode").notEmpty().withMessage("verifyCode_is_required"),
+        body("email").notEmpty().withMessage("Email_is_required").isEmail().withMessage("Email_is_not_valid").normalizeEmail().withMessage("Email_is_required")
+
     ]
 }
 

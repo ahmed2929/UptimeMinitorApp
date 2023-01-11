@@ -116,9 +116,11 @@ exports.logIn = async (req, res) => {
       password
     } = req.body;
     // check if user exists and select password
+    console.log("email is ",email)
     const user = await User.findOne({
       email,
     }).select("+password");
+    console.log("user i s ",user)
     if(!user){
       return errorResMsg(res, 401, req.t("User_not_found"));
     }
@@ -350,7 +352,7 @@ exports.ResendVirificationCode = async (req, res) => {
     }
 
     const user = await User.findOne({email:email});
-
+    console.log("user is ",email)
      if(!user){
       return  errorResMsg(res, 406, req.t("user_is_not_found"));
      }

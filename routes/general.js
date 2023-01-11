@@ -106,6 +106,11 @@ router.get(
     userController.getReportSingleMed
 );
 
+router.get(
+    "/doses/all",
+    IsAuth(),
+    userController.getAllDoses
+);
 
 
 

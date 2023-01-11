@@ -181,7 +181,7 @@ exports.CreateNewMed = async (req, res) => {
     }
     // check if StartDate in the past 
     
-    let DateTime = new Date()
+    let DateTime = new Date((new Date()).getTime() - (60*60*24*1000))
     //DateTime.setDate(DateTime.getDate() - 1);
     console.log(DateTime , new Date(+jsonSchduler.StartDate))
     if((+jsonSchduler.StartDate)<DateTime.getTime()){
@@ -1988,6 +1988,168 @@ exports.getReportSingleMed=async (req, res) => {
     
    
    
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+exports.getAllDoses=async (req, res) => {
+  /**
+   * get my doses and my dependents doses
+   * 
+   * 
+   */
+  /** 
+   * return doses with a spacic date
+   * if no date is provided the defult is today
+   * returns not suspended dosages
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    let {
+    date,
+    ProfileID,
+    EndDate
+    }=req.query
+
+             /*
+    
+    check permission 
+    
+    */
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    // get the viewer permissions
+    const viewerProfile =await Profile.findOne({
+    "Owner.User":id
+    })
+    
+    if(!viewerProfile){
+       return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    const viewer =await Viewer.findOne({
+     ViewerProfile:viewerProfile._id,
+     DependentProfile:ProfileID
+    })
+    if(!viewer&&profile.Owner.User.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    // check if the user is the owner and has write permission or can add meds
+      //case the owner dont has write permission
+      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+      let hasGeneralReadPermissions;
+      let hasSpacificReadPermissions;
+      if(profile.Owner.User.toString()===id){
+        hasGeneralReadPermissions=true
+      }else{
+        hasGeneralReadPermissions=viewer.CanReadDoses;
+        hasSpacificReadPermissions=viewer.CanReadSpacificMeds.map(elem=>{
+         if(elem.CanReadDoses){
+           return elem.Med
+         }
+       });
+      }
+    
+
+
+
+    // get occurances which equal today
+    if(!date){
+      date=new Date()
+    }
+    const queryDate =new Date(+date)
+    let nextDay
+    if(!EndDate){
+      nextDay=new Date(+date)
+      nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+      }else{
+      nextDay=EndDate
+      }
+    
+      // get all my dependents
+    const mydependents =await Viewer.find({
+      ViewerProfile:viewerProfile._id
+    })
+    
+    const dependentsProfiles =mydependents.filter(elem=>{
+      return elem.CanReadDoses;
+    })
+    const dependentsProfilesIDs =dependentsProfiles.map(elem=>{
+      return elem.DependentProfile
+    })
+    // push the viewer profile to dependentsProfileIDs
+    dependentsProfilesIDs.push(viewerProfile._id)
+
+    // get general permissions doses
+    const generalDoses =await Occurance.find({
+      ProfileID:{$in:dependentsProfilesIDs},
+      PlannedDateTime:{$gte:queryDate,$lt:nextDay},
+      isSuspended:false
+
+    }).select(
+      "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id ProfileID"
+    )
+    .populate({
+      path:"ProfileID",
+      select:"Owner.User",
+      populate:{
+        path:"Owner.User",
+        select:"firstName lastName email"
+      }
+
+    })
+
+    // get doses which i has read permissions to
+    const dependentsWithSpacific =mydependents.filter(elem=>{
+      return !elem.CanReadDoses;
+    })
+    const dependentsSpacificMeds =[]
+    
+    dependentsWithSpacific.forEach(dependent=>{
+      dependent.CanReadSpacificMeds.forEach(elem=>{
+        if(elem.CanReadDoses){
+          dependentsSpacificMeds.push(elem.Med)
+        }
+      })
+
+    })
+    const spacificDoses =await Occurance.find({
+      PlannedDateTime:{$gte:queryDate,$lt:nextDay},
+      isSuspended:false,
+      Medication:{$in:dependentsSpacificMeds}
+
+    })
+    .select("PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id ProfileID")
+    .populate({
+      path:"ProfileID",
+      select:"Owner",
+      populate:{
+        path:"Owner.User",
+        select:"firstName lastName email"
+      }
+
+    })
+    
+const doses=[...generalDoses,...spacificDoses]
+
+
+  return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+
+   
+    
+  
     
   } catch (err) {
     // return error response

@@ -830,22 +830,26 @@ exports.CreateDependetA = async (req, res) => {
         if(Status===1){
             invetation.Status=1;
             
-            // add the dependent to the master profile
-            CareGiverProfile.Dependents.push({
-                Profile:dependentProfile._id,
-                Dependent: invetation.dependent
-            })
-            //get careGiver permissions
-            const permissions = {
-               ... invetation.permissions
-            }
-            // create new viewer
-            const newViewer = new Viewer({
+              //get careGiver permissions
+              const permissions = {
+                ... invetation.permissions
+             }
+          
+               // create new viewer
+               const newViewer = new Viewer({
                 ViewerProfile:CareGiverProfile._id,
                 DependentProfile:dependentProfile._id,
                 ...permissions
 
             })
+
+            // add the dependent to the master profile
+            CareGiverProfile.Dependents.push({
+                Profile:dependentProfile._id,
+                Dependent: invetation.dependent,
+                viewer:newViewer._id
+            })
+          
             // add the master to the dependent profile
             dependentProfile.Viewers.push({
                 viewer:newViewer._id,
