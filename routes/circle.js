@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const CicleController = require("../Controller/Users/Circle/index");
+const CircleController = require("../Controller/Users/Circle/index");
 const validation = require("../utils/Validation");
 const IsAuth  =require('../utils/Authorization').authorization
 const upload =require("../config/multerConfig")
@@ -11,48 +11,48 @@ router.post(
     "/create/dependent/A",
     upload.single("img"),
     IsAuth(),
-    CicleController.CreateDependetA
+    CircleController.CreateDependentA
 );
 
 router.post(
     "/create/dependent/B",
     upload.single("img"),
     IsAuth(),
-    CicleController.CreateDependetB
+    CircleController.CreateDependentB
 );
 
 router.post(
     "/change/invitation/status",
     IsAuth(),
-    CicleController.ChangeInvitationStatus
+    CircleController.ChangeInvitationStatus
 );
 
 router.post(
     "/add/caregiver",
     IsAuth(),
-    CicleController.AddCareGiver
+    CircleController.AddCareGiver
 );
 
 router.post(
     "/change/dependent/request",
     IsAuth(),
-    CicleController.ChangeInvitationStatusToAcceptDependent
+    CircleController.ChangeInvitationStatusToAcceptDependent
 );
 
 router.get(
     "/invitation",
     IsAuth(),
-    CicleController.getInvitations
+    CircleController.getInvitations
 );
 router.get(
     "/dependent",
     IsAuth(),
-    CicleController.Dependents
+    CircleController.Dependents
 );
 router.get(
     "/caregiver",
     IsAuth(),
-    CicleController.CareGiver
+    CircleController.CareGiver
 );
 
 

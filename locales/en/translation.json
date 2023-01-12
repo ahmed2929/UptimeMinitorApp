@@ -57,7 +57,7 @@
     "no_specific_days_provided":"no_specific_days_provided",
     "invalid_occurence_pattern":"invalid_occurence_pattern",
     "symtom_created":"symtom_created",
-    "depenentA_created":"depenentA_created",
+    "dependentA_created":"depenentA_created",
     "user_already_dependent":"user_already_dependent",
     "user_already_viewer":"user_already_viewer",
     "user_already_owner":"user_already_owner",

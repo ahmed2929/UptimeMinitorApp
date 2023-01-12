@@ -1,0 +1,2317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Medication - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/your-github-username/pet-adoption-center-sdk" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessResetPasswordToken">exports.GenerateAccessResetPasswordToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessToken">exports.GenerateAccessToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResendVerificationCode">exports.ResendVerificationCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResetPassword">exports.ResetPassword</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.SendRestPasswordCode">exports.SendRestPasswordCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.VerifyAccount">exports.VerifyAccount</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.logIn">exports.logIn</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.signUp">exports.signUp</a></li></ul></li><li><a href="Doses.html">Doses</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Doses.html#.exports.ChangeDoseStatus">exports.ChangeDoseStatus</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.EditSingleDose">exports.EditSingleDose</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.SuspendDoses">exports.SuspendDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getAllDoses">exports.getAllDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getDoses">exports.getDoses</a></li></ul></li><li><a href="MedicalCircle.html">MedicalCircle</a><ul class='methods'><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.AddCareGiver">exports.AddCareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CareGiver">exports.CareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatus">exports.ChangeInvitationStatus</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatusToAcceptDependent">exports.ChangeInvitationStatusToAcceptDependent</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentA">exports.CreateDependentA</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentB">exports.CreateDependentB</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.Dependents">exports.Dependents</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.getInvitations">exports.getInvitations</a></li></ul></li><li><a href="Medication.html">Medication</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Medication.html#.exports.CreateNewMed">exports.CreateNewMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.EditMed">exports.EditMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.deletMedictionCycle">exports.deletMedictionCycle</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.getMedication">exports.getMedication</a></li></ul></li><li><a href="Report.html">Report</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReport">exports.getReport</a></li><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReportSingleMed">exports.getReportSingleMed</a></li></ul></li><li><a href="Symptom.html">Symptom</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.CreateSymptom">exports.CreateSymptom</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.getSymptoms">exports.getSymptoms</a></li></ul></li><li><a href="routes.html">routes</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Medication</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            Namespace
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+
+    
+
+    <h4 class="name" id="Medication">Medication</h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>controller/general/index.js</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Users_Medication_index.js.html">Controller/Users/Medication/index.js</a>, <a href="Controller_Users_Medication_index.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.CreateNewMed"><span class="type-signature type-signature-static">(static) </span>exports.CreateNewMed<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><ul>
+<li>-1 user access this api to create a new med</li>
+<li>-2 check if the user has a profile
+user token and ProfileID are required:
+-the ProfileID is the ProfileID of the person you want to query about him and if you are Authorization will return the data .</li>
+</ul>
+<p>-this api is used to create  a new med and its schdule
+-med schudle is under 4 senarios
+-SchduleType takes the fowllowing values
+-{1:asNeeded,2:everyDay,3:daysInterval,         0:withSapacicDays}
+-Note: DateTime is the dose date and time in ms format
+example of schdule values
+1- occure evry day
+{
+&quot;StartDate&quot;: 1671636600000,
+&quot;EndDate&quot;: 1671985800000,
+&quot;AsNeeded&quot;: false,
+&quot;ScheduleType&quot;:2,
+&quot;DaysInterval&quot;: null,
+&quot;DpacifcDays&quot;: null,</p>
+<pre><code>&quot;dosage&quot;: [
+  {
+    &quot;dose&quot;: 2,
+    &quot;DateTime&quot;: 1671636600000
+  },
+   {
+    &quot;dose&quot;: 1,
+    &quot;DateTime&quot;: 1671640200000
+  }
+]
+</code></pre>
+<p>}
+2-  with days intervals
+{
+&quot;StartDate&quot;: 1671698510816,
+&quot;EndDate&quot;: 1671985800000,
+&quot;AsNeeded&quot;: false,
+&quot;ScheduleType&quot;:3,
+&quot;DaysInterval&quot;: 2,
+&quot;DpacifcDays&quot;: null,</p>
+<pre><code>&quot;dosage&quot;: [
+  {
+    &quot;dose&quot;: 5,
+    &quot;DateTime&quot;: 1671636600000
+  },
+   {
+    &quot;dose&quot;: 4,
+    &quot;DateTime&quot;: 1671640200000
+  }
+]
+</code></pre>
+<p>}
+3-happens in a spacific days</p>
+<p>{
+&quot;StartDate&quot;: 1671695330693,
+&quot;EndDate&quot;: 1674664200000,
+&quot;AsNeeded&quot;: false,
+&quot;ScheduleType&quot;: &quot;0&quot;,
+&quot;DaysInterval&quot;: null,
+&quot;DpacifcDays&quot;: [
+&quot;Thursday&quot;,
+&quot;Friday&quot;,
+&quot;Saturday&quot;
+],
+&quot;dosage&quot;: [
+{
+&quot;dose&quot;: 2,
+&quot;DateTime&quot;: 1671636600000
+},
+{
+&quot;dose&quot;: 1,
+&quot;DateTime&quot;: 1671640200000
+}
+]
+}</p>
+<p>4- as needed
+{
+&quot;StartDate&quot;: 1671695330693,
+&quot;EndDate&quot;: null,
+&quot;AsNeeded&quot;: true,
+&quot;ScheduleType&quot;: &quot;1&quot;,
+&quot;DaysInterval&quot;: null,
+&quot;dosage&quot;: [
+{
+&quot;dose&quot;: 2,
+&quot;DateTime&quot;: null
+}</p>
+<p>]
+}</p>
+<p>-externalInfo is an object which contains the med information which is returned form search api
+{
+&quot;DrugCode&quot;:&quot;H21-5135-05410-01&quot;,
+etc...</p>
+<pre><code>}
+</code></pre>
+<p>// create Occurances</p>
+<p>-date and time are represinted in ms format
+-med take time is extracted from startDate ms
+-start date must be provided , the api consumer must provide startdate with the choosen time
+-if then no endDate then the defult is date.now()+3 monthes
+-the defult pattern is every day with occurence pattern 1 means everyday (case 1)
+-if the user proviced occurence pattern n(2,3,4 ...etc) means the generated occurences evry n days (case 2)
+-case 3 when user choose spacifc days to run the interval</p>
+<ul>
+<li>for case 1 and 2 run GenerateOccurances function wich takes (userID,medId,SchdulerId,OccrurencePattern,startDate,endDate,OccurancesData) as
+parametars and returns array of objects wich reprisints occurence valid object</li>
+<li>then write the ocuurences in the database</li>
+</ul></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Users_Medication_index.js.html">Controller/Users/Medication/index.js</a>, <a href="Controller_Users_Medication_index.js.html#line175">line 175</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express request object</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>user id extracted from authorization header</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>request body</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med name</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med type</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>strenth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med strenth</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>unit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med unit</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>quantity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med quantity</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>instructions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>instructions</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>condition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>condition</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>file.img</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>img</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.ProfileID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>ProfileID</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.externalInfo</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>externalInfo is an object which contains the med information which is returned form search api{</p>
+<p>&quot;DrugCode&quot;:&quot;H21-5135-05410-01&quot;,
+etc...</p>
+<p>}</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.Schduler</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the med scheduler object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express response object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-throws">Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user does not have a profile</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user is not the owner of the profile or has a permission</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns created med</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.EditMed"><span class="type-signature type-signature-static">(static) </span>exports.EditMed<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>edit med and schdule api
+-this api sholud be called when user needs to edit med or its schdule
+-the caller must be the med creator or has a permission
+-medId and schdule id is required
+-that data to be edit</p>
+<hr>
+<p>logic</p>
+<hr>
+<p>1- make sure that the caller is the med creator or has a permission
+2- make sure that the med id and shcdule id is valid
+3- retrive the med and edit it
+4- retrive the schdule and edit it
+5- edit all the future occurance if it changed</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Users_Medication_index.js.html">Controller/Users/Medication/index.js</a>, <a href="Controller_Users_Medication_index.js.html#line605">line 605</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express request object</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>user id extracted from authorization header</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>request body</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med name</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med type</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>strenth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med strenth</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>unit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med unit</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>quantity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>med quantity</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>instructions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>instructions</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>condition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>condition</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>file.img</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>img</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.ProfileID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>ProfileID</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.externalInfo</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>externalInfo is an object which contains the med information which is returned form search api{</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.MedId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>MedID
+&quot;DrugCode&quot;:&quot;H21-5135-05410-01&quot;,
+etc...</p>
+<p>}</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.Schduler</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the med scheduler object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express response object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-throws">Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user does not have a profile</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user is not the owner of the profile or has a permission</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the MedID is not valid</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns edited med</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.deletMedictionCycle"><span class="type-signature type-signature-static">(static) </span>exports.deletMedictionCycle<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>delete all cycle
+-this api sholud be called when user needs to delete medicatation cycle
+-the caller must be the med creator
+-medId and schdule id is required
+-that data to be edit</p>
+<hr>
+<p>logic</p>
+<hr>
+<p>1- make sure that the caller is the med creator
+2- make sure that the med id and shcdule id is valid
+3- flag the med and schduler as deleted
+4- delete all the future doses</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Users_Medication_index.js.html">Controller/Users/Medication/index.js</a>, <a href="Controller_Users_Medication_index.js.html#line1134">line 1134</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express request object</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>user id extracted from authorization header</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.ProfileID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>ProfileID</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.MedId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>ProfileID</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express response object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-throws">Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user does not have a profile</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user is not the owner of the profile or has a permission</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the MedID is not valid</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns edited med</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.getMedication"><span class="type-signature type-signature-static">(static) </span>exports.getMedication<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>*return all user mediction if he is the profile owner
+return all meds that he has a permission to view for that profile id</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Users_Medication_index.js.html">Controller/Users/Medication/index.js</a>, <a href="Controller_Users_Medication_index.js.html#line994">line 994</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express request object</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>user id extracted from authorization header</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>query.ProfileID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>ProfileID
+&quot;DrugCode&quot;:&quot;H21-5135-05410-01&quot;,
+etc...</p>
+<p>}</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>body.Schduler</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the med scheduler object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express response object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-throws">Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user does not have a profile</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>if the user is not the owner of the profile or has a permission</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Returns array of med</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.0</a> on Thu Jan 12 2023 15:33:24 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

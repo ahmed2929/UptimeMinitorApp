@@ -1,6 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Controller/Users/Authontication/index.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/your-github-username/pet-adoption-center-sdk" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessResetPasswordToken">exports.GenerateAccessResetPasswordToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessToken">exports.GenerateAccessToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResendVirificationCode">exports.ResendVirificationCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResetPassword">exports.ResetPassword</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.SendRestPasswordCode">exports.SendRestPasswordCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.VerifyAccount">exports.VerifyAccount</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.logIn">exports.logIn</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.signUp">exports.signUp</a></li></ul></li><li><a href="routes.html">routes</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Controller/Users/Authontication/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file controller/Authontication/index.js
+ * @namespace controllers
+ * @namespace Auth
+ * 
+ */
+
+
 const User = require("../../../DB/Schema/User");
 const Profile = require("../../../DB/Schema/Profile");
-const Permission = require("../../../DB/Schema/Permissions");
 const messages = require("../../../Messages/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
 const {
@@ -11,10 +67,30 @@ const {
 const {GenerateToken,GenerateRandomCode,GenerateRefreshToken} =require("../../../utils/HelperFunctions")
 
 
-// Signup
-exports.signUp = async (req, res) => {
 
-  /**
+/**
+ * create a new user
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.firstName - First name of the user
+ * @param {string} req.body.lastName - Last name of the user
+ * @param {Object} req.body.mobileNumber - Object consist of country code and phone number
+ * @param {string} req.body.mobileNumber.countryCode -country code
+ * @param {string} req.body.mobileNumber.phoneNumber -phone number
+ * @param {string} req.body.email - Email of the user
+ * @param {string} req.body.password - Password of the user
+ * @param {string} req.body.lang - user default language , the default is english user can provide en or ar
+ * 
+ * @throws {Error} if the email already exist
+ * @throws {Error} if the phone number already exist
+ * @returns {string} - message that the user registered successfully
+ *
+   * @description
    * req: an object containing the HTTP request data, including the request body which should contain the user's email, mobile number, and other information needed to create a new user account.
     • res: an object containing the HTTP response data, including functions for sending a response back to the client.
     The function first tries to find an existing user with the provided email or mobile number. If a user is found, it returns an error message indicating that the email or mobile number is already taken. If no user is found, it generates a verification code and a verification expiration date (24 hours from the current time) and creates a new user account with this information. It also generates a token and a refresh token for the new user.
@@ -23,6 +99,8 @@ exports.signUp = async (req, res) => {
    * 
    * 
    */
+exports.signUp = async (req, res) => {
+
  
   try {
     // get user with email
@@ -34,7 +112,7 @@ exports.signUp = async (req, res) => {
     if (user) {
       return errorResMsg(res, 423, req.t("email_is_already_taken_Or_phone"));
     }
-    // generate VerifictionCode and VerifictionXpireDate for user .
+    // generate Verifiction Code and VerifictionXpireDate for user .
     // VerifictionXpireDate after 24 hours
     const VerifictionCode = await GenerateRandomCode(2);
     const VerifictionXpireDate =  Date.now()  + 8.64e+7 ;
@@ -99,17 +177,35 @@ exports.signUp = async (req, res) => {
   }
 };
 
-// Login
-exports.logIn = async (req, res) => {
-  /**
+
+
+/**
+ * login user
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.email - Email of the user
+ * @param {string} req.body.password - Password of the user
+ * @throws {Error} if the email is not found
+ * @throws {Error} if the password does not match the email
+ * @throws {Error} if the user is not verified
+ * @returns {Object} - contains user data,token , refresh token
+ *
+   * @description
    * the login process for an existing user. It takes in two parameters:
     • req: an object containing the HTTP request data, including the request body which should contain the user's email and password.
     • res: an object containing the HTTP response data, including functions for sending a response back to the client.
       The function first retrieves the user's email and password from the request body. It then checks if a user with the provided email exists, and retrieves the user's password if it does. It then checks if the provided password is correct by calling the correctPassword method on the user object. If the password is incorrect or the user does not exist, it returns an error message indicating that the email or password is incorrect.
-      If the email and password are correct, it generates a token and a refresh token for the user and sends a successful response to the client containing the generated tokens.
+      If the email and password are correct,and the user account is verified it generates a token and a refresh token for the user and sends a successful response to the client containing the generated tokens.
       If there is an error during the process, it returns an error response with a status code of 500 and the error message.
    * 
    */
+exports.logIn = async (req, res) => {
+ 
   try {
     const {
       email,
@@ -160,24 +256,42 @@ exports.logIn = async (req, res) => {
   }
 };
 
-exports.SendRestPasswordCode= async (req, res) => {
-  try {
-    /**
-     * The SendRestPasswordCode function is an asynchronous function that sends a reset password code to a user's email address.
+
+/**
+ * send rest password code 
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.email - Email of the user
+ * @throws {Error} if the email is not found
+ * @returns {string} - return message rest_password_code_has_been_sent
+ *
+   * @description
+   * -1 this function is a part of rest password process
+   * -2 to rest password you need to access 
+   * -send rest password code
+   * -take the code and and send it with the email to GenerateAccessResetPasswordToken and it returns you a token
+   * -use this token to access rest password api to rest new password
+   ** The SendRestPasswordCode function is an asynchronous function that sends a reset password code to a user's email address.
       The function takes in two arguments: req and res. The req argument is the HTTP request object, which contains information about the incoming request, such as the body of the request, query parameters, and headers. The res argument is the HTTP response object, which is used to send a response back to the client.
       The function begins by trying to retrieve the email property from the req.body object. If the email property is not present, the function sends an error response with a status code of 406 (Not Acceptable) and a message indicating that the email is required.
       Next, the function uses the User model to try to find a user with the specified email address. If no user is found, the function sends an error response with a status code of 406 (Not Acceptable) and a message indicating that the user is not found.
       If a user is found, the function generates a random code using the  following equation  `Math.floor(Math.random()*9000+1000) `  
       and set expiration time to 24h from the  current time
-
-
-
       It then sends an email to the user with the reset password code. The email message is generated using a separate function (either messages.forgetMessage_EN or messages.forgetMessage_AR) depending on the user's language preference.
           4. The reset password code and expiration date are then saved to the user's record in the database.
           5. Finally, the function returns a success message saying that the reset password code has been sent.
       If any errors occur during the process, the function returns an error message with an HTTP status code of 500
-     * 
-     */
+   
+      * the code is valid within 24 h
+   */
+exports.SendRestPasswordCode= async (req, res) => {
+  try {
+    
     const {email} = req.body;
     if (!email) {
       return  errorResMsg(res, 406, req.t("Email_is_required"));
@@ -213,9 +327,24 @@ exports.SendRestPasswordCode= async (req, res) => {
   }
 };
 
-exports.GenerateAccessResetPasswordToken= async (req, res) => {
-  /**
-   * The function starts by destructuring the email and code from the request body.
+/**
+ * send rest password code 
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.email - Email of the user
+ * @param {string} req.body.code - otp code
+ * @throws {Error} if the email is not found
+ * @throws {Error} if the code is not valid
+ * @throws {Error} if the code is expired
+ * @returns {Object} - contains token
+ *
+   * @description
+    * The function starts by destructuring the email and code from the request body.
     1. It then searches for a user with the given email using the User.findOne() method.
     2. If no user is found, it sends an error response with a message saying "user is not found".
     3. If a user is found, it checks if the code provided in the request body matches the code stored in the user's record.
@@ -227,9 +356,9 @@ exports.GenerateAccessResetPasswordToken= async (req, res) => {
     Note: The errorResMsg() and successResMsg() functions are helper functions that are used to 
     send error and success responses to the client, respectively.
      The GenerateToken() function is a helper function that is used to generate a new token.
-   * 
-   * 
    */
+exports.GenerateAccessResetPasswordToken= async (req, res) => {
+  
 
   try {
     const {
@@ -249,7 +378,7 @@ exports.GenerateAccessResetPasswordToken= async (req, res) => {
       return errorResMsg(res, 406, req.t("code_is_not_valid"));
    }
    
-   if(user.ResetPasswordXpireDate<=Date.now()){
+   if(user.ResetPasswordXpireDate&lt;=Date.now()){
       return errorResMsg(res, 406, req.t("code_is_expired"));
    }
 
@@ -263,6 +392,29 @@ exports.GenerateAccessResetPasswordToken= async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+
+
+/**
+ * rest password
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.Authorization - access token
+ * @param {string} req.body.NewPassword - user new password
+ * @throws {Error} if the email is not found
+ * @returns {string} - password_has_been_updated
+ *
+   * @description
+    * This function requires access token in its header
+    * The function starts by destructuring the NewPassword from the request body.
+    * set the new password to the user and save it to db
+    * 
+   */
 
 exports.ResetPassword = async (req, res) => {
   try {
@@ -298,6 +450,33 @@ exports.ResetPassword = async (req, res) => {
   }
 };
 
+
+/**
+ * verify account
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.verfiycode - verify code
+ * @param {string} req.body.email - user email
+ * @throws {Error} if the email is not found
+ * @throws {Error} if the user is already verified
+ * @throws {Error} if the code is not valid
+ * @throws {Error} if the code is expired
+ * @returns {string} -message account_has_been_activated
+ *
+   * @description
+    * 
+    * The function starts by destructuring the code and email from the request body.
+    * compares the verify code with the code sent to the user
+    * if the are match and not expired set the verify to true
+    * else return error
+    * 
+   */
+
 exports.VerifyAccount = async (req, res) => {
   try {
     const {
@@ -327,7 +506,7 @@ exports.VerifyAccount = async (req, res) => {
         return errorResMsg(res, 406, req.t("verifyCode_is_not_valid"));
      }
      
-     if(user.VerifictionXpireDate<=Date.now()){
+     if(user.VerifictionXpireDate&lt;=Date.now()){
         return errorResMsg(res, 406, 'verifyCode_is_expired');
      }
      //activate user
@@ -341,6 +520,30 @@ exports.VerifyAccount = async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+
+/**
+ * resend verify code
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.email - user email
+ * @throws {Error} if the email is not found
+ * @throws {Error} if the user is already verified
+ * @returns {string} - message is activation_code_has_been_sent
+ *
+   * @description
+    * 
+    * The function starts by destructuring the email from the request body.
+    * resend activation code to the user if he is not verified 
+    * 
+   */
+
+
 
 exports.ResendVirificationCode = async (req, res) => {
   try {
@@ -380,6 +583,30 @@ exports.ResendVirificationCode = async (req, res) => {
 };
 
 
+/**
+ * Generate Access Token
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {string} req.body.Authorization - refresh token
+ * @throws {Error} if user not found
+ * @throws {Error} if refresh token expired
+
+ * @returns {Object} - contains access token
+ *
+   * @description
+    * 
+    *this function takes refresh token in the header
+    *if the the refresh token is valid 
+    * generates a new access token
+    * 
+    * 
+   */
+
+
 exports.GenerateAccessToken = async (req, res) => {
   try {
     const UserID=req.id.id
@@ -408,3 +635,32 @@ exports.GenerateAccessToken = async (req, res) => {
   }
 };
 
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.0</a> on Thu Jan 12 2023 10:22:03 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

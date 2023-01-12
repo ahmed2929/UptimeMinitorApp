@@ -1,4 +1,53 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Controller/Users/Circle/index.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/your-github-username/pet-adoption-center-sdk" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessResetPasswordToken">exports.GenerateAccessResetPasswordToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessToken">exports.GenerateAccessToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResendVerificationCode">exports.ResendVerificationCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResetPassword">exports.ResetPassword</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.SendRestPasswordCode">exports.SendRestPasswordCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.VerifyAccount">exports.VerifyAccount</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.logIn">exports.logIn</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.signUp">exports.signUp</a></li></ul></li><li><a href="Doses.html">Doses</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Doses.html#.exports.ChangeDoseStatus">exports.ChangeDoseStatus</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.EditSingleDose">exports.EditSingleDose</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.SuspendDoses">exports.SuspendDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getAllDoses">exports.getAllDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getDoses">exports.getDoses</a></li></ul></li><li><a href="MedicalCircle.html">MedicalCircle</a><ul class='methods'><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.AddCareGiver">exports.AddCareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CareGiver">exports.CareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatus">exports.ChangeInvitationStatus</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatusToAcceptDependent">exports.ChangeInvitationStatusToAcceptDependent</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentA">exports.CreateDependentA</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentB">exports.CreateDependentB</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.Dependents">exports.Dependents</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.getInvitations">exports.getInvitations</a></li></ul></li><li><a href="Medication.html">Medication</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Medication.html#.exports.CreateNewMed">exports.CreateNewMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.EditMed">exports.EditMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.deletMedictionCycle">exports.deletMedictionCycle</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.getMedication">exports.getMedication</a></li></ul></li><li><a href="Report.html">Report</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReport">exports.getReport</a></li><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReportSingleMed">exports.getReportSingleMed</a></li></ul></li><li><a href="Symptom.html">Symptom</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.CreateSymptom">exports.CreateSymptom</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.getSymptoms">exports.getSymptoms</a></li></ul></li><li><a href="routes.html">routes</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Controller/Users/Circle/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @file controller/Circle/index.js
  * @namespace controllers
  * @namespace MedicalCircle
@@ -296,7 +345,7 @@ exports.CreateDependentA = async (req, res) => {
             
           // check if user exists and send invitation to that user
           // case user is active
-          if (user&&!user.temp) {
+          if (user&amp;&amp;!user.temp) {
             /**
              * user alreay exists
              * send notification to that user
@@ -376,7 +425,7 @@ exports.CreateDependentA = async (req, res) => {
           }
 
             // case user is not active
-            if (user&&user.temp) {
+            if (user&amp;&amp;user.temp) {
                 return errorResMsg(res, 400, req.t("user_is_not_active"));
             }
 //******************************************************************* */
@@ -681,17 +730,17 @@ The filter can be based on the status, sent, and received parameters.
         // get the invetations
         let invetations;
         //defult filter with all prametars
-        if(sent && recieved){
+        if(sent &amp;&amp; recieved){
             invetations = await Invetation.find({
                 $or:[{From:ProfileID},{To:ProfileID}],
                 Status:Status||{ $exists:true}
             }).populate("dependent")
-        }else if(sent&&!recieved){
+        }else if(sent&amp;&amp;!recieved){
             invetations = await Invetation.find({
                 From:ProfileID,
                 Status:Status||{ $exists:true}
             }).populate("dependent")
-        }else if(recieved&&!sent){
+        }else if(recieved&amp;&amp;!sent){
             console.log("recieved will run")
             invetations = await Invetation.find({
                 To:ProfileID,
@@ -1214,4 +1263,32 @@ retrieves the dependents of the user from the viewer collection which master pro
       console.log(err)
       return errorResMsg(res, 500, err);
     }
-  }; 
+  }; </code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.0</a> on Thu Jan 12 2023 15:33:24 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

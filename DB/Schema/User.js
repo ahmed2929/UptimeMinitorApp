@@ -33,10 +33,10 @@ var userSchema = new Schema({
     type:Boolean,
     default:false
   },
-  VerifictionCode:{
+  verificationCode:{
     type:String
   },
-  VerifictionXpireDate:{
+  verificationExpiryDate:{
     type:Date
   },
   mobileNumber:{
@@ -52,7 +52,7 @@ var userSchema = new Schema({
   RestPasswordCode:{
     type:String
   },
-  ResetPasswordXpireDate:{
+  ResetPasswordExpiryDate:{
     type:Date
   },
   lang:{

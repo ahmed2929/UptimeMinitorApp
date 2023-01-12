@@ -7,7 +7,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
-const Authontication=require('../routes/authontication')
+const Authorization=require('../routes/Authorization')
 const General=require('../routes/general')
 const i18next =require("i18next")
 const i18nextMiddleware = require("i18next-http-middleware");
@@ -95,7 +95,7 @@ app.get("/", (req, res) => {
   });
 
   
-  app.use("/api/v1/auth", Authontication);
+  app.use("/api/v1/auth", Authorization);
   app.use("/api/v1/general",General);
   app.use("/api/v1/admin",Admin);
   app.use("/api/v1/circle",Circle);

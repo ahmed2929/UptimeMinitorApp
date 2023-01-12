@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Controller/Users/Doses/index.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/your-github-username/pet-adoption-center-sdk" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessResetPasswordToken">exports.GenerateAccessResetPasswordToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessToken">exports.GenerateAccessToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResendVerificationCode">exports.ResendVerificationCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResetPassword">exports.ResetPassword</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.SendRestPasswordCode">exports.SendRestPasswordCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.VerifyAccount">exports.VerifyAccount</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.logIn">exports.logIn</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.signUp">exports.signUp</a></li></ul></li><li><a href="Doses.html">Doses</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Doses.html#.exports.ChangeDoseStatus">exports.ChangeDoseStatus</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.EditSingleDose">exports.EditSingleDose</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.SuspendDoses">exports.SuspendDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getAllDoses">exports.getAllDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getDoses">exports.getDoses</a></li></ul></li><li><a href="MedicalCircle.html">MedicalCircle</a><ul class='methods'><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.AddCareGiver">exports.AddCareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CareGiver">exports.CareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatus">exports.ChangeInvitationStatus</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatusToAcceptDependent">exports.ChangeInvitationStatusToAcceptDependent</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentA">exports.CreateDependentA</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentB">exports.CreateDependentB</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.Dependents">exports.Dependents</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.getInvitations">exports.getInvitations</a></li></ul></li><li><a href="Medication.html">Medication</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Medication.html#.exports.CreateNewMed">exports.CreateNewMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.EditMed">exports.EditMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.deletMedictionCycle">exports.deletMedictionCycle</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.getMedication">exports.getMedication</a></li></ul></li><li><a href="Report.html">Report</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReport">exports.getReport</a></li><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReportSingleMed">exports.getReportSingleMed</a></li></ul></li><li><a href="Symptom.html">Symptom</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.CreateSymptom">exports.CreateSymptom</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.getSymptoms">exports.getSymptoms</a></li></ul></li><li><a href="routes.html">routes</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Controller/Users/Doses/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+/**
+ * @file controller/Doses/index.js
+ * @namespace controllers
+ * @namespace Doses
+ * 
+ */
+
+const SchdulerSchema = require("../../../DB/Schema/Schduler");
+const UserMedcation = require("../../../DB/Schema/UserMedcation");
+const Occurance = require("../../../DB/Schema/Occurances");
+const Viewer =require("../../../DB/Schema/Viewers")
+const {
+  successResMsg,
+  errorResMsg
+} = require("../../../utils/ResponseHelpers");
+const Profile = require("../../../DB/Schema/Profile")
+
+
+
+
+/**
+ * EditSingleDose
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Doses
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.body.ProfileID - Profile ID of the user
+ * @param {string} req.body.occuraceId - occuraceId
+ * @param {string} req.body.MedInfo - {
+        "strenth":25,
+        "unit":"mg",
+        "quantity":6,
+        "instructions":"edited",
+        "condition":"edit2",
+        "type":"injection",
+        "name":"edit"
+
+    }
+ * @param {string} req.body.PlannedDateTime - in ms format
+ * @param {string} req.body.PlannedDose - eg:num of pills
+ * @param {Object} res - Express response object
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile or has a permission
+ * 
+ * 
+ * @returns {Object} - Returns the edited dose
+ * @description 
+ *     edit singleDose
+     * -this api should be called when user needs to edit singleDose
+     * -the caller must be the med creator or has a permission
+     * occurrenceId is required
+     * - data to be edit
+     * ********************************
+     * logic
+     * ********************************
+     * 1- make sure that the caller is the med creator
+     * 2- make sure that the med id and schedule id is valid
+     * 3- retrieved the occurrence and edit
+     * 
+     * 
+       
+ * 
+ */
+
+exports.EditSingleDose=async (req, res) => {
+
+   
+    try {
+  
+      const {id} =req.id
+      let {
+      occuraceId,
+      MedInfo,
+      PlannedDateTime,
+      PlannedDose,
+      ProfileID
+      }=req.body
+  
+      
+  
+      
+      const oldOccurance=await Occurance.findById(occuraceId)
+      if(!oldOccurance){
+        return errorResMsg(res, 400, req.t("invalid_occurence_id"));
+      }
+  
+       /*
+      
+      check permission 
+      
+      */
+  
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      // get the viewer permissions
+      const viewerProfile =await Profile.findOne({
+      "Owner.User":id
+      })
+      
+      if(!viewerProfile){
+         return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      const viewer =await Viewer.findOne({
+       ViewerProfile:viewerProfile._id,
+       DependentProfile:ProfileID
+      })
+  
+      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+  
+      // check if the user is the owner and has write permission or can add meds
+  
+      if(profile.Owner.User.toString()!=id){
+        // check if the user has add med permission
+        const hasWritePermissonToAllMeds=viewer.CanWriteDoses;
+        // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
+        const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
+          if(med.Med.toString()===oldOccurance.Medication.toString()){
+            return med.CanWriteDoses
+          }
+        }) 
+        if(!(hasWritePermissonToThatDose||hasWritePermissonToAllMeds)){
+          return errorResMsg(res, 401, req.t("Unauthorized"));
+        }
+        
+      }
+      //case the owner dont has write permission
+      if(profile.Owner.toString()===id&amp;&amp;!profile.Owner.Permissions.write){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+  
+  
+      // start edit occurance
+      
+      // update 
+      oldOccurance.PlannedDateTime=PlannedDateTime||oldOccurance.PlannedDateTime
+      oldOccurance.PlannedDose=PlannedDose||oldOccurance.PlannedDose
+      oldOccurance.MedInfo={
+        strenth:MedInfo.strenth||oldOccurance.MedInfo.strenth,
+        unit:MedInfo.unit||oldOccurance.MedInfo.unit,
+        quantity:MedInfo.quantity||oldOccurance.MedInfo.quantity,
+        instructions:MedInfo.instructions||oldOccurance.MedInfo.instructions,
+        condition:MedInfo.condition||oldOccurance.MedInfo.condition,
+        type:MedInfo.type||oldOccurance.MedInfo.type,
+        name:MedInfo.name||oldOccurance.MedInfo.name,
+        ScheduleType:MedInfo.ScheduleType||oldOccurance.MedInfo.ScheduleType,
+        
+      }
+      oldOccurance.EditedBy=viewerProfile._id
+      await oldOccurance.save()
+      
+      // return succesfull response
+      return successResMsg(res, 200, {message:req.t("Occurance_Updated")});
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+ 
+/**
+ * suspend Dose
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Doses
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.body.ProfileID - Profile ID of the user
+ * @param {string} req.body.SchdulerId - scheduler id 
+ * @param {string} req.body.StartDate -start date in ms format
+ * @param {string} req.body.EndDate -EndDate date in ms format
+ * @param {Object} res - Express response object
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile or has a permission 
+ * 
+ * 
+ * @returns {Object} - Returns success message
+ * @description 
+ *    suspend doses form date to date
+     * ********************************
+     * logic
+     * ********************************
+     * -1 retrieve all occurrences form date to date
+     * -2 flag it as suspended
+     * -3 if the user has a permission to do this action
+     * 
+       
+ * 
+ */
+
+
+  exports.SuspendDoses=async (req, res) => {
+  
+  
+    try {
+  
+      const {id} =req.id
+      let {
+      SchdulerId,
+      StartDate,
+      EndDate,
+      ProfileID
+      }=req.body
+  
+      // check for permison
+      const schduler =await SchdulerSchema.findById(SchdulerId)
+      if(!schduler){
+        return errorResMsg(res, 400, req.t("Schduler_not_found"));
+      }
+        /*
+      
+      check permission 
+      
+      */
+  
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      // get the viewer permissions
+      const viewerProfile =await Profile.findOne({
+      "Owner.User":id
+      })
+      
+      if(!viewerProfile){
+         return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      const viewer =await Viewer.findOne({
+       ViewerProfile:viewerProfile._id,
+       DependentProfile:ProfileID
+      })
+  
+      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      // check if the user is the owner and has write permission or can add meds
+  
+      if(profile.Owner.User.toString()!=id){
+        // check if the user has add med permission
+        const hasWritePermissonToThatMed=viewer.CanWriteMeds;
+        // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
+        const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
+          if(med.Med.toString()===schduler.medication.toString()){
+            return med.CanWrite
+          }
+        }) 
+        if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){
+          return errorResMsg(res, 401, req.t("Unauthorized"));
+        }
+        
+      }
+      //case the owner dont has write permission
+      if(profile.Owner.toString()===id&amp;&amp;!profile.Owner.Permissions.write){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+  
+  
+      
+      //retrive all the occurences between two dates and mark them as suspended
+  
+      await Occurance.updateMany({
+        Schduler:SchdulerId,
+        PlannedDateTime:{$gte:StartDate,$lte:EndDate},
+      
+      },{
+        isSuspended:true
+      })
+      // return succesfull response
+      return successResMsg(res, 200, {message:req.t("Dose_suspended")});
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+  
+  /**
+ * change Dose status
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Doses
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.body.ProfileID - Profile ID of the user
+ * @param {string} req.body.OccuranceId - occurrence id 
+ * @param {string} req.body.Status -2 confirmed 4 rejected
+ * @param {string} req.body.EndDate -EndDate date in ms format
+ * @param {Object} res - Express response object
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile or has a permission 
+ * 
+ * 
+ * @returns {Object} - Returns success message
+ * @description 
+ *    change dose status
+     * ********************************
+     * logic
+     * ********************************
+     * -1 get dose by id
+     * -2 change its status to the new one
+     * **********
+     *  0: Status mean it's not yet active (future dose), --default
+     *  1: Status mean it's in Transit (time is here , not yet 60 mins passed), --server action
+     *  2: status code means it's taken. , --action by user
+     *  3: it's ignored (60 minutes passed no action) --server action
+     *  4: status means its rejected
+     * 
+       
+ * 
+ */
+
+
+  exports.ChangeDoseStatus=async (req, res) => {
+  
+    /** change dose status
+     * ********************************
+     * logic
+     * ********************************
+     * -1 get dose by id
+     * -2 change its status to the new one
+     * **********
+     *  0: Status mean it's not yet active (future dose), --default
+     *  1: Status mean it's in Transit (time is here , not yet 60 mins passed), --server action
+     *  2: status code means it's taken. , --action by user
+     *  3: it's ignored (60 minutes passed no action) --server action
+     *  4: status means its rejected
+     * 
+     */
+    try {
+  
+      const {id} =req.id
+      let {
+      OccuranceId,
+      Status,
+      ProfileID
+      }=req.body
+  
+      // check for permission
+      const dose =await Occurance.findById(OccuranceId)
+      if(!dose){
+        return errorResMsg(res, 400, req.t("Dose_not_found"));
+      }
+      //permission check
+  
+            /*
+      
+      check permission 
+      
+      */
+  
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      // get the viewer permissions
+      const viewerProfile =await Profile.findOne({
+      "Owner.User":id
+      })
+      
+      if(!viewerProfile){
+         return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      const viewer =await Viewer.findOne({
+       ViewerProfile:viewerProfile._id,
+       DependentProfile:ProfileID
+      })
+      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+  
+      // check if the user is the owner and has write permission or can add meds
+  
+      if(profile.Owner.User.toString()!=id){
+        // check if the user has add med permission
+        const hasWritePermissonToThatMed=viewer.CanWriteDoses;
+        // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
+        const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
+          if(med.Med.toString()===dose.Medication.toString()){
+            return med.CanWriteDoses
+          }
+        }) 
+        if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){
+          return errorResMsg(res, 401, req.t("Unauthorized"));
+        }
+        
+      }
+      //case the owner dont has write permission
+      if(profile.Owner.toString()===id&amp;&amp;!profile.Owner.Permissions.write){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+  
+  
+  
+  
+  
+      if(!(Status==2||Status==4)){
+        return errorResMsg(res, 400, req.t("Invalid_status"));
+      }
+  
+      // edit quantaty
+      if(Status==2){
+        const Medication=await UserMedcation.findById(dose.Medication)
+        Medication.quantity=Medication.quantity-dose.PlannedDose
+        await Medication.save()
+      }
+      // change dose status
+      
+     dose.Status=Status
+      await dose.save()
+  
+      
+  
+      // return succesfull response
+      return successResMsg(res, 200, {message:req.t("Dose_Status_Changed")});
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+  
+
+   /**
+ * getDoses
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Doses
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.body.ProfileID - Profile ID of the user
+ * @param {string} req.body.date - start date
+ * @param {string} req.body.EndDate -EndDate date in ms format and its optional if not provided wil return the doses of the date
+ * @param {Object} res - Express response object
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile or has a permission 
+ * 
+ * 
+ * @returns {Object} - Returns doses of that date range
+ * @description 
+ *    change dose status
+     * ********************************
+     * logic
+        return doses with a date range if the EndDate is not provided then it will return the doses of the date 
+     * if no date is provided the default is today
+     * returns not suspended dosages
+     * Note(the returned doses is the doses with the provided  profile id )
+     * 
+       
+ * 
+ */
+
+
+
+  exports.getDoses=async (req, res) => {
+  
+    /** 
+     * return doses with a spastic date
+     * if no date is provided the default is today
+     * returns not suspended dosages
+     * 
+     */
+    try {
+  
+      const {id} =req.id
+      let {
+      date,
+      ProfileID,
+      EndDate
+      }=req.query
+  
+               /*
+      
+      check permission 
+      
+      */
+  
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      // get the viewer permissions
+      const viewerProfile =await Profile.findOne({
+      "Owner.User":id
+      })
+      
+      if(!viewerProfile){
+         return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      const viewer =await Viewer.findOne({
+       ViewerProfile:viewerProfile._id,
+       DependentProfile:ProfileID
+      })
+      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      // check if the user is the owner and has write permission or can add meds
+        //case the owner dont has write permission
+        if(profile.Owner.toString()===id&amp;&amp;!profile.Owner.Permissions.read){
+          return errorResMsg(res, 401, req.t("Unauthorized"));
+        }
+        let hasGeneralReadPermissions;
+        let hasSpacificReadPermissions;
+        if(profile.Owner.User.toString()===id){
+          hasGeneralReadPermissions=true
+        }else{
+          hasGeneralReadPermissions=viewer.CanReadDoses;
+          hasSpacificReadPermissions=viewer.CanReadSpacificMeds.map(elem=>{
+           if(elem.CanReadDoses){
+             return elem.Med
+           }
+         });
+        }
+      
+  
+  
+  
+      // get occurances which equal today
+      if(!date){
+        date=new Date()
+      }
+      const queryDate =new Date(+date)
+      let nextDay
+      if(!EndDate){
+        nextDay=new Date(+date)
+        nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+        }else{
+        nextDay=EndDate
+        }
+      
+      // case has a general read permissions
+      if(hasGeneralReadPermissions){
+        const doses =await Occurance.find({
+          ProfileID:ProfileID,
+          PlannedDateTime:{$gte:queryDate,$lt:nextDay},
+          isSuspended:false
+    
+        }).select(
+          "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id"
+        )
+          // return succesfull response
+      return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+      }else if(hasSpacificReadPermissions.length>0){ //has spacific permission
+        // case has spacific read permissions
+        const doses =await Occurance.find({
+          ProfileID:ProfileID,
+          PlannedDateTime:{$gte:queryDate,$lt:nextDay},
+          isSuspended:false,
+          Medication:{$in:hasSpacificReadPermissions}
+    
+        }).select(
+          "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id"
+        )
+          // return succesfull response
+      return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+      }else{
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+     
+      
+    
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+
+    /**
+ * getAllDoses
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Doses
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.body.ProfileID - Profile ID of the user
+ * @param {string} req.body.date - start date
+ * @param {string} req.body.EndDate -EndDate date in ms format and its optional if not provided wil return the doses of the date
+ * @param {Object} res - Express response object
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile or has a permission 
+ * 
+ * 
+ * @returns {Object} - Returns doses of that date range
+ * @description 
+ *    change dose status
+     * ********************************
+     * logic
+        return doses with a date range if the EndDate is not provided then it will return the doses of the date 
+     * if no date is provided the default is today
+     * returns not suspended dosages
+     * Note(the returned doses is the doses with the provided profile id and its dependents )
+     * 
+     * 
+       
+ * 
+ */
+
+
+
+  exports.getAllDoses=async (req, res) => {
+    /**
+     * get my doses and my dependents doses
+     * 
+     * 
+     */
+    /** 
+     * return doses with a spacic date
+     * if no date is provided the defult is today
+     * returns not suspended dosages
+     * 
+     */
+    try {
+  
+      const {id} =req.id
+      let {
+      date,
+      ProfileID,
+      EndDate
+      }=req.query
+  
+               /*
+      
+      check permission 
+      
+      */
+  
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      // get the viewer permissions
+      const viewerProfile =await Profile.findOne({
+      "Owner.User":id
+      })
+      
+      if(!viewerProfile){
+         return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+  
+      const viewer =await Viewer.findOne({
+       ViewerProfile:viewerProfile._id,
+       DependentProfile:ProfileID
+      })
+      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      // check if the user is the owner and has write permission or can add meds
+        //case the owner dont has write permission
+        if(profile.Owner.toString()===id&amp;&amp;!profile.Owner.Permissions.read){
+          return errorResMsg(res, 401, req.t("Unauthorized"));
+        }
+        let hasGeneralReadPermissions;
+        let hasSpacificReadPermissions;
+        if(profile.Owner.User.toString()===id){
+          hasGeneralReadPermissions=true
+        }else{
+          hasGeneralReadPermissions=viewer.CanReadDoses;
+          hasSpacificReadPermissions=viewer.CanReadSpacificMeds.map(elem=>{
+           if(elem.CanReadDoses){
+             return elem.Med
+           }
+         });
+        }
+      
+  
+  
+  
+      // get occurances which equal today
+      if(!date){
+        date=new Date()
+      }
+      const queryDate =new Date(+date)
+      let nextDay
+      if(!EndDate){
+        nextDay=new Date(+date)
+        nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+        }else{
+        nextDay=EndDate
+        }
+      
+        // get all my dependents
+      const mydependents =await Viewer.find({
+        ViewerProfile:viewerProfile._id
+      })
+      
+      const dependentsProfiles =mydependents.filter(elem=>{
+        return elem.CanReadDoses;
+      })
+      const dependentsProfilesIDs =dependentsProfiles.map(elem=>{
+        return elem.DependentProfile
+      })
+      // push the viewer profile to dependentsProfileIDs
+      dependentsProfilesIDs.push(viewerProfile._id)
+  
+      // get general permissions doses
+      const generalDoses =await Occurance.find({
+        ProfileID:{$in:dependentsProfilesIDs},
+        PlannedDateTime:{$gte:queryDate,$lt:nextDay},
+        isSuspended:false
+  
+      }).select(
+        "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id ProfileID"
+      )
+      .populate({
+        path:"ProfileID",
+        select:"Owner.User",
+        populate:{
+          path:"Owner.User",
+          select:"firstName lastName email"
+        }
+  
+      })
+  
+      // get doses which i has read permissions to
+      const dependentsWithSpacific =mydependents.filter(elem=>{
+        return !elem.CanReadDoses;
+      })
+      const dependentsSpacificMeds =[]
+      
+      dependentsWithSpacific.forEach(dependent=>{
+        dependent.CanReadSpacificMeds.forEach(elem=>{
+          if(elem.CanReadDoses){
+            dependentsSpacificMeds.push(elem.Med)
+          }
+        })
+  
+      })
+      const spacificDoses =await Occurance.find({
+        PlannedDateTime:{$gte:queryDate,$lt:nextDay},
+        isSuspended:false,
+        Medication:{$in:dependentsSpacificMeds}
+  
+      })
+      .select("PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id ProfileID")
+      .populate({
+        path:"ProfileID",
+        select:"Owner",
+        populate:{
+          path:"Owner.User",
+          select:"firstName lastName email"
+        }
+  
+      })
+      
+  const doses=[...generalDoses,...spacificDoses]
+  
+  
+    return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+  
+     
+      
+    
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  </code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.0</a> on Thu Jan 12 2023 15:33:24 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

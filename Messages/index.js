@@ -220,7 +220,7 @@ exports.forgetMessage_EN = ( code) => {
 `
 }
 
-exports.resetSucess_EN = (name) => {
+exports.resetSuccess_EN = (name) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
 	<div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
@@ -286,7 +286,7 @@ exports.forgetMessage_AR = ( code) => {
 `
 }
 
-exports.resetSucess_AR = (name) => {
+exports.resetSuccess_AR = (name) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
 	<div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >

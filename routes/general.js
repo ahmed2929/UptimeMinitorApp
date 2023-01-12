@@ -1,26 +1,27 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../Controller/Users/general/index");
+const generalController = require("../Controller/Users/general/index");
 const validation = require("../utils/Validation");
 const IsAuth  =require('../utils/Authorization').authorization
 const upload =require("../config/multerConfig")
-
-
-
+const MedicationController =require("../Controller/Users/Medication/index")
+const DosesController =require("../Controller/Users/Doses/index")
+const SymptomController =require("../Controller/Users/Symptom/index")
+const ReportController =require("../Controller/Users/Reports/index")
 router.post(
     "/create/new/med",
     upload.single("img"),
     validation.CreateNewMed(),
     validation.validate,
     IsAuth(),
-    userController.CreateNewMed
+    MedicationController.CreateNewMed
 );
 
 router.put(
     "/edit/med",
     upload.single("img"),
     IsAuth(),
-    userController.EditMed
+    MedicationController.EditMed
 );
 
 router.put(
@@ -28,13 +29,13 @@ router.put(
     validation.EditSingleDoseValidation(),
     validation.validate,
     IsAuth(),
-    userController.EditSingleDose
+    DosesController.EditSingleDose
 );
 
 router.delete(
     "/delete/midication/cycle",
     IsAuth(),
-    userController.deletMedictionCycle
+    MedicationController.deletMedictionCycle
 );
 
 router.post(
@@ -42,7 +43,7 @@ router.post(
     validation.SuspendDoseFromDateToDate(),
     validation.validate,
     IsAuth(),
-    userController.SuspendDoses
+    DosesController.SuspendDoses
 );
 
 
@@ -51,7 +52,7 @@ router.put(
     validation.changeLanguage(),
     validation.validate,
     IsAuth(),
-    userController.ChangeUserDefultLang
+    generalController.ChangeUserDefaultLang
 );
 
 router.put(
@@ -59,57 +60,57 @@ router.put(
     validation.ChangeDoseStatus(),
     validation.validate,
     IsAuth(),
-    userController.ChangeDoseStatus
+    DosesController.ChangeDoseStatus
 );
 
 router.get(
     "/doses",
     IsAuth(),
-    userController.getDoses
+    DosesController.getDoses
 );
 
 router.get(
     "/medications",
     IsAuth(),
-    userController.getMedication
+    MedicationController.getMedication
 );
 
 
 
 router.get(
     "/search",
-    userController.SerachForMed
+    generalController.SearchForMed
 );
 
 router.post(
     "/create/new/symtom",
     upload.fields([{name:"img",maxCount:1},{name:"voice",maxCount:1}]),
     IsAuth(),
-    userController.CreateSymtom
+    SymptomController.CreateSymptom
 );
 
 router.get(
     "/symtoms",
     IsAuth(),
-    userController.getSymtoms
+    SymptomController.getSymptoms
 );
 
 router.get(
     "/report",
     IsAuth(),
-    userController.getReport
+    ReportController.getReport
 );
 
 router.get(
     "/single/med/report",
     IsAuth(),
-    userController.getReportSingleMed
+    ReportController.getReportSingleMed
 );
 
 router.get(
     "/doses/all",
     IsAuth(),
-    userController.getAllDoses
+    DosesController.getAllDoses
 );
 
 
