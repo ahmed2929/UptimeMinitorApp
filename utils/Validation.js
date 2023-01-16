@@ -225,13 +225,13 @@ exports.CreateNewMed = () => {
 
 // Validate the type field
 check('type')
- .exists()  // Make sure the field exists
+ .optional()
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
 // Validate the strenth field
 check('strenth')
- .exists()  // Make sure the field exists
+.optional()
  .isInt()  // Make sure it's an integer
  .custom((strenth) => {
    if (strenth < 1) {
@@ -242,13 +242,13 @@ check('strenth')
 
 // Validate the unit field
 check('unit')
- .exists()  // Make sure the field exists
+.optional()
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
 // Validate the quantity field
 check('quantity')
- .exists()  // Make sure the field exists
+.optional()
  .isInt()  // Make sure it's an integer
  .custom((quantity) => {
    if (quantity < 1) {
@@ -259,13 +259,13 @@ check('quantity')
 
 // Validate the instructions field
 check('instructions')
- .exists()  // Make sure the field exists
+.optional()
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
 // Validate the condition field
 check('condition')
- .exists()  // Make sure the field exists
+.optional()
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 

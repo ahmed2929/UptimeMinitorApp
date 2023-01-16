@@ -14,7 +14,6 @@ const i18nextMiddleware = require("i18next-http-middleware");
 const Backend = require("i18next-fs-backend");
 const Admin =require("../routes/admin")
 const Circle =require("../routes/circle")
-
 // set localiztion config
 i18next.use(Backend).use(i18nextMiddleware.LanguageDetector)
 .init({
@@ -99,6 +98,7 @@ app.get("/", (req, res) => {
   app.use("/api/v1/general",General);
   app.use("/api/v1/admin",Admin);
   app.use("/api/v1/circle",Circle);
+  
 
 
 

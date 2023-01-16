@@ -10,6 +10,7 @@ const User = require("../../../DB/Schema/User");
 const Profile = require("../../../DB/Schema/Profile");
 const messages = require("../../../Messages/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
+const {RegisterAndroidDevice,RegisterIOSDevice} =require("../../../config/SendNotification")
 const {
   successResMsg,
   errorResMsg
@@ -79,8 +80,12 @@ exports.signUp = async (req, res) => {
     const newProfile =await Profile.create({
       Owner:{
         User:newUser._id
-      }
-      
+      },
+      firstName:req.body.firstName,
+      lastName:req.body.lastName,
+      email:req.body.email,
+      mobileNumber:req.body.mobileNumber,
+      lang:req.body.lang||"en",      
 
     })
     newUser.profile=newProfile._id
@@ -160,7 +165,9 @@ exports.logIn = async (req, res) => {
   try {
     const {
       email,
-      password
+      password,
+      DeviceToken,
+      DeviceOs
     } = req.body;
     // check if user exists and select password
     console.log("email is ",email)
@@ -178,6 +185,30 @@ exports.logIn = async (req, res) => {
     if (!user || !(await user.correctPassword(password, user.password))) {
       // return error message if password is wrong
       return errorResMsg(res, 401, req.t("Incorrect_email_or_password"));
+    }
+
+    if(DeviceToken.length>0&&DeviceOs.length>0){
+      const userProfile=await Profile.findById(user.profile)
+      // and new DeviceToken and DeviceOs into the userProfile.NotificationInfo if the DeviceToken and os does not exist in the array
+      if(!userProfile.NotificationInfo.DevicesTokens.some((item)=>item.DeviceToken===DeviceToken&&item.DeviceOs===DeviceOs)){
+        userProfile.NotificationInfo.DevicesTokens.push({
+          DeviceToken,
+          DeviceOs
+        })
+        // assign the new device to the user profile 
+        if(DeviceOs==="IOS"){
+          userProfile.NotificationInfo.IOS=true
+         await RegisterIOSDevice(user.profile,DeviceToken)
+        }else if(DeviceOs==="Android"){
+          userProfile.NotificationInfo.Android=true
+          await RegisterAndroidDevice(user.profile,DeviceToken)
+        }else{
+          return errorResMsg(res, 401, req.t("Invalid_os_type"));
+        }
+        await userProfile.save()
+      
+      }
+      
     }
 
     // create user token

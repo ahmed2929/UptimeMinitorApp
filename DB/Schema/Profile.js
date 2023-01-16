@@ -53,6 +53,54 @@ var ProfileSchema = new Schema({
     temp:{
         type:Boolean,
         default:false
+    },
+    firstName:{
+        type:String,
+       
+    },
+    lastName:{
+        type:String,
+       
+    },
+    email:{
+        type:String,
+     
+
+    },
+    mobileNumber:{
+        countryCode:{
+          type:String,
+
+        },
+        phoneNumber:{
+          type:String,
+      
+        }
+      },
+    lang:{
+        type:String,
+        default:"en"
+    },
+    NotificationInfo:{
+        IOS:{
+            type:Boolean,
+            default:false
+        },
+        Android:{
+            type:Boolean,
+            default:false
+        },
+        DevicesTokens:[{
+            DeviceOs:{
+                type:String,
+                required:true
+            },
+            DeviceToken:{
+                type:String,
+                required:true
+            }
+        }]
+
     }
 
  
