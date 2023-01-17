@@ -14,8 +14,10 @@ const Dependent = require("../../../DB/Schema/DependetUser");
 const Invetation =require("../../../DB/Schema/invitations")
 const User = require("../../../DB/Schema/User");
 const Viewer =require("../../../DB/Schema/Viewers")
-const messages = require("../../../Messages/index")
+const messages = require("../../../Messages/Email/index")
+const NotificationMessages=require("../../../Messages/Notifications/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
+const {SendPushNotificationToUserRegardlessLangAndOs} =require("../../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
@@ -345,16 +347,20 @@ exports.CreateDependentA = async (req, res) => {
             await newDependentUser.save()
             await newInvetation.save()
 
-            // send notification to the user
+            // send notification to the user using email
 
             if(userprofile.Owner.User.lang==="en"){
-                const Invitation = messages.InvetationSentToExistentDependentUser_EN(profile.Owner.User.firstName,firstName);
+              //  email   
+              const Invitation = messages.InvetationSentToExistentDependentUser_EN(profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,Invitation)
                }else{
                 const Invitation = messages.InvetationSentToExistentDependentUser_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,Invitation)
                }
-          
+            // send notification to the user using push notification 
+            await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile,"NewInvitationFromCareGiver",{
+              Invitation:newInvetation
+            })
 
             const responseData ={
                 ProfileID:userprofile._id,
@@ -603,6 +609,13 @@ exports.CreateDependentA = async (req, res) => {
                 viewer:newViewer._id
 
             })
+
+             // send notification to the user using push notification 
+             await SendPushNotificationToUserRegardlessLangAndOs(dependentProfile,masterProfile,"DependentAcceptedInvitation",{
+              Invitation:invetation
+            })
+
+
             await dependentProfile.save()
             await masterProfile.save()
             await invetation.save()
@@ -967,7 +980,10 @@ Add a new caregiver to a user's profile
                 const Invitation = messages.InvetationSentToExistentCareGiverUser_AR(RestPasswordCode,profile.Owner.User.firstName,user.firstName);
                 await SendEmailToUser(email,Invitation)
                }
-          
+
+               await SendPushNotificationToUserRegardlessLangAndOs(profile,CareGiverprofile,"NewInvitationFromDependent",{
+                Invitation:newInvetation
+              })
 
             const responseData ={
                 CareGiverProfileID:CareGiverprofile._id,
@@ -1118,6 +1134,11 @@ Add a new caregiver to a user's profile
             await CareGiverProfile.save()
             await invetation.save()
             // return accept confirmation
+
+            await SendPushNotificationToUserRegardlessLangAndOs(CareGiverProfile,dependentProfile,"CareGiverAcceptedInvitation",{
+              Invitation:invetation
+            })
+
             return successResMsg(res, 200, {message:req.t("invitation_accepted")});
 
        

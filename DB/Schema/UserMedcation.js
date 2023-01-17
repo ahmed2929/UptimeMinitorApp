@@ -61,8 +61,17 @@ var MedictionSchema = new Schema({
   EditedBy:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Profile'
+  },
+  Refile:{
+    Refillable:{
+      type:Boolean,
+      default:false
+    },
+    RefileLevel:{
+      type:Number,
+     
+    }
   }
-
 
   
 

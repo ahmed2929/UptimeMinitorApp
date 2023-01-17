@@ -8,7 +8,7 @@
 
 const User = require("../../../DB/Schema/User");
 const Profile = require("../../../DB/Schema/Profile");
-const messages = require("../../../Messages/index")
+const messages = require("../../../Messages/Email/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
 const {RegisterAndroidDevice,RegisterIOSDevice} =require("../../../config/SendNotification")
 const {

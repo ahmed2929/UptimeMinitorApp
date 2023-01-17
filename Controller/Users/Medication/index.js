@@ -12,6 +12,7 @@ const {UploadFileToAzureBlob,GenerateOccurances,GenerateOccurancesWithDays} =req
 const Occurance = require("../../../DB/Schema/Occurances");
 const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
+const Profile =require("../../../DB/Schema/Profile")
 const {
   successResMsg,
   errorResMsg
@@ -189,6 +190,8 @@ exports.CreateNewMed = async (req, res) => {
         Schduler,
         type,
         ProfileID,
+        Refillable,
+        RefileLevel
       }=req.body
   
        /*
@@ -259,8 +262,12 @@ exports.CreateNewMed = async (req, res) => {
         externalInfo:JSON.parse(externalInfo),
         type,
         ProfileID,
-        CreatorProfile:viewerProfile._id
-  
+        CreatorProfile:viewerProfile._id,
+        Refile:{
+          Refillable,
+          RefileLevel
+        }
+        
       })
     
       
@@ -637,7 +644,9 @@ exports.CreateNewMed = async (req, res) => {
         externalInfo,
         Schduler,
         type,
-        ProfileID
+        ProfileID,
+        Refillable,
+        RefileLevel
       }=req.body
   
   
@@ -722,7 +731,11 @@ exports.CreateNewMed = async (req, res) => {
           condition:condition||oldMed.condition,
           externalInfo:JSON.parse(externalInfo)||oldMed.externalInfo,
           type:type||oldMed.type,
-          EditedBy:viewerProfile._id
+          EditedBy:viewerProfile._id,
+          Refile:{
+            Refillable:RefileLevel||oldMed.Refile.RefileLevel,
+            RefileLevel:RefileLevel||oldMed.Refile.RefileLevel
+          }
         })
         newMed=editedMed
         // genrate MedInfo snapshot
