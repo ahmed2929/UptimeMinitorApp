@@ -733,7 +733,7 @@ exports.CreateNewMed = async (req, res) => {
           type:type||oldMed.type,
           EditedBy:viewerProfile._id,
           Refile:{
-            Refillable:RefileLevel||oldMed.Refile.RefileLevel,
+            Refillable:Refillable||oldMed.Refile.Refillable,
             RefileLevel:RefileLevel||oldMed.Refile.RefileLevel
           }
         })

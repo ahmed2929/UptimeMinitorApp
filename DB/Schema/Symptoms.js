@@ -41,6 +41,10 @@ var SymtomsSchema = new Schema({
   CreatorProfile:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Profile'
+  },
+  EditedBy:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Profile'
   }
 
 

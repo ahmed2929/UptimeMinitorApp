@@ -93,6 +93,10 @@ exports.CreateDependentA = async (req, res) => {
             return errorResMsg(res, 400, req.t("Unauthorized"));
         }
 
+        if(profile.Owner.User.email=== email){
+          return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
+       }
+
         // check for  email and mobile if it provided
         if(email){
             const emailExist = await User.findOne({
@@ -271,9 +275,14 @@ exports.CreateDependentA = async (req, res) => {
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         // check if the user if the user is the owner of that profile
-        if(profile.Owner.User._id.toString() !== id){
-            return errorResMsg(res, 400, req.t("Unauthorized"));
-        }
+        // if(profile.Owner.User._id.toString() !== id){
+        //     return errorResMsg(res, 400, req.t("Unauthorized"));
+        // }
+
+        // the user can not add himself as a caregiver
+        if(profile.Owner.User.email=== email){
+          return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
+       }
 
         // check for  email and mobile if it provided
         const mobileNumber={
@@ -887,8 +896,13 @@ Add a new caregiver to a user's profile
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         // check if the user if the user is the owner of that profile
-        if(profile.Owner.User._id.toString() !== id){
-            return errorResMsg(res, 400, req.t("Unauthorized"));
+        // if(profile.Owner.User._id.toString() !== id){
+        //     return errorResMsg(res, 400, req.t("Unauthorized"));
+        // }
+
+        // the user can not add himself as a caregiver
+        if(profile.Owner.User.email=== email){
+           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
         }
 
         // check for  email and mobile if it provided

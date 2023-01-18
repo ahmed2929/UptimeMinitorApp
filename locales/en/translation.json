@@ -69,7 +69,12 @@
     "invitation_status_changed_before":"invitation_status_changed_before",
     "registration_successful":"registration successful",
     "Please_Verify_Your_Account":"Please_Verify_Your_Account",
-    "User_not_found":"User_not_found"
+    "User_not_found":"User_not_found",
+    "symptom_not_found":"symptom_not_found",
+    "symptom_is_deleted":"symptom_is_deleted",
+    "symptom_updated":"symptom_updated",
+    "symptom_deleted":"symptom_deleted",
+    "you_can_not_add_yourself_as_a_caregiver":"you_can_not_add_yourself_as_a_caregiver"
     
 
 

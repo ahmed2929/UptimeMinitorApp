@@ -365,7 +365,158 @@ check('Schduler')
     ]
 }
 
+exports.EditMed = () => {
+    return [
+        // Validate the name field
+ check('name')
+ .optional()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
 
+// Validate the type field
+check('type')
+ .optional()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the strenth field
+check('strenth')
+.optional()
+ .isInt()  // Make sure it's an integer
+ .custom((strenth) => {
+   if (strenth < 1) {
+     throw new Error('strenth must be greater than 1 or equals');
+   }
+   return true;
+ }),
+
+// Validate the unit field
+check('unit')
+.optional()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the quantity field
+check('quantity')
+.optional()
+ .isInt()  // Make sure it's an integer
+ .custom((quantity) => {
+   if (quantity < 1) {
+     throw new Error('quantity must be greater than or equals 1');
+   }
+   return true;
+ }),
+
+// Validate the instructions field
+check('instructions')
+.optional()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the condition field
+check('condition')
+.optional()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the Schduler field
+
+ 
+
+    ]
+}
+
+exports.CreateNewSymptom = () => {
+    return [
+        // Validate the name field
+ check('ProfileID')
+ .exists()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the type field
+check('Type')
+ .exists()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the strenth field
+check('Description')
+.exists()
+.isString()  // Make sure it's a string
+.notEmpty(),  // Make sure it's not empty
+
+// Validate the unit field
+check('StartedIn')
+.exists()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the quantity field
+check('StartedIn')
+.exists()
+ .isInt()  // Make sure it's an integer
+ .custom((quantity) => {
+   if (quantity < 1) {
+     throw new Error('quantity must be greater than or equals 1');
+   }
+   return true;
+ }),
+
+// Validate the instructions field
+check('Severity')
+.exists()
+.isInt()  // Make sure it's an integer
+.withMessage("Severity_is_invalid")
+
+    ]
+}
+
+exports.EditSymptom = () => {
+    return [
+        // Validate the name field
+ check('ProfileID')
+ .exists()  // Make sure the field exists
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the type field
+check('Type')
+ .optional()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the strenth field
+check('Description')
+.optional()
+.isString()  // Make sure it's a string
+.notEmpty(),  // Make sure it's not empty
+
+// Validate the unit field
+check('StartedIn')
+.optional()
+ .isString()  // Make sure it's a string
+ .notEmpty(),  // Make sure it's not empty
+
+// Validate the quantity field
+check('StartedIn')
+.optional()
+ .isInt()  // Make sure it's an integer
+ .custom((StartedIn) => {
+   if (StartedIn < 1) {
+     throw new Error('StartedIn invalid');
+   }
+   return true;
+ }),
+
+// Validate the instructions field
+check('Severity')
+.optional()
+.isInt()  // Make sure it's an integer
+.withMessage("Severity_is_invalid")
+
+    ]
+}
 
  
 
