@@ -76,7 +76,8 @@ var ViewerSchema = new Schema({
     notify:{
         type:Boolean,
         default:true
-    }
+    },
+ 
 
  
  

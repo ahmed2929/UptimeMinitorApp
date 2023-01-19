@@ -13,7 +13,7 @@ var InvitationsSchema = new Schema({
     },
     Status:{
         type:Number,
-        default:0,
+        default:0, // 0:pending, 1:accepted , 2:rejected
     },
     dependent:{
         type:Schema.Types.ObjectId,

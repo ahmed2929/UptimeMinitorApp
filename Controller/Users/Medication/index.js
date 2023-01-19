@@ -193,7 +193,12 @@ exports.CreateNewMed = async (req, res) => {
         Refillable,
         RefileLevel
       }=req.body
-  
+      
+
+      console.log("requestBody **************",req.body)
+      console.log("requestBody.Schduler **************",req.body.Schduler)
+      console.log("requestFiles **************",req.file)
+
        /*
       
       check permission will only allow if the id is the Owner id 
@@ -285,7 +290,7 @@ exports.CreateNewMed = async (req, res) => {
         SchudleType:JSON.parse(Schduler).ScheduleType,
       }
       // create schduler 
-      jsonSchduler=JSON.parse(Schduler)
+      let jsonSchduler=JSON.parse(Schduler)
   
       // validate schdule data
       if(!jsonSchduler.StartDate){
@@ -453,7 +458,7 @@ exports.CreateNewMed = async (req, res) => {
   
       }else if (jsonSchduler.ScheduleType=='0'){
   
-        // case user choose spacic days
+        // case user choose specific days
         const occuraces=[]
       for(const doseElement of jsonSchduler.dosage){
   
@@ -536,7 +541,11 @@ exports.CreateNewMed = async (req, res) => {
         _id:newSchduler._id,
         ...jsonSchduler
       },
-      ProfileID
+      ProfileID,
+      Refile:{
+        Refillable,
+        RefileLevel
+      }
   
      }
       // return succesfull response
@@ -544,7 +553,7 @@ exports.CreateNewMed = async (req, res) => {
       
     } catch (err) {
       // return error response
-      console.log(err)
+      console.log("error is ",err)
       return errorResMsg(res, 500, err);
     }
   };
@@ -1250,4 +1259,6 @@ exports.CreateNewMed = async (req, res) => {
       return errorResMsg(res, 500, err);
     }
   };
+  
+
   

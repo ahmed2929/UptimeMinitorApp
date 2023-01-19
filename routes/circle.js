@@ -55,7 +55,29 @@ router.get(
     CircleController.CareGiver
 );
 
+router.put(
+    "/edit/caregiver/Permissions",
+    IsAuth(),
+    CircleController.EditCareGiverPermissions
+)
 
+router.delete(
+    "/delete/caregiver/Permissions",
+    IsAuth(),
+    CircleController.DeleteCareGiverPermissions
+)
+
+router.delete(
+    "/delete/dependent",
+    IsAuth(),
+    CircleController.DeleteDependent
+)
+
+router.delete(
+    "/delete/invitation",
+    IsAuth(),
+    CircleController.DeleteInvitation
+)
 
 
 

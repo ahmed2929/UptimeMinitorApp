@@ -74,7 +74,14 @@
     "symptom_is_deleted":"symptom_is_deleted",
     "symptom_updated":"symptom_updated",
     "symptom_deleted":"symptom_deleted",
-    "you_can_not_add_yourself_as_a_caregiver":"you_can_not_add_yourself_as_a_caregiver"
+    "you_can_not_add_yourself_as_a_caregiver":"you_can_not_add_yourself_as_a_caregiver",
+    "relationship_not_found":"relationship_not_found",
+    "Permission_Updated_Successfully":"Permission_Updated_Successfully",
+    "Caregiver_Deleted_Successfully":"Caregiver_Deleted_Successfully",
+    "Dependent_Deleted_Successfully":"Dependent_Deleted_Successfully",
+    "Not_enough_medication_Stock":"Not_enough_medication_Stock",
+    "Invitation_can_not_be_deleted":"Invitation_can_not_be_deleted",
+    "Invitation_deleted_Successfully":"Invitation_deleted_Successfully"
     
 
 

@@ -96,6 +96,9 @@ exports.CreateDependentA = async (req, res) => {
         if(profile.Owner.User.email=== email){
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
        }
+       if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
+        return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
+     }
 
         // check for  email and mobile if it provided
         if(email){
@@ -275,14 +278,18 @@ exports.CreateDependentA = async (req, res) => {
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         // check if the user if the user is the owner of that profile
-        // if(profile.Owner.User._id.toString() !== id){
-        //     return errorResMsg(res, 400, req.t("Unauthorized"));
-        // }
+        if(profile.Owner.User._id.toString() !== id){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
 
         // the user can not add himself as a caregiver
         if(profile.Owner.User.email=== email){
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
        }
+
+       if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
+        return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
+     }
 
         // check for  email and mobile if it provided
         const mobileNumber={
@@ -895,15 +902,19 @@ Add a new caregiver to a user's profile
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
-        // check if the user if the user is the owner of that profile
-        // if(profile.Owner.User._id.toString() !== id){
-        //     return errorResMsg(res, 400, req.t("Unauthorized"));
-        // }
+       // check if the user if the user is the owner of that profile
+        if(profile.Owner.User._id.toString() !== id){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
 
         // the user can not add himself as a caregiver
         if(profile.Owner.User.email=== email){
            return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
         }
+
+        if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
+          return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
+       }
 
         // check for  email and mobile if it provided
         const mobileNumber={
@@ -1241,7 +1252,7 @@ retrieves the dependents of the user from the viewer collection which master pro
         responseData=[
             ...profile.Viewers
         ]
-        // return succesfull response
+        // return sucess response
         return successResMsg(res, 200, {message:req.t("caregivers"),data:responseData});
       
     } catch (err) {
@@ -1250,3 +1261,387 @@ retrieves the dependents of the user from the viewer collection which master pro
       return errorResMsg(res, 500, err);
     }
   }; 
+
+
+  
+  /**
+
+@function
+EditCareGiverPermissions
+@async
+@memberof controllers
+@memberof MedicalCircle
+
+@param {Object} req - Express request object
+@param {string} req.id - user id
+@param {string} req.ProfileID. - user ProfileID
+@param {string} req.ViewerID. - ViewerID represents relationship id 
+@param {Object} req.Permissions - the updated Permissions (if the value is null the value will not be set)
+eg
+Permissions=
+  {
+    "CanWriteMeds": false,
+    "CanReadDoses": false,
+    "CanWriteDoses": false,
+    "CanReadRefil": false,
+    "CanReadAllMeds": false,
+    "CanReadSideEffect": true,
+    "CanAddMeds": true,
+    "CanWriteSymtoms": false,
+    "CanReadSpacificMeds": [
+      {
+        "Med": "63b69329424603fd6128b72c",
+        "CanRead": true,
+        "CanWrite": true,
+        "CanReadDoses": true,
+        "CanReadRefil": true,
+        "CanWriteRefil": false,
+        "CanWriteDoses": false
+      }
+    ],
+    "notify": true
+  
+}
+@param {Object} res - Express response object
+
+@returns {Object} - array of  object containing the caregivers of the user
+
+@description This function is used to update caregiver permissions
+
+@throws {400} - When the provided profile ID is not a valid ObjectId or when the user is not authorized to access the profile.
+@throws {400} - When the provided ViewerID is not found
+@throws {500} - When there's an error in the server.
+*/
+
+exports.EditCareGiverPermissions = async (req, res) => {
+  /**
+     *  EditCareGiverPermission
+     */
+
+  try {
+
+   const {id} =req.id
+    const {
+      ProfileID,
+      ViewerID,
+      Permissions
+    }=req.body
+
+    /**
+     * permissions eg
+     * 
+     *  "permissions": {
+    "CanWriteMeds": false,
+    "CanReadDoses": false,
+    "CanWriteDoses": false,
+    "CanReadRefil": false,
+    "CanReadAllMeds": false,
+    "CanReadSideEffect": true,
+    "CanAddMeds": true,
+    "CanWriteSymtoms": false,
+    "CanReadSpacificMeds": [
+      {
+        "Med": "63b69329424603fd6128b72c",
+        "CanRead": true,
+        "CanWrite": true,
+        "CanReadDoses": true,
+        "CanReadRefil": true,
+        "CanWriteRefil": false,
+        "CanWriteDoses": false
+      }
+    ],
+    "notify": true
+  }
+     * 
+     */
+
+
+      // make sure that the api consumer is authorized
+      if(!mongoose.isValidObjectId(ProfileID)){
+          return errorResMsg(res, 400, req.t("invalid_profile_id"));
+      }
+      const profile = await Profile.findById(ProfileID)
+      if(!profile){
+          return errorResMsg(res, 400, req.t("profile_not_found"));
+      }
+      if(profile.Owner.User._id.toString()!=id){
+          return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+     
+      // get the relationship 
+      const relationship = await Viewer.findOne({
+        DependentProfile:ProfileID,
+        _id:ViewerID
+      })
+      
+      if(!relationship){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      // update the relationship
+      relationship.CanWriteMeds=Permissions.CanWriteMeds||relationship.CanWriteMeds
+      relationship.CanReadDoses=Permissions.CanReadDoses||relationship.CanReadDoses
+      relationship.CanWriteDoses=Permissions.CanWriteDoses||relationship.CanWriteDoses
+      relationship.CanReadRefil=Permissions.CanReadRefil||relationship.CanReadRefil
+      relationship.CanReadAllMeds=Permissions.CanReadAllMeds||relationship.CanReadAllMeds
+      relationship.CanReadSideEffect=Permissions.CanReadSideEffect||relationship.CanReadSideEffect
+      relationship.CanAddMeds=Permissions.CanAddMeds||relationship.CanAddMeds
+      relationship.CanWriteSymtoms=Permissions.CanWriteSymtoms||relationship.CanWriteSymtoms
+      relationship.CanReadSpacificMeds=Permissions.CanReadSpacificMeds||relationship.CanReadSpacificMeds
+      relationship.notify=Permissions.notify||relationship.notify
+     
+     
+      // save changes
+      await relationship.save()
+
+     
+     
+
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Permission_Updated_Successfully"),data:relationship});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+}; 
+
+  
+
+
+ /**
+
+@function
+deleteCareGiverPermissions
+@async
+@memberof controllers
+@memberof MedicalCircle
+
+@param {Object} req - Express request object
+@param {string} req.id - user id
+@param {string} req.ProfileID. - user ProfileID
+@param {string} req.ViewerID. - ViewerID represents relationship id 
+@param {Object} res - Express response object
+
+@returns {Object} - success message with the deleted document
+
+@description This function is used to delete caregiver Permissions
+
+@throws {400} - When the provided profile ID is not a valid ObjectId or when the user is not authorized to access the profile.
+@throws {400} - When the provided ViewerID is not found
+@throws {500} - When there's an error in the server.
+*/
+
+exports.DeleteCareGiverPermissions = async (req, res) => {
+  /**
+     *  deleteCareGiverPermission
+     */
+
+  try {
+
+   const {id} =req.id
+    const {
+      ProfileID,
+      ViewerID,
+      
+    }=req.body
+
+   
+
+      // make sure that the api consumer is authorized
+      if(!mongoose.isValidObjectId(ProfileID)){
+          return errorResMsg(res, 400, req.t("invalid_profile_id"));
+      }
+      const profile = await Profile.findById(ProfileID)
+      if(!profile){
+          return errorResMsg(res, 400, req.t("profile_not_found"));
+      }
+      if(profile.Owner.User._id.toString()!=id){
+          return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+     
+      // get the relationship 
+      const relationship = await Viewer.findOneAndDelete({
+        DependentProfile:ProfileID,
+        _id:ViewerID
+      })
+      console.log("relationship",relationship)
+      
+      if(!relationship){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      // delete the viewer object which its viewer === ViewerID for dependent profile in the Viewer array
+     
+      profile.Viewers=profile.Viewers.filter(obj=>obj.viewer.toString()!=ViewerID)
+    
+      // delete the viewer object from dependent which its viewer === ViewerID from caregiver profile
+      const caregiverProfile=await Profile.findById(relationship.ViewerProfile.toString())
+      caregiverProfile.Dependents=caregiverProfile.Dependents.filter(obj=>obj.viewer.toString()!=ViewerID)
+      // save changes
+      await caregiverProfile.save()
+      await profile.save()
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Caregiver_Deleted_Successfully"),data:relationship});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+}; 
+
+
+ /**
+
+@function
+DeleteDependent
+@async
+@memberof controllers
+@memberof MedicalCircle
+
+@param {Object} req - Express request object
+@param {string} req.id - user id
+@param {string} req.ProfileID. - user ProfileID
+@param {string} req.ViewerID. - ViewerID represents relationship id 
+@param {Object} res - Express response object
+
+@returns {Object} - success message with the deleted document
+
+@description This function is used to delete dependent
+
+@throws {400} - When the provided profile ID is not a valid ObjectId or when the user is not authorized to access the profile.
+@throws {400} - When the provided ViewerID is not found
+@throws {500} - When there's an error in the server.
+*/
+
+exports.DeleteDependent = async (req, res) => {
+  /**
+     *  DeleteDependent
+     */
+
+  try {
+
+  const {id} =req.id
+    const {
+      ProfileID,
+      ViewerID,
+      
+    }=req.body
+
+   
+
+      // make sure that the api consumer is authorized
+      if(!mongoose.isValidObjectId(ProfileID)){
+          return errorResMsg(res, 400, req.t("invalid_profile_id"));
+      }
+      const profile = await Profile.findById(ProfileID)
+      if(!profile){
+          return errorResMsg(res, 400, req.t("profile_not_found"));
+      }
+      if(profile.Owner.User._id.toString()!=id){
+          return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+     
+      // get the relationship 
+      const relationship = await Viewer.findOneAndDelete({
+        ViewerProfile:ProfileID,
+        _id:ViewerID
+      })
+      console.log("relationship",relationship)
+      
+      if(!relationship){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      // delete the dependent from caregiver profile
+     
+      profile.Dependents=profile.Dependents.filter(obj=>obj.viewer.toString()!=ViewerID)
+    
+      // delete caregiver form dependent profile
+      const DependentProfile=await Profile.findById(relationship.DependentProfile.toString())
+      DependentProfile.Viewers=DependentProfile.Viewers.filter(obj=>obj.viewer.toString()!=ViewerID)
+      // save changes
+      await DependentProfile.save()
+      await profile.save()
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Dependent_Deleted_Successfully"),data:relationship});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+}; 
+
+
+ /**
+
+@function
+Cancel invitation if it is still pending
+@async
+@memberof controllers
+@memberof MedicalCircle
+
+@param {Object} req - Express request object
+@param {string} req.id - user id
+@param {string} req.ProfileID. - user ProfileID
+@param {string} req.InvitationID. - InvitationID
+@param {Object} res - Express response object
+
+@returns {Object} - success message 
+
+@description This function is used to delete invitation
+
+@throws {400} - When the provided profile ID is not a valid ObjectId or when the user is not authorized to access the profile.
+@throws {400} - When the provided invitation is not found
+@throws {500} - When there's an error in the server.
+*/
+
+exports.DeleteInvitation = async (req, res) => {
+  /**
+     *  DeleteDependent
+     */
+
+  try {
+
+   const {id} =req.id
+    const {
+      ProfileID,
+      InvitationID,
+      
+    }=req.body
+
+   
+
+      // make sure that the api consumer is authorized
+      if(!mongoose.isValidObjectId(ProfileID)){
+          return errorResMsg(res, 400, req.t("invalid_profile_id"));
+      }
+      const profile = await Profile.findById(ProfileID)
+      if(!profile){
+          return errorResMsg(res, 400, req.t("profile_not_found"));
+      }
+      if(profile.Owner.User._id.toString()!=id){
+          return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+     
+      // get the invitation
+      const invitation = await Invetation.findOneAndDelete({
+        _id:InvitationID,
+        From:ProfileID,
+        Status:0 // still pending
+      })
+      
+      
+      if(!invitation){
+        return errorResMsg(res, 400, req.t("Invitation_can_not_be_deleted"));
+      }
+
+      return successResMsg(res, 200, {message:req.t("Invitation_deleted_Successfully"),data:invitation});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+}; 
+

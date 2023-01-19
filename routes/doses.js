@@ -21,6 +21,13 @@ router.post(
     DosesController.SuspendDoses
 );
 
+
+router.post(
+    "/take/non/scheduled/dose",
+    IsAuth(),
+    DosesController.TakeAsNeededDose
+)
+
 router.put(
     "/change/status",
     validation.ChangeDoseStatus(),

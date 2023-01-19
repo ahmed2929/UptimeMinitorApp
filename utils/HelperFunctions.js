@@ -1,3 +1,10 @@
+/**
+ * @file HelperFunctions.js
+ * @namespace HelperFunctions
+ * 
+ * 
+ */
+
 const jwt=require('jsonwebtoken')
 const crypto = require('crypto');
 const User = require('../DB/Schema/User');
@@ -9,6 +16,34 @@ const NotificationMessages =require("../Messages/Notifications/index")
 const {sendNotification} =require("../config/SendNotification")
 
 // create refresh token
+
+/**
+ * Creates a new dependent user
+ * 
+ * @function
+ * @memberof HelperFunctions
+ * 
+ * @param {string} token - 
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile
+ * @throws {Error} if the email or mobile number already exist
+ * 
+ * @returns {Object} - Returns the new dependent user
+ * @description 
+ *     * -1 user access this api to create a dependent who has no phone
+       * -2 email and phone number are optional
+       * -3 if email and phone number are provided make sure that the are unique
+       * -4 link the new dependent to the user profile
+       * -5 user can confirm or reject dependent doses
+       * -6 user has full permissions to mange the dependent 
+       * -7 (read/write) medications,schedule,doses and get notifications
+       * -8 create a new profile to that dependent
+       
+ * 
+ */
+
+
 
 const GenerateRefreshToken=(id)=>{
     try {

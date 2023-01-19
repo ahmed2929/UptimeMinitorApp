@@ -421,12 +421,32 @@ exports.EditSingleDose=async (req, res) => {
         return errorResMsg(res, 400, req.t("Invalid_status"));
       }
   
-      // edit quantaty
+      if(Status==dose.Status){
+        return errorResMsg(res, 400, req.t("Dose_status_already_changed"));
+      }
+      const Medication=await UserMedcation.findById(dose.Medication)
+      if(!Medication){
+        return errorResMsg(res, 400, req.t("Medication_not_found"));
+      }
+
+
+      if(Medication.quantity-dose.PlannedDose<=0){
+        return errorResMsg(res, 400, req.t("Not_enough_medication_Stock"));
+      }
+
+      // edit quantity
       if(Status==2){
-        const Medication=await UserMedcation.findById(dose.Medication)
         Medication.quantity=Medication.quantity-dose.PlannedDose
         await Medication.save()
       }
+      // if the dose confirmed then rejected add the planned dose again to the med stock
+  
+      if(Status==4&&dose.Status==2){
+        
+        Medication.quantity=Medication.quantity+dose.PlannedDose
+        await Medication.save()
+      }
+      
       // change dose status
       
      dose.Status=Status
@@ -434,7 +454,7 @@ exports.EditSingleDose=async (req, res) => {
   
       
   
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("Dose_Status_Changed")});
       
     } catch (err) {
@@ -794,4 +814,159 @@ exports.EditSingleDose=async (req, res) => {
       return errorResMsg(res, 500, err);
     }
   };
+  
+
+
+ /**
+ * TakeAsNeededDose
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Doses
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.body.ProfileID - Profile ID of the user
+ * @param {string} req.body.MedID - MedID
+ * @param {Object} res - Express response object
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile or has a permission 
+ * @throws {Error} if the planned dose bigger than med stock
+ * 
+ * 
+ * @returns {Object} - Returns success message
+ * @description 
+ *    create new dose
+     * ********************************
+     * logic
+     * ********************************
+     * -1 get med by id
+     * -2 generate a new dose 
+     * **********
+       
+ * 
+ */
+
+
+ exports.TakeAsNeededDose=async (req, res) => {
+  
+  /**  create new dose
+     * ********************************
+     * logic
+     * ********************************
+     * -1 get med by id
+     * -2 generate a new dose 
+     * */
+  try {
+
+    const {id} =req.id
+    let {
+     MedID,
+     PlannedDateTime,
+     PlannedDose,
+    ProfileID
+    }=req.body
+
+    // check for permission
+    const med =await UserMedcation.findById(MedID)
+    if(!med){
+      return errorResMsg(res, 400, req.t("Medication_not_found"));
+    }
+    //permission check
+
+          /*
+    
+    check permission 
+    
+    */
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    // get the viewer permissions
+    const viewerProfile =await Profile.findOne({
+    "Owner.User":id
+    })
+    
+    if(!viewerProfile){
+       return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+
+    const viewer =await Viewer.findOne({
+     ViewerProfile:viewerProfile._id,
+     DependentProfile:ProfileID
+    })
+    if(!viewer&&profile.Owner.User.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+
+    // check if the user is the owner and has write permission or can add meds
+
+    if(profile.Owner.User.toString()!=id){
+      // check if the user has add med permission
+      const hasWritePermissonToThatMed=viewer.CanWriteDoses;
+      // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
+      const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
+        if(med.Med.toString()===dose.Medication.toString()){
+          return med.CanWriteDoses
+        }
+      }) 
+      if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+      
+    }
+    //case the owner dont has write permission
+    if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      return errorResMsg(res, 401, req.t("Unauthorized"));
+    }
+
+  // generate a new dose
+  const newDose =new Occurance({
+    Medication:MedID,
+    PlannedDateTime,
+    PlannedDose,
+    ProfileID,
+    MedInfo:{
+      strenth:med.strenth,
+      name:med.name,
+      unit:med.unit,
+      type:med.type,
+      quantity:med.quantity,
+      instructions:med.instructions,
+      img:med.img,
+      condition:med.condition,
+      SchudleType:'AsNeeded'
+    },
+    Schduler:med.Schduler,
+
+  })
+
+  
+  if(med.quantity-newDose.PlannedDose<=0){
+    return errorResMsg(res, 400, req.t("Not_enough_medication_Stock"));
+  }
+  
+  // handle med stock
+  med.quantity=med.quantity-newDose.PlannedDose
+
+
+  await newDose.save()
+  await med.save()
+    // edit quantity
+  
+    
+    // return successful response
+    return successResMsg(res, 200, {message:req.t("AsNeeded_Dose_Created"),data:newDose});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
   
