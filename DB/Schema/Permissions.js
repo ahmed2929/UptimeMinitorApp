@@ -12,14 +12,14 @@ User:{// profile owner
     type:Schema.Types.ObjectId,
     ref:"User",
 },
-    Medcations:[{
+    Medications:[{
         Profile:{
             type:Schema.Types.ObjectId,
             ref:"Profile",
         },
         Med:{
             type:Schema.Types.ObjectId,
-            ref:"UserMedcation",
+            ref:"UserMedication",
         },
         Permissions:{
             read:{

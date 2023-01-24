@@ -6,9 +6,9 @@
  * 
  */
 
-const SchdulerSchema = require("../../../DB/Schema/Schduler");
-const UserMedcation = require("../../../DB/Schema/UserMedcation");
-const Occurance = require("../../../DB/Schema/Occurances");
+const SchedulerSchema = require("../../../DB/Schema/Scheduler");
+const UserMedication = require("../../../DB/Schema/UserMedication");
+const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers")
 const {
   successResMsg,
@@ -29,9 +29,9 @@ const Profile = require("../../../DB/Schema/Profile")
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
  * @param {string} req.body.ProfileID - Profile ID of the user
- * @param {string} req.body.occuraceId - occuraceId
+ * @param {string} req.body.OccurrenceId - OccurrenceId
  * @param {string} req.body.MedInfo - {
-        "strenth":25,
+        "strength":25,
         "unit":"mg",
         "quantity":6,
         "instructions":"edited",
@@ -74,7 +74,7 @@ exports.EditSingleDose=async (req, res) => {
   
       const {id} =req.id
       let {
-      occuraceId,
+      OccurrenceId,
       MedInfo,
       PlannedDateTime,
       PlannedDose,
@@ -84,9 +84,9 @@ exports.EditSingleDose=async (req, res) => {
       
   
       
-      const oldOccurance=await Occurance.findById(occuraceId)
-      if(!oldOccurance){
-        return errorResMsg(res, 400, req.t("invalid_occurence_id"));
+      const oldOccurrence=await Occurrence.findById(OccurrenceId)
+      if(!oldOccurrence){
+        return errorResMsg(res, 400, req.t("invalid_occurrence_id"));
       }
   
        /*
@@ -125,7 +125,7 @@ exports.EditSingleDose=async (req, res) => {
         const hasWritePermissonToAllMeds=viewer.CanWriteDoses;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
-          if(med.Med.toString()===oldOccurance.Medication.toString()){
+          if(med.Med.toString()===oldOccurrence.Medication.toString()){
             return med.CanWriteDoses
           }
         }) 
@@ -140,27 +140,27 @@ exports.EditSingleDose=async (req, res) => {
       }
   
   
-      // start edit occurance
+      // start edit Occurrence
       
       // update 
-      oldOccurance.PlannedDateTime=PlannedDateTime||oldOccurance.PlannedDateTime
-      oldOccurance.PlannedDose=PlannedDose||oldOccurance.PlannedDose
-      oldOccurance.MedInfo={
-        strenth:MedInfo.strenth||oldOccurance.MedInfo.strenth,
-        unit:MedInfo.unit||oldOccurance.MedInfo.unit,
-        quantity:MedInfo.quantity||oldOccurance.MedInfo.quantity,
-        instructions:MedInfo.instructions||oldOccurance.MedInfo.instructions,
-        condition:MedInfo.condition||oldOccurance.MedInfo.condition,
-        type:MedInfo.type||oldOccurance.MedInfo.type,
-        name:MedInfo.name||oldOccurance.MedInfo.name,
-        ScheduleType:MedInfo.ScheduleType||oldOccurance.MedInfo.ScheduleType,
+      oldOccurrence.PlannedDateTime=PlannedDateTime||oldOccurrence.PlannedDateTime
+      oldOccurrence.PlannedDose=PlannedDose||oldOccurrence.PlannedDose
+      oldOccurrence.MedInfo={
+        strength:MedInfo.strength||oldOccurrence.MedInfo.strength,
+        unit:MedInfo.unit||oldOccurrence.MedInfo.unit,
+        quantity:MedInfo.quantity||oldOccurrence.MedInfo.quantity,
+        instructions:MedInfo.instructions||oldOccurrence.MedInfo.instructions,
+        condition:MedInfo.condition||oldOccurrence.MedInfo.condition,
+        type:MedInfo.type||oldOccurrence.MedInfo.type,
+        name:MedInfo.name||oldOccurrence.MedInfo.name,
+        ScheduleType:MedInfo.ScheduleType||oldOccurrence.MedInfo.ScheduleType,
         
       }
-      oldOccurance.EditedBy=viewerProfile._id
-      await oldOccurance.save()
+      oldOccurrence.EditedBy=viewerProfile._id
+      await oldOccurrence.save()
       
-      // return succesfull response
-      return successResMsg(res, 200, {message:req.t("Occurance_Updated")});
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Occurrence_Updated")});
       
     } catch (err) {
       // return error response
@@ -180,7 +180,7 @@ exports.EditSingleDose=async (req, res) => {
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
  * @param {string} req.body.ProfileID - Profile ID of the user
- * @param {string} req.body.SchdulerId - scheduler id 
+ * @param {string} req.body.SchedulerId - scheduler id 
  * @param {string} req.body.StartDate -start date in ms format
  * @param {string} req.body.EndDate -EndDate date in ms format
  * @param {Object} res - Express response object
@@ -211,16 +211,16 @@ exports.EditSingleDose=async (req, res) => {
   
       const {id} =req.id
       let {
-      SchdulerId,
+      SchedulerId,
       StartDate,
       EndDate,
       ProfileID
       }=req.body
   
       // check for permison
-      const schduler =await SchdulerSchema.findById(SchdulerId)
-      if(!schduler){
-        return errorResMsg(res, 400, req.t("Schduler_not_found"));
+      const Scheduler =await SchedulerSchema.findById(SchedulerId)
+      if(!Scheduler){
+        return errorResMsg(res, 400, req.t("Scheduler_not_found"));
       }
         /*
       
@@ -257,7 +257,7 @@ exports.EditSingleDose=async (req, res) => {
         const hasWritePermissonToThatMed=viewer.CanWriteMeds;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
-          if(med.Med.toString()===schduler.medication.toString()){
+          if(med.Med.toString()===Scheduler.medication.toString()){
             return med.CanWrite
           }
         }) 
@@ -273,16 +273,16 @@ exports.EditSingleDose=async (req, res) => {
   
   
       
-      //retrive all the occurences between two dates and mark them as suspended
+      //retrieve all the occurrences between two dates and mark them as suspended
   
-      await Occurance.updateMany({
-        Schduler:SchdulerId,
+      await Occurrence.updateMany({
+        Scheduler:SchedulerId,
         PlannedDateTime:{$gte:StartDate,$lte:EndDate},
       
       },{
         isSuspended:true
       })
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("Dose_suspended")});
       
     } catch (err) {
@@ -303,7 +303,7 @@ exports.EditSingleDose=async (req, res) => {
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
  * @param {string} req.body.ProfileID - Profile ID of the user
- * @param {string} req.body.OccuranceId - occurrence id 
+ * @param {string} req.body.OccurrenceId - occurrence id 
  * @param {string} req.body.Status -2 confirmed 4 rejected
  * @param {string} req.body.EndDate -EndDate date in ms format
  * @param {Object} res - Express response object
@@ -352,13 +352,13 @@ exports.EditSingleDose=async (req, res) => {
   
       const {id} =req.id
       let {
-      OccuranceId,
+      OccurrenceId,
       Status,
       ProfileID
       }=req.body
   
       // check for permission
-      const dose =await Occurance.findById(OccuranceId)
+      const dose =await Occurrence.findById(OccurrenceId)
       if(!dose){
         return errorResMsg(res, 400, req.t("Dose_not_found"));
       }
@@ -424,7 +424,7 @@ exports.EditSingleDose=async (req, res) => {
       if(Status==dose.Status){
         return errorResMsg(res, 400, req.t("Dose_status_already_changed"));
       }
-      const Medication=await UserMedcation.findById(dose.Medication)
+      const Medication=await UserMedication.findById(dose.Medication)
       if(!Medication){
         return errorResMsg(res, 400, req.t("Medication_not_found"));
       }
@@ -565,7 +565,7 @@ exports.EditSingleDose=async (req, res) => {
   
   
   
-      // get occurances which equal today
+      // get Occurrences which equal today
       if(!date){
         date=new Date()
       }
@@ -580,28 +580,29 @@ exports.EditSingleDose=async (req, res) => {
       
       // case has a general read permissions
       if(hasGeneralReadPermissions){
-        const doses =await Occurance.find({
+        const doses =await Occurrence.find({
           ProfileID:ProfileID,
           PlannedDateTime:{$gte:queryDate,$lt:nextDay},
           isSuspended:false
     
         }).select(
-          "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id"
+          "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id"
         )
-          // return succesfull response
+          // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:doses});
       }else if(hasSpacificReadPermissions.length>0){ //has spacific permission
         // case has spacific read permissions
-        const doses =await Occurance.find({
+        const doses =await Occurrence.find({
           ProfileID:ProfileID,
           PlannedDateTime:{$gte:queryDate,$lt:nextDay},
           isSuspended:false,
           Medication:{$in:hasSpacificReadPermissions}
     
         }).select(
-          "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id"
+          "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id"
         )
-          // return succesfull response
+       
+          // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:doses});
       }else{
         return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -661,7 +662,7 @@ exports.EditSingleDose=async (req, res) => {
      */
     /** 
      * return doses with a spacic date
-     * if no date is provided the defult is today
+     * if no date is provided the default is today
      * returns not suspended dosages
      * 
      */
@@ -722,7 +723,7 @@ exports.EditSingleDose=async (req, res) => {
   
   
   
-      // get occurances which equal today
+      // get Occurrences which equal today
       if(!date){
         date=new Date()
       }
@@ -750,13 +751,13 @@ exports.EditSingleDose=async (req, res) => {
       dependentsProfilesIDs.push(viewerProfile._id)
   
       // get general permissions doses
-      const generalDoses =await Occurance.find({
+      const generalDoses =await Occurrence.find({
         ProfileID:{$in:dependentsProfilesIDs},
         PlannedDateTime:{$gte:queryDate,$lt:nextDay},
         isSuspended:false
   
       }).select(
-        "PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id ProfileID"
+        "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID"
       )
       .populate({
         path:"ProfileID",
@@ -782,13 +783,13 @@ exports.EditSingleDose=async (req, res) => {
         })
   
       })
-      const spacificDoses =await Occurance.find({
+      const spacificDoses =await Occurrence.find({
         PlannedDateTime:{$gte:queryDate,$lt:nextDay},
         isSuspended:false,
         Medication:{$in:dependentsSpacificMeds}
   
       })
-      .select("PlannedDateTime PlannedDose Status Medication Schduler MedInfo _id ProfileID")
+      .select("PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID")
       .populate({
         path:"ProfileID",
         select:"Owner",
@@ -869,7 +870,7 @@ exports.EditSingleDose=async (req, res) => {
     }=req.body
 
     // check for permission
-    const med =await UserMedcation.findById(MedID)
+    const med =await UserMedication.findById(MedID)
     if(!med){
       return errorResMsg(res, 400, req.t("Medication_not_found"));
     }
@@ -925,13 +926,13 @@ exports.EditSingleDose=async (req, res) => {
     }
 
   // generate a new dose
-  const newDose =new Occurance({
+  const newDose =new Occurrence({
     Medication:MedID,
     PlannedDateTime,
     PlannedDose,
     ProfileID,
     MedInfo:{
-      strenth:med.strenth,
+      strength:med.strength,
       name:med.name,
       unit:med.unit,
       type:med.type,
@@ -939,9 +940,9 @@ exports.EditSingleDose=async (req, res) => {
       instructions:med.instructions,
       img:med.img,
       condition:med.condition,
-      SchudleType:'AsNeeded'
+      SchedulerType:'AsNeeded'
     },
-    Schduler:med.Schduler,
+    Scheduler:med.Scheduler,
 
   })
 

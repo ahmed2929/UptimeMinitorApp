@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-var schduler = new Schema({
+var Scheduler = new Schema({
   medication:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'UserMedcation'
+    ref:'UserMedication'
   },
   User:{
     type:mongoose.Schema.Types.ObjectId,
@@ -37,7 +37,7 @@ var schduler = new Schema({
     type:Number,
     default:null
   },
-  SpacifcDays:{
+  SpecificDays:{
     type:[String],
     default:null
     },
@@ -78,6 +78,6 @@ var schduler = new Schema({
 },{ timestamps: true });
 
 
-const Schduler = mongoose.model("Schduler", schduler);
+const SchedulerSchema = mongoose.model("Scheduler", Scheduler);
 
-module.exports = Schduler;
+module.exports = SchedulerSchema;

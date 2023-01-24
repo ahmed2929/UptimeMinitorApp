@@ -7,8 +7,8 @@
 
 
 
-const UserMedcation = require("../../../DB/Schema/UserMedcation");
-const Occurance = require("../../../DB/Schema/Occurances");
+const UserMedication = require("../../../DB/Schema/UserMedication");
+const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
 const {
@@ -44,7 +44,7 @@ const Profile = require("../../../DB/Schema/Profile")
                 "med": {
                     "_id": "",
                     "name": "",
-                    "strenth": ,
+                    "strength": ,
                     "unit": ""
                 },
                 "confirmed": ,
@@ -137,7 +137,7 @@ exports.getReport=async (req, res) => {
     // case general permission
     if(hasGeneralReadPermissions){
        // case spacific permission
-       const doses =await Occurance.aggregate([{
+       const doses =await Occurrence.aggregate([{
          $match:{
            ProfileID: mongoose.Types.ObjectId(ProfileID),
            PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
@@ -197,7 +197,7 @@ exports.getReport=async (req, res) => {
        const responseData=[];
    
        for (const elem of doses) {
-         const med =await UserMedcation.findById(elem._id.Medication).select("name img unit strenth")
+         const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength")
          responseData.push({
            med:med,
            confirmed:elem.confirmed,
@@ -209,14 +209,14 @@ exports.getReport=async (req, res) => {
        }
    
     
-       // return succesfull response
+       // return successful response
        return successResMsg(res, 200, {message:req.t("Success"),data:responseData});
   
     }else if(hasSpacificReadPermissions.length>0){
       // case spacific permission
       ids = hasSpacificReadPermissions.map(function(el) { return mongoose.Types.ObjectId(el) })
   
-      const doses =await Occurance.aggregate([{
+      const doses =await Occurrence.aggregate([{
         $match:{
           ProfileID: mongoose.Types.ObjectId(ProfileID),
           PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
@@ -277,7 +277,7 @@ exports.getReport=async (req, res) => {
       const responseData=[];
   
       for (const elem of doses) {
-        const med =await UserMedcation.findById(elem._id.Medication).select("name img unit strenth")
+        const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength")
         responseData.push({
           med:med,
           confirmed:elem.confirmed,
@@ -289,7 +289,7 @@ exports.getReport=async (req, res) => {
       }
   
    
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:responseData});
     }else{
       return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -399,8 +399,8 @@ exports.getReport=async (req, res) => {
   
     // case general permission
     if(hasGeneralReadPermissions){
-       // case spacific permission
-       const doses =await Occurance.find({
+       // case spasific permission
+       const doses =await Occurrence.find({
     
            ProfileID: mongoose.Types.ObjectId(ProfileID),
            PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
@@ -408,26 +408,26 @@ exports.getReport=async (req, res) => {
        }).populate(
        {
           path:"Medication",
-          select:"name img unit strenth type"
+          select:"name img unit strength type"
        }
        ).select("-MedInfo")
        
       
    
     
-       // return succesfull response
+       // return successful response
        return successResMsg(res, 200, {message:req.t("Success"),data:doses});
   
     }else if(hasSpacificReadPermissions.length>0){
   
-       // if the MedID is not in hasSpacificReadPermissions array return unauzorized
+       // if the MedID is not in hasSpacificReadPermissions array return Unauthorized
     if(!hasSpacificReadPermissions.includes(MedID)){
       return errorResMsg(res, 401, req.t("Unauthorized"));
     }
     
   
   
-       const doses =await Occurance.find({
+       const doses =await Occurrence.find({
     
         ProfileID: mongoose.Types.ObjectId(ProfileID),
         PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
@@ -436,18 +436,18 @@ exports.getReport=async (req, res) => {
     }).populate(
     {
        path:"Medication",
-       select:"name img unit strenth type"
+       select:"name img unit strength type"
     }
     ).select("Medication PlannedDateTime PlannedDose Status ProfileID")
     
    
   
   
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 200, {message:req.t("Success"),data:doses});
       
   
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:doses});
     }else{
       return errorResMsg(res, 401, req.t("Unauthorized"));

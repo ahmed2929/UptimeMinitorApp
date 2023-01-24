@@ -1,9 +1,9 @@
-exports.InvetationSentToExistentCareGiverUser_EN = (invetationFrom,userName) => {
+exports.InvitationSentToExistentCareGiverUser_EN = (InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to be a caregiver to him </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to be a caregiver to him </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -19,12 +19,12 @@ exports.InvetationSentToExistentCareGiverUser_EN = (invetationFrom,userName) => 
 `}
 
 
-exports.InvetationSentToExistentCareGiverUser_AR = (invetationFrom,userName) => {
+exports.InvitationSentToExistentCareGiverUser_AR = (InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -42,12 +42,12 @@ exports.InvetationSentToExistentCareGiverUser_AR = (invetationFrom,userName) => 
 
 
 
-exports.InvetationSentToExistentDependentUser_EN = (invetationFrom,userName) => {
+exports.InvitationSentToExistentDependentUser_EN = (InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to be your caregiver </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to be your caregiver </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -63,12 +63,12 @@ exports.InvetationSentToExistentDependentUser_EN = (invetationFrom,userName) => 
 `}
 
 
-exports.InvetationSentToExistentDependentUser_AR= (invetationFrom,userName) => {
+exports.InvitationSentToExistentDependentUser_AR= (InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -83,12 +83,12 @@ exports.InvetationSentToExistentDependentUser_AR= (invetationFrom,userName) => {
        
 `}
 
-exports.InvetationSentToDependent_EN = (otp,invetationFrom,userName) => {
+exports.InvitationSentToDependent_EN = (otp,InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -104,12 +104,12 @@ exports.InvetationSentToDependent_EN = (otp,invetationFrom,userName) => {
          `
 }
 
-exports.InvetationSentToDependent_AR= (otp,invetationFrom,userName) => {
+exports.InvitationSentToDependent_AR= (otp,InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -128,12 +128,12 @@ exports.InvetationSentToDependent_AR= (otp,invetationFrom,userName) => {
 
 
 
-exports.InvetationSentToCareGiver_EN = (otp,invetationFrom,userName) => {
+exports.InvitationSentToCareGiver_EN = (otp,InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -150,12 +150,12 @@ exports.InvetationSentToCareGiver_EN = (otp,invetationFrom,userName) => {
 }
 
 
-exports.InvetationSentToCareGiver_AR = (otp,invetationFrom,userName) => {
+exports.InvitationSentToCareGiver_AR = (otp,InvitationFrom,userName) => {
 	return `
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${invetationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">

@@ -31,7 +31,7 @@ router.put(
 router.delete(
     "/delete/medication/cycle",
     IsAuth(),
-    MedicationController.deletMedictionCycle
+    MedicationController.deleteMedicationCycle
 );
 
 

@@ -36,7 +36,7 @@ exports.AddMedRecommendation = async (req, res) => {
                 PackageName:Med['Package Name'],
                 GenericCode:Med['Generic Code'],
                 GenericName:Med['Generic Name'],
-                strenth:Med['Strength'],
+                strength:Med['Strength'],
                 DosageForm:Med['Dosage Form'],
                 PackageSize:Med['Package Size'],
                 DispenseMode:Med['Dispense Mode'],
@@ -63,16 +63,16 @@ exports.AddMedRecommendation = async (req, res) => {
 
     const result=await MedRecommendation.deleteMany( { } );
 
-    console.log("delete old meds db eneded")
+    console.log("delete old meds db ended")
 
     // Execute the Ordered Batch
     console.log("batch started")
-    const reuslt=await batch.execute();
-    console.log(reuslt)
+    const resultt=await batch.execute();
+    console.log(resultt)
     delete file
 
     fs.unlinkSync(req.file.path);
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 200, {message:req.t("Med_Recommendation_List_Has_Been_Created")});
   } catch (err) {
     // return error response

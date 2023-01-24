@@ -16,6 +16,7 @@ router.put(
 
 router.get(
     "/search",
+   
     generalController.SearchForMed
 );
 

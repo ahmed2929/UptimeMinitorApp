@@ -27,7 +27,7 @@ exports.ChangeUserDefaultLang = async (req, res) => {
     user.lang=lang;
     await user.save()
 
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 200, {message:req.t("lang_has_changed")});
   } catch (err) {
     // return error response
@@ -52,7 +52,7 @@ exports.SearchForMed = async (req, res) => {
         
       }).limit(5);
     } 
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 200, {data:results});
   } catch (err) {
     // return error response

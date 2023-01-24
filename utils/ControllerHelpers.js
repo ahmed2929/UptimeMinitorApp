@@ -1,0 +1,254 @@
+const SchedulerSchema = require("../DB/Schema//Scheduler");
+const UserMedication = require("../DB/Schema/UserMedication");
+const {UploadFileToAzureBlob,GenerateOccurrences,GenerateOccurrencesWithDays,CheckRelationShipBetweenCareGiverAndDependent} =require("./HelperFunctions")
+const Occurrence = require("../DB/Schema/Occurrences");
+const Viewer =require("../DB/Schema/Viewers")
+const mongoose = require("mongoose");
+const Profile =require("../DB/Schema/Profile")
+const {
+  successResMsg,
+  errorResMsg
+} = require("./ResponseHelpers");
+
+
+const CreateNewScheduler=async(jsonScheduler,newMed,id,ProfileID,viewerProfile,req,res)=>{
+    try {
+
+        // validate schedule data
+ if(!jsonScheduler.StartDate){
+    return errorResMsg(res, 400, req.t("start_date_required"));
+  }
+  // check if StartDate in the past 
+  
+  let DateTime = new Date((new Date()).getTime() - (60*60*24*1000))
+  //DateTime.setDate(DateTime.getDate() - 1);
+  console.log(DateTime , new Date(+jsonScheduler.StartDate))
+  // if((+jsonScheduler.StartDate)<DateTime.getTime()){
+  //   return errorResMsg(res, 400, req.t("start_date_in_the_past"));
+  // }
+  if(jsonScheduler.ScheduleType!="1"&&jsonScheduler.ScheduleType!="2"&&
+    jsonScheduler.ScheduleType!="3"&&jsonScheduler.ScheduleType.toString()!="0"){
+      return errorResMsg(res, 400, req.t("invalid_schedule_type"));
+    }
+
+  if(jsonScheduler.EndDate){
+    if((+jsonScheduler.EndDate)<DateTime.getTime()){
+      return errorResMsg(res, 400, req.t("end_date_in_the_past"));
+    }
+
+    if((+jsonScheduler.EndDate)<(+jsonScheduler.StartDate)){
+      return errorResMsg(res, 400, req.t("end_date_before_start_date"));
+    }
+
+
+  }
+// validate dose if its not as needed
+  if(jsonScheduler.ScheduleType!="1"){
+    if(!jsonScheduler.dosage){
+      return errorResMsg(res, 400, req.t("no_dosage_provided"));
+    }
+    if(jsonScheduler.dosage.length===0){
+      return errorResMsg(res, 400, req.t("no_dosage_provided"));
+    }
+    jsonScheduler.dosage.forEach(dose => {
+
+      if(dose.dose<1){
+        return errorResMsg(res, 400, req.t("invalid_dose"));
+      }
+      // if(+(dose.DateTime)<DateTime.getTime()){
+      //   return errorResMsg(res, 400, req.t("dose_date_in_the_past"));
+      // }
+
+    });
+
+  }
+  // validate specific days if its not as needed
+  if(jsonScheduler.ScheduleType=="0"){
+    if(!jsonScheduler.SpecificDays){
+      return errorResMsg(res, 400, req.t("no_specific_days_provided"));
+    }
+    if(jsonScheduler.SpecificDays.length===0){
+      return errorResMsg(res, 400, req.t("no_specific_days_provided"));
+    }
+
+  }
+  // validate occurrence pattern if its not as needed
+  if(jsonScheduler.ScheduleType=="3"){
+    if(!jsonScheduler.DaysInterval){
+      return errorResMsg(res, 400, req.t("invalid_occurrence_pattern"));
+    }
+    if(jsonScheduler.DaysInterval<2){
+      return errorResMsg(res, 400, req.t("invalid_occurrence_pattern"));
+    }
+
+  }
+
+
+  if(!jsonScheduler.EndDate){
+    var result = new Date(jsonScheduler.StartDate);
+    result.setMonth(result.getMonth() + 3);
+    jsonScheduler.EndDate=result
+    
+  }
+
+
+  const newScheduler = new SchedulerSchema({
+    medication:newMed._id,
+    User:id,
+    ...jsonScheduler
+    ,
+    ProfileID,
+    CreatorProfile:viewerProfile._id
+
+  })
+  return newScheduler
+
+
+
+
+    } catch (error) {
+        console.log(error)
+        return errorResMsg(res, 500, req.t("internal_server_error"));
+    }
+ 
+  
+
+
+
+
+}
+
+const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res)=>{
+     // create Occurrences
+      /**
+       *  -date and time are represented in ms format
+       *  -med take time is extracted from startDate ms 
+       * -start date must be provided , the api consumer must provide startDate with the chosen time
+       * -if then no endDate then the default is date.now()+3 months
+       * -the default pattern is every day with occurrence pattern 1 means everyday (case 1)
+       * -if the user proviced occurrence pattern n(2,3,4 ...etc) means the generated occurrences evry n days (case 2)
+       * -case 3 when user choose spacifc days to run the interval
+       * - for case 1 and 2 run GenerateOccurrences function which takes (userID,medId,SchedulerId,occurrencePattern,startDate,endDate,OccurrencesData) as
+       * parametars and returns array of objects wich reprisints occurrence valid object
+       * - then write the ocuurences in the database
+       * 
+       * 
+       */
+  
+      // get get start and end date
+      try {
+
+        let startDate=jsonScheduler.StartDate
+        let endDate=jsonScheduler.EndDate
+        let occurrencePattern;
+        if(!startDate){
+          return errorResMsg(res, 400, req.t("start_date_required"));
+          
+        }
+      
+        // get scheuler senario 
+        if(!jsonScheduler.ScheduleType){
+          return errorResMsg(res, 400, req.t("Scheduler_type_required"));
+          
+        }
+        // get occurrence pattern
+        // the fowllowing code must rurns in case 2 and 3 only
+        if(jsonScheduler.ScheduleType=='2'||jsonScheduler.ScheduleType=='3'){
+    
+        //case every day
+        if(jsonScheduler.ScheduleType=='2'){ 
+          occurrencePattern=1
+        }else if(jsonScheduler.ScheduleType=='3'){ //case days interval
+          occurrencePattern= Number(jsonScheduler.DaysInterval)
+        }
+        // generate occurrences data
+    
+        const occurrences=[]
+        for(const doseElement of jsonScheduler.dosage){
+    
+          const OccurrencesData={
+            PlannedDose:doseElement.dose,
+            ProfileID
+          }
+          const start=new Date(doseElement.DateTime)
+          let end;
+          if(!jsonScheduler.EndDate){
+    
+            var result = new Date(start);
+            result.setMonth(result.getMonth() + 3);
+    
+            end=result
+          }else{
+            end=new Date(jsonScheduler.EndDate)
+    
+          }
+       
+          
+          const newOccurrences=await GenerateOccurrences(id,newMed._id,MedInfo,newScheduler._id,occurrencePattern,start,end,OccurrencesData,req,res)
+          occurrences.push(...newOccurrences);
+    
+    
+        };
+    
+        // write occurrences to database
+        await Occurrence.insertMany(occurrences)
+    
+    
+     
+        
+    
+        }else if (jsonScheduler.ScheduleType=='0'){
+    
+          // case user choose specific days
+          const occurrences=[]
+        for(const doseElement of jsonScheduler.dosage){
+    
+          const OccurrencesData={
+            PlannedDose:doseElement.dose,
+            ProfileID,
+            CreatorProfile:viewerProfile._id
+          }
+          const start=new Date(doseElement.DateTime)
+          
+         
+            EndOfCycle=new Date(end)
+    
+          
+    
+          const intervalDays=jsonScheduler.SpecificDays
+          
+          const newOccurrences=await GenerateOccurrencesWithDays(id,newMed._id,MedInfo,newScheduler._id,intervalDays,start,EndOfCycle,OccurrencesData)
+          occurrences.push(...newOccurrences)
+    
+    
+        };
+    
+        // write occurrences to database
+        await Occurrence.insertMany(occurrences)
+    
+    
+    
+        }else if(jsonScheduler.ScheduleType=='1'){
+          // as needed
+          newScheduler.AsNeeded=true
+    
+        }
+        var endAfter3Month = new Date(startDate);
+        endAfter3Month .setMonth(endAfter3Month .getMonth() + 3);
+        newScheduler.EndDate=jsonScheduler.EndDate||endAfter3Month
+        return newScheduler;
+
+        
+      } catch (error) {
+        console.log(error)
+        return errorResMsg(res, 500, req.t("internal_server_error"));
+      }
+   
+      
+}
+
+
+module.exports={
+    CreateNewScheduler,
+    CreateOccurrences
+}

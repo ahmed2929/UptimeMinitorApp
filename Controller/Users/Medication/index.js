@@ -6,13 +6,14 @@
  */
 
 
-const SchdulerSchema = require("../../../DB/Schema/Schduler");
-const UserMedcation = require("../../../DB/Schema/UserMedcation");
-const {UploadFileToAzureBlob,GenerateOccurances,GenerateOccurancesWithDays} =require("../../../utils/HelperFunctions")
-const Occurance = require("../../../DB/Schema/Occurances");
+const SchedulerSchema = require("../../../DB/Schema/Scheduler");
+const UserMedication = require("../../../DB/Schema/UserMedication");
+const {UploadFileToAzureBlob,GenerateOccurrences,GenerateOccurrencesWithDays,CheckRelationShipBetweenCareGiverAndDependent} =require("../../../utils/HelperFunctions")
+const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
 const Profile =require("../../../DB/Schema/Profile")
+const {CreateNewScheduler,CreateOccurrences} =require("../../../utils/ControllerHelpers")
 const {
   successResMsg,
   errorResMsg
@@ -21,7 +22,7 @@ const {
 
 
 /**
- * Creates a new dependent user
+ * Creates a new medication
  * 
  * @function
  * @memberof controllers
@@ -31,7 +32,7 @@ const {
  * @param {Object} req.body - request body
  * @param {string} req.body.name - med name
  * @param {string} req.body.type - med type
- * @param {string} req.body.strenth - med strenth
+ * @param {string} req.body.strength - med strength
  * @param {string} req.body.unit - med unit
  * @param {string} req.body.quantity - med quantity
  * @param {string} req.body.instructions - instructions
@@ -44,7 +45,7 @@ const {
     etc...
  * 
  * }
- * @param {Object} req.body.Schduler - the med scheduler object 
+ * @param {Object} req.body.Scheduler - the med scheduler object 
  * @param {Object} res - Express response object
  * 
  * @throws {Error} if the user does not have a profile
@@ -109,24 +110,25 @@ example of schdule values
 3-happens in a spacific days
 
 {
-  "StartDate": 1671695330693,
-  "EndDate": 1674664200000,
+  "StartDate": 1674383236586,
+  "EndDate": 1675202400000,
   "AsNeeded": false,
   "ScheduleType": "0",
   "DaysInterval": null,
-  "DpacifcDays": [
+  "SpecificDays": [
     "Thursday",
     "Friday",
     "Saturday"
   ],
+  
   "dosage": [
     {
       "dose": 2,
-      "DateTime": 1671636600000
+      "DateTime": 1675240200000
     },
     {
       "dose": 1,
-      "DateTime": 1671640200000
+      "DateTime": 1675240200000
     }
   ]
 }
@@ -154,17 +156,17 @@ example of schdule values
     
     }
 
-   // create Occurances
+   // create Occurrences
       *
        *  -date and time are represinted in ms format
        *  -med take time is extracted from startDate ms 
        * -start date must be provided , the api consumer must provide startdate with the choosen time
-       * -if then no endDate then the defult is date.now()+3 monthes
-       * -the defult pattern is every day with occurence pattern 1 means everyday (case 1)
-       * -if the user proviced occurence pattern n(2,3,4 ...etc) means the generated occurences evry n days (case 2)
+       * -if then no endDate then the default is date.now()+3 monthes
+       * -the default pattern is every day with occurrence pattern 1 means everyday (case 1)
+       * -if the user proviced occurrence pattern n(2,3,4 ...etc) means the generated occurrences evry n days (case 2)
        * -case 3 when user choose spacifc days to run the interval
-       * - for case 1 and 2 run GenerateOccurances function wich takes (userID,medId,SchdulerId,OccrurencePattern,startDate,endDate,OccurancesData) as
-       * parametars and returns array of objects wich reprisints occurence valid object
+       * - for case 1 and 2 run GenerateOccurrences function wich takes (userID,medId,SchedulerId,occurrencePattern,startDate,endDate,OccurrencesData) as
+       * parametars and returns array of objects wich reprisints occurrence valid object
        * - then write the ocuurences in the database
        * 
        * 
@@ -180,23 +182,23 @@ exports.CreateNewMed = async (req, res) => {
       const {id} =req.id
       const {
         name,
-        strenth,
+        strength,
         description,
         unit,
         quantity,
         instructions,
         condition,
         externalInfo,
-        Schduler,
+        Scheduler,
         type,
         ProfileID,
-        Refillable,
+        Refilelable,
         RefileLevel
       }=req.body
       
 
       console.log("requestBody **************",req.body)
-      console.log("requestBody.Schduler **************",req.body.Schduler)
+      console.log("requestBody.Scheduler **************",req.body.Scheduler)
       console.log("requestFiles **************",req.file)
 
        /*
@@ -205,29 +207,14 @@ exports.CreateNewMed = async (req, res) => {
       and has a addMed permission
       
       */
-       const profile =await Profile.findById(ProfileID)
-       if(!profile){
-         return errorResMsg(res, 400, req.t("Profile_not_found"));
-       }
-  
-       // get the viewer permissions
-       const viewerProfile =await Profile.findOne({
-       "Owner.User":id
-       })
-       
-       if(!viewerProfile){
-          return errorResMsg(res, 400, req.t("Profile_not_found"));
-       }
-  
-       const viewer =await Viewer.findOne({
-        ViewerProfile:viewerProfile._id,
-        DependentProfile:ProfileID
-       })
-       if(!viewer&&profile.Owner.User.toString()!==id){
+    
+      const authorized =await CheckRelationShipBetweenCareGiverAndDependent(ProfileID,id)
+      if(!authorized){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
-  
-        
+      const [viewer,profile,viewerProfile]=authorized
+
+
        // check if the user is the owner and has write permission or can add meds
    
        if(profile.Owner.User.toString()!==id){
@@ -239,14 +226,14 @@ exports.CreateNewMed = async (req, res) => {
          }
          
        }
-       //case the owner dont has write permission
+       //case the owner does not has write permission
        if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
          return errorResMsg(res, 401, req.t("Unauthorized"));
        }
    
      
       let img
-      // store the image to aure
+      // store the image to azure
       if(req.file){
          img = await UploadFileToAzureBlob(req.file)
       }
@@ -254,11 +241,11 @@ exports.CreateNewMed = async (req, res) => {
      
   
       // create new med
-      const newMed = new UserMedcation({
+      const newMed = new UserMedication({
         img,
         user:mongoose.Types.ObjectId(id),
         name,
-        strenth,
+        strength,
         description,
         unit,
         quantity,
@@ -269,7 +256,7 @@ exports.CreateNewMed = async (req, res) => {
         ProfileID,
         CreatorProfile:viewerProfile._id,
         Refile:{
-          Refillable,
+          Refilelable,
           RefileLevel
         }
         
@@ -279,7 +266,7 @@ exports.CreateNewMed = async (req, res) => {
       // generate medIfo snapshot
       const MedInfo={
         img,
-        strenth,
+        strength,
         unit,
         instructions,
         condition,
@@ -287,225 +274,32 @@ exports.CreateNewMed = async (req, res) => {
         name,
         ProfileID,
         CreatorProfile:viewerProfile._id,
-        SchudleType:JSON.parse(Schduler).ScheduleType,
+        SchedulerType:JSON.parse(Scheduler).ScheduleType,
       }
-      // create schduler 
-      let jsonSchduler=JSON.parse(Schduler)
-  
-      // validate schdule data
-      if(!jsonSchduler.StartDate){
-        return errorResMsg(res, 400, req.t("start_date_required"));
-      }
-      // check if StartDate in the past 
-      
-      let DateTime = new Date((new Date()).getTime() - (60*60*24*1000))
-      //DateTime.setDate(DateTime.getDate() - 1);
-      console.log(DateTime , new Date(+jsonSchduler.StartDate))
-      if((+jsonSchduler.StartDate)<DateTime.getTime()){
-        return errorResMsg(res, 400, req.t("start_date_in_the_past"));
-      }
-      if(jsonSchduler.ScheduleType!="1"&&jsonSchduler.ScheduleType!="2"&&
-        jsonSchduler.ScheduleType!="3"&&jsonSchduler.ScheduleType!="0"){
-          return errorResMsg(res, 400, req.t("invalid_schedule_type"));
-        }
-  
-      if(jsonSchduler.EndDate){
-        if((+jsonSchduler.EndDate)<DateTime.getTime()){
-          return errorResMsg(res, 400, req.t("end_date_in_the_past"));
-        }
-  
-        if((+jsonSchduler.EndDate)<(+jsonSchduler.StartDate)){
-          return errorResMsg(res, 400, req.t("end_date_before_start_date"));
-        }
-  
-  
-      }
-  // validate dose if its not as needed
-      if(jsonSchduler.ScheduleType!="1"){
-        if(!jsonSchduler.dosage){
-          return errorResMsg(res, 400, req.t("no_dosage_provided"));
-        }
-        if(jsonSchduler.dosage.length===0){
-          return errorResMsg(res, 400, req.t("no_dosage_provided"));
-        }
-        jsonSchduler.dosage.forEach(dose => {
-  
-          if(dose.dose<1){
-            return errorResMsg(res, 400, req.t("invalid_dose"));
-          }
-          if(+(dose.DateTime)<DateTime.getTime()){
-            return errorResMsg(res, 400, req.t("dose_date_in_the_past"));
-          }
-  
-        });
-  
-      }
-      // validate specific days if its not as needed
-      if(jsonSchduler.ScheduleType=="0"){
-        if(!jsonSchduler.SpecificDays){
-          return errorResMsg(res, 400, req.t("no_specific_days_provided"));
-        }
-        if(jsonSchduler.SpecificDays.length===0){
-          return errorResMsg(res, 400, req.t("no_specific_days_provided"));
-        }
-  
-      }
-      // validate occurence pattern if its not as needed
-      if(jsonSchduler.ScheduleType=="3"){
-        if(!jsonSchduler.DaysInterval){
-          return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
-        }
-        if(jsonSchduler.DaysInterval<2){
-          return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
-        }
-  
-      }
-  
-  
-      if(!jsonSchduler.EndDate){
-        var result = new Date(jsonSchduler.StartDate);
-        result.setMonth(result.getMonth() + 3);
-        jsonSchduler.EndDate=result
-        
-      }
-  
-  
-      const newSchduler = new SchdulerSchema({
-        medication:newMed._id,
-        User:id,
-        ...jsonSchduler
-        ,
-        ProfileID,
-        CreatorProfile:viewerProfile._id
-  
-      })
-  
-      // create Occurances
-      /**
-       *  -date and time are represinted in ms format
-       *  -med take time is extracted from startDate ms 
-       * -start date must be provided , the api consumer must provide startdate with the choosen time
-       * -if then no endDate then the defult is date.now()+3 monthes
-       * -the defult pattern is every day with occurence pattern 1 means everyday (case 1)
-       * -if the user proviced occurence pattern n(2,3,4 ...etc) means the generated occurences evry n days (case 2)
-       * -case 3 when user choose spacifc days to run the interval
-       * - for case 1 and 2 run GenerateOccurances function wich takes (userID,medId,SchdulerId,OccrurencePattern,startDate,endDate,OccurancesData) as
-       * parametars and returns array of objects wich reprisints occurence valid object
-       * - then write the ocuurences in the database
-       * 
-       * 
-       */
-  
-      // get get start and end date
-      let startDate=jsonSchduler.StartDate
-      let endDate=jsonSchduler.EndDate
-      let OccrurencePattern;
-      if(!startDate){
-        return errorResMsg(res, 400, req.t("start_date_required"));
-        
-      }
-    
-      // get schule senario 
-      if(!jsonSchduler.ScheduleType){
-        return errorResMsg(res, 400, req.t("schduler_type_required"));
-        
-      }
-      // get occurence pattern
-      // the fowllowing code must rurns in case 2 and 3 only
-      if(jsonSchduler.ScheduleType=='2'||jsonSchduler.ScheduleType=='3'){
-  
-      //case every day
-      if(jsonSchduler.ScheduleType=='2'){ 
-        OccrurencePattern=1
-      }else if(jsonSchduler.ScheduleType=='3'){ //case days interval
-        OccrurencePattern= Number(jsonSchduler.DaysInterval)
-      }
-      // generate occurences data
-  
-      const occuraces=[]
-      for(const doseElement of jsonSchduler.dosage){
-  
-        const OccurancesData={
-          PlannedDose:doseElement.dose,
-          ProfileID
-        }
-        const start=new Date(doseElement.DateTime)
-        
-        if(!jsonSchduler.EndDate){
-  
-          var result = new Date(baseDate);
-          result.setMonth(result.getMonth() + 3);
-  
-          end=result
-        }else{
-          end=new Date(jsonSchduler.EndDate)
-  
-        }
+      // create Scheduler 
+      let jsonScheduler=JSON.parse(Scheduler)
      
-        
-        const newOccurances=await GenerateOccurances(id,newMed._id,MedInfo,newSchduler._id,OccrurencePattern,start,end,OccurancesData)
-        occuraces.push(...newOccurances)
+     // validate Scheduler 
+     const ValidateScheduler= await CreateNewScheduler(jsonScheduler,newMed,id,ProfileID,viewerProfile,req,res)
+
+
+      // create Occurrences
+    const newScheduler= await CreateOccurrences(jsonScheduler,ValidateScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res)
+     
   
+      // save med and Scheduler
   
-      };
-  
-      // write occurences to database
-      await Occurance.insertMany(occuraces)
-  
-  
-   
-      
-  
-      }else if (jsonSchduler.ScheduleType=='0'){
-  
-        // case user choose specific days
-        const occuraces=[]
-      for(const doseElement of jsonSchduler.dosage){
-  
-        const OccurancesData={
-          PlannedDose:doseElement.dose,
-          ProfileID,
-          CreatorProfile:viewerProfile._id
-        }
-        const start=new Date(doseElement.DateTime)
-        
-       
-          end=new Date(jsonSchduler.EndDate)
-  
-        
-  
-        const intervalDays=jsonSchduler.SpecificDays
-        
-        const newOccurances=await GenerateOccurancesWithDays(id,newMed._id,MedInfo,newSchduler._id,intervalDays,start,end,OccurancesData)
-        occuraces.push(...newOccurances)
-  
-  
-      };
-  
-      // write occurences to database
-      await Occurance.insertMany(occuraces)
-  
-  
-  
-      }else if(jsonSchduler.ScheduleType=='1'){
-        // as needed
-        newSchduler.AsNeeded=true
-  
-      }
-  
-      // save med and schduler
-  
-      newMed.Schduler=newSchduler._id
-      await newSchduler.save()
+      newMed.Scheduler=newScheduler._id
+      await newScheduler.save()
       await newMed.save()
   
        // give the med creator full access for that med
-       // if the med creator is the parent make refil and doses true
+       // if the med creator is the parent make Refile and doses true
        if(profile.Owner.User==id){
         if(viewer){
           viewer.CanReadSpacificMeds.push({
             Med:newMed._id,
-            Refil:true,
+            Refile:true,
             Doses:true
            })
         }
@@ -527,28 +321,13 @@ exports.CreateNewMed = async (req, res) => {
   
   
      const responseData={
-      img,
-      strenth,
-      unit,
-      instructions,
-      condition,
-      type,
-      name,
-      quantity,
-      description,
-      _id:newMed._id,
-      Schduler:{
-        _id:newSchduler._id,
-        ...jsonSchduler
-      },
-      ProfileID,
-      Refile:{
-        Refillable,
-        RefileLevel
-      }
+        med:newMed,
+        scheduler:newScheduler
+
+
   
      }
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("med_created"),data:responseData});
       
     } catch (err) {
@@ -561,7 +340,7 @@ exports.CreateNewMed = async (req, res) => {
     
 
 /**
- * Creates a new dependent user
+ * edit med
  * 
  * @function
  * @memberof controllers
@@ -571,7 +350,7 @@ exports.CreateNewMed = async (req, res) => {
  * @param {Object} req.body - request body
  * @param {string} req.body.name - med name
  * @param {string} req.body.type - med type
- * @param {string} req.body.strenth - med strenth
+ * @param {string} req.body.strength - med strength
  * @param {string} req.body.unit - med unit
  * @param {string} req.body.quantity - med quantity
  * @param {string} req.body.instructions - instructions
@@ -585,7 +364,7 @@ exports.CreateNewMed = async (req, res) => {
     etc...
  * 
  * }
- * @param {Object} req.body.Schduler - the med scheduler object 
+ * @param {Object} req.body.Scheduler - the med scheduler object 
  * @param {Object} res - Express response object
  * 
  * @throws {Error} if the user does not have a profile
@@ -607,7 +386,7 @@ exports.CreateNewMed = async (req, res) => {
      * 2- make sure that the med id and shcdule id is valid
      * 3- retrive the med and edit it 
      * 4- retrive the schdule and edit it
-     * 5- edit all the future occurance if it changed
+     * 5- edit all the future Occurrence if it changed
      * 
      * 
      * 
@@ -632,7 +411,7 @@ exports.CreateNewMed = async (req, res) => {
      * 2- make sure that the med id and shcdule id is valid
      * 3- retrive the med and edit it 
      * 4- retrive the schdule and edit it
-     * 5- edit all the future occurance if it changed
+     * 5- edit all the future Occurrence if it changed
      * 
      * 
      * 
@@ -644,17 +423,17 @@ exports.CreateNewMed = async (req, res) => {
         img,
         MedId,
         name,
-        strenth,
+        strength,
         description,
         unit,
         quantity,
         instructions,
         condition,
         externalInfo,
-        Schduler,
+        Scheduler,
         type,
         ProfileID,
-        Refillable,
+        Refilelable,
         RefileLevel
       }=req.body
   
@@ -664,29 +443,11 @@ exports.CreateNewMed = async (req, res) => {
       check permission 
       
       */
-      const profile =await Profile.findById(ProfileID)
-      if(!profile){
-        return errorResMsg(res, 400, req.t("Profile_not_found"));
-      }
-  
-      // get the viewer permissions
-      const viewerProfile =await Profile.findOne({
-      "Owner.User":id
-      })
-      
-      if(!viewerProfile){
-         return errorResMsg(res, 400, req.t("Profile_not_found"));
-      }
-  
-      const viewer =await Viewer.findOne({
-       ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
-      })
-  
-      if(!viewer&&profile.Owner.User.toString()!==id){
+      const authorized =await CheckRelationShipBetweenCareGiverAndDependent(ProfileID,id)
+      if(!authorized){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
-  
+      const [viewer,profile,viewerProfile]=authorized
       // check if the user is the owner and has write permission or can add meds
   
       if(profile.Owner.User.toString()!==id){
@@ -718,7 +479,7 @@ exports.CreateNewMed = async (req, res) => {
         if(!MedId){
           return errorResMsg(res, 400, req.t("Medication_id_required"));
         }
-        const oldMed=await UserMedcation.findById(MedId);
+        const oldMed=await UserMedication.findById(MedId);
         if(!oldMed){
           return errorResMsg(res, 404, req.t("Medication_not_found"));
         }
@@ -729,28 +490,28 @@ exports.CreateNewMed = async (req, res) => {
   
   
         // edit medication
-       const editedMed= await UserMedcation.findByIdAndUpdate(MedId,{
+       const editedMed= await UserMedication.findByIdAndUpdate(MedId,{
           img:img||oldMed.img,
           name:name||oldMed.name,
-          strenth:strenth||oldMed.strenth,
+          strength:strength||oldMed.strength,
           description:description||oldMed.description,
           unit:unit||oldMed.unit,
           quantity:quantity||oldMed.quantity,
           instructions:instructions||oldMed.instructions,
           condition:condition||oldMed.condition,
-          externalInfo:JSON.parse(externalInfo)||oldMed.externalInfo,
+          externalInfo:externalInfo?JSON.parse(externalInfo):null||oldMed.externalInfo,
           type:type||oldMed.type,
           EditedBy:viewerProfile._id,
           Refile:{
-            Refillable:Refillable||oldMed.Refile.Refillable,
+            Refilelable:Refilelable||oldMed.Refile.Refilelable,
             RefileLevel:RefileLevel||oldMed.Refile.RefileLevel
           }
-        })
+        },{new:true})
         newMed=editedMed
         // genrate MedInfo snapshot
         const MedInfo={
           img:editedMed.img,
-          strenth:editedMed.strenth,
+          strength:editedMed.strength,
           unit:editedMed.unit,
           instructions:editedMed.instructions,
           condition:editedMed.condition,
@@ -761,74 +522,85 @@ exports.CreateNewMed = async (req, res) => {
          
   
         }
+        console.log("MedInfo",MedInfo)
+         const resultaaa=await Occurrence.updateMany({
+          Medication:editedMed._id.toString(),
+        },{
+         $set: { MedInfo: MedInfo } 
+        })
+        console.log("result",resultaaa)
         // if nod edit for schdule will return
   
-        if(!Schduler){
-          return successResMsg(res, 200, {message:req.t("Medication_updated")});
+        if(!Scheduler){
+          return successResMsg(res, 200, {message:req.t("Medication_updated"),data:editedMed});
         }
   
   
   
-       const SchdulerId=editedMed.Schduler._id
+       const SchedulerId=editedMed.Scheduler._id
   
         // edit schdule
-      const OldSchduler = await SchdulerSchema.findById(SchdulerId)
-      if(!OldSchduler){
-        return errorResMsg(res, 404, req.t("schduler_not_found"));
+      const OldScheduler = await SchedulerSchema.findById(SchedulerId)
+      if(!OldScheduler){
+        return errorResMsg(res, 404, req.t("Scheduler_not_found"));
       }
-  
+     
+      // delete all the future Occurrences
+      console.log("SchedulerId",SchedulerId)
+     const deleted= await Occurrence.deleteMany({Medication:editedMed._id.toString(),PlannedDateTime:{$gte:new Date().toISOString()}})
+     console.log("deleted",deleted) 
     
-      console.log("schduler ",Schduler)
-      const jsonSchduler=JSON.parse(Schduler)
+      console.log("Scheduler ",Scheduler)
+      const jsonScheduler=JSON.parse(Scheduler)
   
-      MedInfo.ScheduleType= jsonSchduler.ScheduleType
+      MedInfo.ScheduleType= jsonScheduler.ScheduleType
   
       // validate schdule data
       // check if StartDate in the past 
       const DateTime = new Date()
-      if((+jsonSchduler.StartDate)<DateTime.getTime()){
-        return errorResMsg(res, 400, req.t("start_date_in_the_past"));
-      }
+      // if((+jsonScheduler.StartDate)<DateTime.getTime()){
+      //   return errorResMsg(res, 400, req.t("start_date_in_the_past"));
+      // }
   
       // validate schdule if exist
   
-      if(jsonSchduler.ScheduleType){
-        if(jsonSchduler.ScheduleType!="1"&&jsonSchduler.ScheduleType!="2"&&
-        jsonSchduler.ScheduleType!="3"&&jsonSchduler.ScheduleType!="0"){
+      if(jsonScheduler.ScheduleType){
+        if(jsonScheduler.ScheduleType!="1"&&jsonScheduler.ScheduleType!="2"&&
+        jsonScheduler.ScheduleType!="3"&&jsonScheduler.ScheduleType!="0"){
           return errorResMsg(res, 400, req.t("invalid_schedule_type"));
         }
       }
   
     
   
-      if(jsonSchduler.EndDate){
-        if((+jsonSchduler.EndDate)<DateTime.getTime()){
-          return errorResMsg(res, 400, req.t("end_date_in_the_past"));
-        }
+      // if(jsonScheduler.EndDate){
+      //   // if((+jsonScheduler.EndDate)<DateTime.getTime()){
+      //   //   return errorResMsg(res, 400, req.t("end_date_in_the_past"));
+      //   // }
   
-        if((+jsonSchduler.EndDate)<(+OldSchduler.StartDate)){
-          return errorResMsg(res, 400, req.t("end_date_before_start_date"));
-        }
+      //   if((+jsonScheduler.EndDate)<(+OldScheduler.StartDate)){
+      //     return errorResMsg(res, 400, req.t("end_date_before_start_date"));
+      //   }
+        
   
-  
-      }
+      // }
   // validate dose if its not as needed
-      if(jsonSchduler.ScheduleType){
-        if(jsonSchduler.ScheduleType!="1"){
-          if(!jsonSchduler.dosage){
+      if(jsonScheduler.ScheduleType){
+        if(jsonScheduler.ScheduleType!="1"){
+          if(!jsonScheduler.dosage){
             return errorResMsg(res, 400, req.t("no_dosage_provided"));
           }
-          if(jsonSchduler.dosage.length===0){
+          if(jsonScheduler.dosage.length===0){
             return errorResMsg(res, 400, req.t("no_dosage_provided"));
           }
-          jsonSchduler.dosage.forEach(dose => {
+          jsonScheduler.dosage.forEach(dose => {
     
             if(dose.dose<1){
               return errorResMsg(res, 400, req.t("invalid_dose"));
             }
-            if(+(dose.DateTime)<DateTime.getTime()){
-              return errorResMsg(res, 400, req.t("dose_date_in_the_past"));
-            }
+            // if(+(dose.DateTime)<DateTime.getTime()){
+            //   return errorResMsg(res, 400, req.t("dose_date_in_the_past"));
+            // }
     
           });
     
@@ -836,22 +608,22 @@ exports.CreateNewMed = async (req, res) => {
   
   
       // validate specific days if its not as needed
-      if(jsonSchduler.ScheduleType=="0"){
-        if(!jsonSchduler.SpecificDays){
+      if(jsonScheduler.ScheduleType=="0"){
+        if(!jsonScheduler.SpecificDays){
           return errorResMsg(res, 400, req.t("no_specific_days_provided"));
         }
-        if(jsonSchduler.SpecificDays.length===0){
+        if(jsonScheduler.SpecificDays.length===0){
           return errorResMsg(res, 400, req.t("no_specific_days_provided"));
         }
   
       }
-      // validate occurence pattern if its not as needed
-      if(jsonSchduler.ScheduleType=="3"){
-        if(!jsonSchduler.DaysInterval){
-          return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
+      // validate occurrence pattern if its not as needed
+      if(jsonScheduler.ScheduleType=="3"){
+        if(!jsonScheduler.DaysInterval){
+          return errorResMsg(res, 400, req.t("invalid_occurrence_pattern"));
         }
-        if(jsonSchduler.DaysInterval<2){
-          return errorResMsg(res, 400, req.t("invalid_occurence_pattern"));
+        if(jsonScheduler.DaysInterval<2){
+          return errorResMsg(res, 400, req.t("invalid_occurrence_pattern"));
         }
   
       }
@@ -859,116 +631,122 @@ exports.CreateNewMed = async (req, res) => {
      
   
   
-      // saved old schduler into history array and update the new one
-     const newSchduler=await SchdulerSchema.findByIdAndUpdate(SchdulerId,{
-        ...jsonSchduler,
-        history:[...OldSchduler.history,OldSchduler]
-      })
-  
-      // delete all the future occurances
-     const deleted= await Occurance.deleteMany({Schduler:SchdulerId,PlannedDateTime:{$gte:new Date()}})
-      console.log("deleted",deleted) 
-     // create new occurances
+      // saved old Scheduler into history array and update the new one
+      console.log("jsonScheduler.startDate",new Date(jsonScheduler.StartDate))
+     const newScheduler=jsonScheduler
+      console.log("newScheduler.startDate",new Date(newScheduler.StartDate))
+        var endAfter3Month = new Date(newScheduler.StartDate);
+        endAfter3Month .setMonth(endAfter3Month .getMonth() + 3);
+        newScheduler.EndDate=jsonScheduler.EndDate||endAfter3Month
+      
+
+      
+     // create new Occurrences
   
        // get get start and end date
-       let startDate=jsonSchduler.StartDate
-       let endDate=jsonSchduler.EndDate
-       let OccrurencePattern;
+       let startDate=jsonScheduler.StartDate
+       let endDate=jsonScheduler.EndDate
+       let occurrencePattern;
        if(!startDate){
          return errorResMsg(res, 400, req.t("start_date_required"));
          
        }
      
        // get schule senario 
-       if(!jsonSchduler.ScheduleType){
-         return errorResMsg(res, 400, req.t("schduler_type_required"));
+       if(!jsonScheduler.ScheduleType){
+         return errorResMsg(res, 400, req.t("Scheduler_type_required"));
          
        }
-       // get occurence pattern
+       // get occurrence pattern
        // the fowllowing code must rurns in case 2 and 3 only
-       if(jsonSchduler.ScheduleType=='2'||jsonSchduler.ScheduleType=='3'){
+       if(jsonScheduler.ScheduleType=='2'||jsonScheduler.ScheduleType=='3'){
    
        //case every day
-       if(jsonSchduler.ScheduleType=='2'){ 
-         OccrurencePattern=1
-       }else if(jsonSchduler.ScheduleType=='3'){ //case days interval
-         OccrurencePattern=jsonSchduler.DaysInterval
+       if(jsonScheduler.ScheduleType=='2'){ 
+         occurrencePattern=1
+       }else if(jsonScheduler.ScheduleType=='3'){ //case days interval
+         occurrencePattern=jsonScheduler.DaysInterval
        }
-       // generate occurences data
+       // generate occurrences data
    
-       const occuraces=[]
-       for(const doseElement of jsonSchduler.dosage){
+       const occurrences=[]
+       for(const doseElement of jsonScheduler.dosage){
    
-         const OccurancesData={
+         const OccurrencesData={
            PlannedDose:doseElement.dose,
            ProfileID
          }
          const start=new Date(doseElement.DateTime)
          
-         if(!jsonSchduler.EndDate){
+         if(!newScheduler.EndDate){
    
-           var result = new Date(baseDate);
+           var result = new Date(newScheduler.StartDate);
            result.setMonth(result.getMonth() + 3);
    
            end=result
          }else{
-           end=new Date(jsonSchduler.EndDate)
+           end=new Date(newScheduler.EndDate)
    
          }
-      
          
-         const newOccurances=await GenerateOccurances(id,newMed._id,MedInfo,newSchduler._id,OccrurencePattern,start,end,OccurancesData)
-         occuraces.push(...newOccurances)
+         
+         const newOccurrences=await GenerateOccurrences(id,editedMed._id,MedInfo,newScheduler._id,occurrencePattern,start,end,OccurrencesData)
+         occurrences.push(...newOccurrences)
    
    
        };
    
-       // write occurences to database
-       await Occurance.insertMany(occuraces)
+       // write occurrences to database
+       await Occurrence.insertMany(occurrences)
    
    
     
        
    
-       }else if (jsonSchduler.ScheduleType=='0'){
+       }else if (jsonScheduler.ScheduleType=='0'){
    
          // case user choose spacic days
-         const occuraces=[]
-       for(const doseElement of jsonSchduler.dosage){
+         const occurrences=[]
+       for(const doseElement of jsonScheduler.dosage){
    
-         const OccurancesData={
+         const OccurrencesData={
            PlannedDose:doseElement.dose,
             ProfileID
          }
          const start=new Date(doseElement.DateTime)
          
-        
-           end=new Date(jsonSchduler.EndDate)
+         let  end=newScheduler.EndDate
    
          
    
-         const intervalDays=jsonSchduler.SpecificDays
+         const intervalDays=jsonScheduler.SpecificDays
          
-         const newOccurances=await GenerateOccurancesWithDays(id,newMed._id,MedInfo,newSchduler._id,intervalDays,start,end,OccurancesData)
-         occuraces.push(...newOccurances)
+         const newOccurrences=await GenerateOccurrencesWithDays(id,editedMed._id,MedInfo,newScheduler._id,intervalDays,start,end,OccurrencesData)
+         occurrences.push(...newOccurrences)
    
    
        };
    
-       // write occurences to database
-       await Occurance.insertMany(occuraces)
+       // write occurrences to database
+       await Occurrence.insertMany(occurrences)
    
    
        }
   
+       
+     console.log("newScheduler",)
   
-  
-  
-      
+    const resulta= await SchedulerSchema.findByIdAndUpdate(SchedulerId,{
+        ...newScheduler,
+        StartDate:new Date(newScheduler.StartDate)
+      })
+       
+      console.log("result",resulta)
+     
   
      
-      // return succesfull response
-      return successResMsg(res, 200, {message:req.t("Schdule_Updated")});
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Scheduler_Updated")});
       
     } catch (err) {
       // return error response
@@ -980,7 +758,7 @@ exports.CreateNewMed = async (req, res) => {
 
 
 /**
- * Creates a new dependent user
+ * get medication
  * 
  * @function
  * @memberof controllers
@@ -994,7 +772,7 @@ exports.CreateNewMed = async (req, res) => {
     etc...
  * 
  * }
- * @param {Object} req.body.Schduler - the med scheduler object 
+ * @param {Object} req.body.Scheduler - the med scheduler object 
  * @param {Object} res - Express response object
  * 
  * @throws {Error} if the user does not have a profile
@@ -1004,7 +782,7 @@ exports.CreateNewMed = async (req, res) => {
  * 
  * @returns {Object} - Returns array of med
  * @description 
- *       *return all user mediction if he is the profile owner
+ *       *return all user Medication if he is the profile owner
     *   return all meds that he has a permission to view for that profile id
        
        
@@ -1016,7 +794,7 @@ exports.CreateNewMed = async (req, res) => {
   exports.getMedication=async (req, res) => {
 
     /** 
-     *return all user mediction if he is the profile owner
+     *return all user Medication if he is the profile owner
     *   return all meds that he has a permission to view for that profile id
      * 
      */
@@ -1078,24 +856,26 @@ exports.CreateNewMed = async (req, res) => {
   
     // case general permission
     if(hasGeneralReadPermissions){
-      const Medication =await UserMedcation.find({
+      const Medication =await UserMedication.find({
         ProfileID
   
       })
-      .populate("Schduler")
+      .populate("Scheduler")
       
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:Medication});
   
     }else if(hasSpacificReadPermissions.length>0){
       // case spacific permission
-      const Medication =await UserMedcation.find({
+      const Medication =await UserMedication.find({
         ProfileID,
         _id:{$in:hasSpacificReadPermissions}
       })
-      .populate("Schduler")
+      .populate("Scheduler")
+
+
       
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:Medication});
     }else{
       return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -1113,7 +893,7 @@ exports.CreateNewMed = async (req, res) => {
 
 
 /**
- * Creates a new dependent user
+ * delete medication
  * 
  * @function
  * @memberof controllers
@@ -1141,7 +921,7 @@ exports.CreateNewMed = async (req, res) => {
      * ********************************
      * 1- make sure that the caller is the med creator
      * 2- make sure that the med id and shcdule id is valid
-     * 3- flag the med and schduler as deleted
+     * 3- flag the med and Scheduler as deleted
      * 4- delete all the future doses
      * 
      * 
@@ -1153,7 +933,7 @@ exports.CreateNewMed = async (req, res) => {
  */
 
 
-  exports.deletMedictionCycle=async (req, res) => {
+  exports.deleteMedicationCycle=async (req, res) => {
 
     /** delete all cycle
      * -this api sholud be called when user needs to delete medicatation cycle
@@ -1165,7 +945,7 @@ exports.CreateNewMed = async (req, res) => {
      * ********************************
      * 1- make sure that the caller is the med creator
      * 2- make sure that the med id and shcdule id is valid
-     * 3- flag the med and schduler as deleted
+     * 3- flag the med and Scheduler as deleted
      * 4- delete all the future doses
      * 
      * 
@@ -1180,7 +960,7 @@ exports.CreateNewMed = async (req, res) => {
       }=req.body
   
       // check for permison
-      const Medication=await UserMedcation.findById(MedId)
+      const Medication=await UserMedication.findById(MedId)
       if(!Medication){
         return errorResMsg(res, 400, req.t("Medication_not_found"));
       }
@@ -1237,20 +1017,20 @@ exports.CreateNewMed = async (req, res) => {
   
   
      
-      const schduler =await SchdulerSchema.findOne({medication:MedId})
+      const Scheduler =await SchedulerSchema.findOne({medication:MedId})
   
-      // delete all future occurences
-      await Occurance.deleteMany({Medication:MedId,PlannedDateTime:{$gt:new Date()}})
+      // delete all future occurrences
+      await Occurrence.deleteMany({Medication:MedId,PlannedDateTime:{$gt:new Date()}})
   
       // update medication deleted flage
       Medication.isDeleted=true;
-      schduler.isDeleted=true;
+      Scheduler.isDeleted=true;
   
       await Medication.save()
-      await schduler.save()
+      await Scheduler.save()
   
       
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("Medication_Cycle_Deleted")});
       
     } catch (err) {

@@ -187,7 +187,7 @@ exports.logIn = async (req, res) => {
       return errorResMsg(res, 401, req.t("Incorrect_email_or_password"));
     }
 
-    if(DeviceToken.length>0&&DeviceOs.length>0){
+    if(DeviceToken&&DeviceToken.length>0&&DeviceOs&&DeviceOs.length>0){
       const userProfile=await Profile.findById(user.profile)
       // and new DeviceToken and DeviceOs into the userProfile.NotificationInfo if the DeviceToken and os does not exist in the array
       if(!userProfile.NotificationInfo.DevicesTokens.some((item)=>item.DeviceToken===DeviceToken&&item.DeviceOs===DeviceOs)){
@@ -442,7 +442,7 @@ exports.ResetPassword = async (req, res) => {
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Object} req.body - request body
- * @param {string} req.body.verfiycode - verify code
+ * @param {string} req.body.verifyCode - verify code
  * @param {string} req.body.email - user email
  * @throws {Error} if the email is not found
  * @throws {Error} if the user is already verified
@@ -462,7 +462,7 @@ exports.ResetPassword = async (req, res) => {
 exports.VerifyAccount = async (req, res) => {
   try {
     const {
-      verfiycode,
+      verifyCode,
       email
     } = req.body;
   
@@ -483,8 +483,8 @@ exports.VerifyAccount = async (req, res) => {
 
 
      
-     if(user.verificationCode.toString()!==verfiycode.toString()){
-     console.log(user.verificationCode.toString(),verfiycode.toString())
+     if(user.verificationCode.toString()!==verifyCode.toString()){
+     console.log(user.verificationCode.toString(),verifyCode.toString())
         return errorResMsg(res, 406, req.t("verifyCode_is_not_valid"));
      }
      

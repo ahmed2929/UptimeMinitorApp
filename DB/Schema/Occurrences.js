@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-var OccurancesSchema = new Schema({
-  Schduler:{
+var OccurrencesSchema = new Schema({
+  Scheduler:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Schduler'
+    ref:'Scheduler'
   },
   user:{
     type:mongoose.Schema.Types.ObjectId,
@@ -13,7 +13,7 @@ var OccurancesSchema = new Schema({
   },
   Medication:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'UserMedcation'
+    ref:'UserMedication'
   }
   ,
   PlannedDateTime:{
@@ -33,20 +33,20 @@ var OccurancesSchema = new Schema({
   },
   MedInfo:{
     img :{type:String},
-    strenth:{type:Number},
+    strength:{type:Number},
     unit:{type:String},
     quantity:{type:Number},
     instructions:{type:String},
     condition:{type:String},
     type:{type:String},
     name:{type:String},
-    SchudleType:{
+    SchedulerType:{
       type:String,
     }
   },
   Status:{
     type:Number,
-    enum : [0,1,2,3,4], // 0: Status mean it's not yet active (future dose), 1: Status mean it's in Transit (time is here , not yet 60 mins passed), 2: status code means it's taken. , 3: it's ignored (60 minutes passed no action) 4:means its rejected
+    enum : [0,1,2,3,4,5], // 0: Status mean it's not yet active (future dose), 1: Status mean it's in Transit (time is here , not yet 60 mins passed), 2: status code means it's taken. , 3: it's ignored (60 minutes passed no action) 4:means its rejected,5:means 30m has passed and his care circle notified
     default: 0
   },
   isSuspended:{
@@ -71,6 +71,6 @@ var OccurancesSchema = new Schema({
 },{ timestamps: true });
 
 
-const User = mongoose.model("Occurances", OccurancesSchema);
+const User = mongoose.model("Occurrences", OccurrencesSchema);
 
 module.exports = User;

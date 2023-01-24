@@ -21,7 +21,7 @@ var MedRecommendationsSchema = new Schema({
     type :String,
     index:true
    },
-  strenth:{
+  strength:{
     type :String
    },
   DosageForm:{

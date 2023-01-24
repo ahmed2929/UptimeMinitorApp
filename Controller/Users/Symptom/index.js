@@ -104,7 +104,7 @@ exports.CreateSymptom = async (req, res) => {
   
       if(profile.Owner.User.toString()!==id){
         // check if the user has add med permission
-        const hasAddMedPermissonToMeds=viewer.CanWriteSymtoms;
+        const hasAddMedPermissonToMeds=viewer.CanWriteSymptoms;
   
         if(!hasAddMedPermissonToMeds){
           return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -147,7 +147,7 @@ exports.CreateSymptom = async (req, res) => {
     const responseData={
       ...newSymton._doc,
     }
-      // return succesfull response
+      // return successful response
       return successResMsg(res, 200, {message:req.t("symtom_created"),data:responseData});
       
     } catch (err) {
@@ -235,15 +235,13 @@ exports.CreateSymptom = async (req, res) => {
       if(profile.Owner.User.toString()===id){
         hasGeneralReadPermissions=true
       }else{
-        hasGeneralReadPermissions=viewer.CanReadSideEffect;
+        hasGeneralReadPermissions=viewer.CanReadSymptoms;
       }
     
       
      
-    
-   
-  
-    // case general permission
+    if(StartDate&&EndDate){
+         // case general permission
     if(hasGeneralReadPermissions){
       const symptoms =await Symptom.find({
         Profile:ProfileID,
@@ -271,6 +269,33 @@ exports.CreateSymptom = async (req, res) => {
       return errorResMsg(res, 401, req.t("Unauthorized"));
     }
   
+    }else{
+      if(hasGeneralReadPermissions){
+        const symptoms =await Symptom.find({
+          Profile:ProfileID,
+          isDeleted:false
+    
+        }).populate({
+          path:"CreatorProfile EditedBy",
+          select:"firstName lastName img",
+          populate:{
+            path:"Owner.User",
+            select:"firstName lastName img"
+          }
+        })
+       
+        
+        // return successfully response
+        return successResMsg(res, 200, {message:req.t("Success"),data:symptoms});
+    
+      
+      }else{
+        return errorResMsg(res, 401, req.t("Unauthorized"));
+      }
+    }
+   
+  
+ 
      
       
     } catch (err) {
@@ -368,7 +393,7 @@ exports.EditSymptom = async (req, res) => {
 
     if(profile.Owner.User.toString()!==id){
       // check if the user has add med permission
-      const CanEditSymptom=viewer.CanWriteSymtoms;
+      const CanEditSymptom=viewer.CanWriteSymptoms;
 
       if(!CanEditSymptom){
         return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -506,7 +531,7 @@ exports.DeleteSymptom = async (req, res) => {
 
     if(profile.Owner.User.toString()!==id){
       // check if the user has add med permission
-      const CanDeleteSymptom=viewer.CanWriteSymtoms;
+      const CanDeleteSymptom=viewer.CanWriteSymptoms;
 
       if(!CanDeleteSymptom){
         return errorResMsg(res, 401, req.t("Unauthorized"));

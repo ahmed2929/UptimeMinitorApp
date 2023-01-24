@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const Schema = mongoose.Schema;
 
 
-var DependetSchema = new Schema({
+var DependentSchema = new Schema({
     img:{
     type:String,
     },
@@ -53,6 +53,6 @@ var DependetSchema = new Schema({
 
 
 
-const Dependent = mongoose.model("Dependent", DependetSchema);
+const Dependent = mongoose.model("Dependent", DependentSchema);
 
 module.exports = Dependent;

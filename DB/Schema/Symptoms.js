@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-var SymtomsSchema = new Schema({
+var SymptomsSchema = new Schema({
   img:{
    type:String
   },
@@ -25,7 +25,7 @@ var SymtomsSchema = new Schema({
     required:true
     
     },
-    StartedIn:{ //defult is the current date
+    StartedIn:{ //default is the current date
         type:Date,
         default:() => Date.now()
     },
@@ -55,6 +55,6 @@ var SymtomsSchema = new Schema({
 },{ timestamps: true });
 
 
-const Symptom = mongoose.model("Symptom", SymtomsSchema);
+const Symptom = mongoose.model("Symptom", SymptomsSchema);
 
 module.exports = Symptom;

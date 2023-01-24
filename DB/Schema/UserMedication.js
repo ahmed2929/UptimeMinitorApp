@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 
-var MedictionSchema = new Schema({
+var MedicationSchema = new Schema({
   img:{
    type:String
   },
@@ -16,7 +16,7 @@ var MedictionSchema = new Schema({
   description:{
     type:String
   },
-  strenth:{
+  strength:{
     type:Number
   },
   unit:{
@@ -39,9 +39,9 @@ var MedictionSchema = new Schema({
     enum : ['pill','liquid','injection','inhaler','patch','implant','intrauterine device','suppository','topical','other'],
     default: 'pill'
   },
-  Schduler:{
+  Scheduler:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:'Schduler'
+    ref:'Scheduler'
   },
   externalInfo:{
     type:Object
@@ -63,7 +63,7 @@ var MedictionSchema = new Schema({
     ref:'Profile'
   },
   Refile:{
-    Refillable:{
+    Refilelable:{
       type:Boolean,
       default:false
     },
@@ -71,6 +71,10 @@ var MedictionSchema = new Schema({
       type:Number,
      
     }
+  },
+  GenerateAutoOccurrence:{
+    type:Boolean,
+    default:false
   }
 
   
@@ -80,6 +84,6 @@ var MedictionSchema = new Schema({
 },{ timestamps: true });
 
 
-const User = mongoose.model("UserMedcation", MedictionSchema);
+const User = mongoose.model("UserMedication", MedicationSchema);
 
 module.exports = User;

@@ -18,7 +18,7 @@ var ViewerSchema = new Schema({
         type:Boolean,
         default:true,
     },
-    CanReadRefil:{
+    CanReadRefile:{
         type:Boolean,
         default:true,
     },
@@ -26,11 +26,11 @@ var ViewerSchema = new Schema({
         type:Boolean,
         default:true,
     },
-    CanReadSideEffect:{
+    CanReadSymptoms:{
         type:Boolean,
         default:true,
     },
-    CanWriteSymtoms:{
+    CanWriteSymptoms:{
         type:Boolean,
         default:true,
     },
@@ -55,11 +55,11 @@ var ViewerSchema = new Schema({
             type:Boolean,
             default:true,
         },
-        CanReadRefil:{
+        CanReadRefile:{
             type:Boolean,
             default:true,
         },
-        CanWriteRefil:{
+        CanWriteRefile:{
             type:Boolean,
             default:false,
         },

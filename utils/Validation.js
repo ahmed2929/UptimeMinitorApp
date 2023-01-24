@@ -40,7 +40,7 @@ exports.resendAcctivationCodeValidationRules = () => {
 
 exports.virifyAccount = () => {
     return [
-        body("verfiycode").notEmpty().withMessage("verifyCode_is_required"),
+        body("verifyCode").notEmpty().withMessage("verifyCode_is_required"),
         body("email").notEmpty().withMessage("Email_is_required").isEmail().withMessage("Email_is_not_valid").normalizeEmail().withMessage("Email_is_required")
 
     ]
@@ -82,7 +82,7 @@ exports.changeLanguage=()=>{
 
 exports.ChangeDoseStatus = () => {
     return [
-        check("OccuranceId").isMongoId().withMessage("invalid_ID"),
+        check("OccurrenceId").isMongoId().withMessage("invalid_ID"),
         check("Status")
         .exists()  // Make sure the field exists
         .isInt()  // Make sure it's an integer
@@ -95,7 +95,7 @@ exports.ChangeDoseStatus = () => {
 
 exports.SuspendDoseFromDateToDate = () => {
     return [
-        check("SchdulerId").isMongoId().withMessage("invalid_ID"),
+        check("SchedulerId").isMongoId().withMessage("invalid_ID"),
         check("StartDate")
         .exists()  // Make sure the field exists
         .isNumeric()  // Make sure it's a numeric value
@@ -144,7 +144,7 @@ exports.SuspendDoseFromDateToDate = () => {
 exports.EditSingleDoseValidation = () => {
     return [
      // Validate the occurrenceId field
-     check('occuraceId')
+     check('OccurrenceId')
      .exists()  // Make sure the field exists
      .isMongoId()
      .withMessage("invalid_ID"), // Make sure it's a valid Mongoose ID
@@ -162,14 +162,14 @@ exports.EditSingleDoseValidation = () => {
          check('MedInfo.type').optional(),
          check('MedInfo.name').optional(),
 
-         check('MedInfo.strenth')
+         check('MedInfo.strength')
            .optional()
            .isInt()
-           .custom((strenth) => {
-            console.log(strenth)
-             if(strenth){
-                 if (strenth < 1) {
-                     throw new Error('strenth must be greater than 0');
+           .custom((strength) => {
+            console.log(strength)
+             if(strength){
+                 if (strength < 1) {
+                     throw new Error('strength must be greater than 0');
                    }
              }
              
@@ -229,16 +229,11 @@ check('type')
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
-// Validate the strenth field
-check('strenth')
+// Validate the strength field
+check('strength')
 .optional()
  .isInt()  // Make sure it's an integer
- .custom((strenth) => {
-   if (strenth < 1) {
-     throw new Error('strenth must be greater than 1 or equals');
-   }
-   return true;
- }),
+ ,
 
 // Validate the unit field
 check('unit')
@@ -250,12 +245,7 @@ check('unit')
 check('quantity')
 .optional()
  .isInt()  // Make sure it's an integer
- .custom((quantity) => {
-   if (quantity < 1) {
-     throw new Error('quantity must be greater than or equals 1');
-   }
-   return true;
- }),
+,
 
 // Validate the instructions field
 check('instructions')
@@ -269,15 +259,15 @@ check('condition')
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
-// Validate the Schduler field
+// Validate the Scheduler field
 
-check('Schduler')
+check('Scheduler')
     .exists()
-    .withMessage("Schduler missed")  // Make sure the field exists
-    // .custom((Schduler) => {
-    //     //console.log(Schduler)
+    .withMessage("Scheduler missed")  // Make sure the field exists
+    // .custom((Scheduler) => {
+    //     //console.log(Scheduler)
     //   // Validate the StartDate field
-    //   check('Schduler.StartDate')
+    //   check('Scheduler.StartDate')
     //     .exists()  // Make sure the field exists
     //     .isInt()  // Make sure it's an integer
     //     .custom((StartDate) => {
@@ -288,7 +278,7 @@ check('Schduler')
     //     })
 
     //   // Validate the EndDate field
-    //   check('Schduler.EndDate')
+    //   check('Scheduler.EndDate')
     //     .exists()  // Make sure the field exists
     //     .isInt()  // Make sure it's an integer
     //     .custom((EndDate) => {
@@ -301,7 +291,7 @@ check('Schduler')
    
 
     //   // Validate the ScheduleType field
-    //   check('Schduler.ScheduleType')
+    //   check('Scheduler.ScheduleType')
     //     .exists()  // Make sure the field exists
     //     .isString()  // Make sure it's a string
     //     .custom((ScheduleType) => {
@@ -313,27 +303,27 @@ check('Schduler')
     //     }),
 
     //   // Validate the DaysInterval field if the ScheduleType is "1"
-    //   check('Schduler.DaysInterval')
+    //   check('Scheduler.DaysInterval')
     //     .optional()  // The field is optional
     //     .isInt()  // Make sure it's an integer
     //     .custom((DaysInterval, { req }) => {
-    //       if (req.body.Schduler.ScheduleType === "1" && (!DaysInterval || DaysInterval < 2)) {
+    //       if (req.body.Scheduler.ScheduleType === "1" && (!DaysInterval || DaysInterval < 2)) {
     //         throw new Error('DaysInterval must be a positive integer');
     //       }
     //       return true;
     //     }),
 
     //   // Validate the SpecificDays field if the ScheduleType is "0"
-    //   check('Schduler.SpecificDays')
+    //   check('Scheduler.SpecificDays')
     //   .optional()  // The field is optional
     //   .isArray()  // Make sure it's an array
     //   .custom((SpecificDays, { req }) => {
-    //     if (req.body.Schduler.ScheduleType === "0" && (!SpecificDays || SpecificDays.length === 0)) {
+    //     if (req.body.Scheduler.ScheduleType === "0" && (!SpecificDays || SpecificDays.length === 0)) {
     //       throw new Error('SpecificDays must not be empty');
     //     }
     //     return true;
     //   }),
-    //   check('Schduler.dosage')
+    //   check('Scheduler.dosage')
     //   .exists()  // Make sure the field exists
     //   .isArray()  // Make sure it's an array
     //   .custom((dosage) => {
@@ -341,7 +331,7 @@ check('Schduler')
     //          // Validate each element of the dosage array
     //     for (let i = 0; i < dosage.length; i++) {
     //         // Validate the DateTime field
-    //         check(`Schduler.dosage[${i}].DateTime`)
+    //         check(`Scheduler.dosage[${i}].DateTime`)
     //           .exists()  // Make sure the field exists
     //           .isInt()  // Make sure it's an integer
     //           .custom((DateTime) => {
@@ -379,13 +369,13 @@ check('type')
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
-// Validate the strenth field
-check('strenth')
+// Validate the strength field
+check('strength')
 .optional()
  .isInt()  // Make sure it's an integer
- .custom((strenth) => {
-   if (strenth < 1) {
-     throw new Error('strenth must be greater than 1 or equals');
+ .custom((strength) => {
+   if (strength < 1) {
+     throw new Error('strength must be greater than 1 or equals');
    }
    return true;
  }),
@@ -419,7 +409,7 @@ check('condition')
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
-// Validate the Schduler field
+// Validate the Scheduler field
 
  
 
@@ -440,7 +430,7 @@ check('Type')
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
-// Validate the strenth field
+// Validate the strength field
 check('Description')
 .exists()
 .isString()  // Make sure it's a string
@@ -486,7 +476,7 @@ check('Type')
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
-// Validate the strenth field
+// Validate the strength field
 check('Description')
 .optional()
 .isString()  // Make sure it's a string

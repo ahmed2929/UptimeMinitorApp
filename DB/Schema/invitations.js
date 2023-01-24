@@ -28,7 +28,7 @@ var InvitationsSchema = new Schema({
             type:Boolean,
             default:true,
         },
-        CanReadRefil:{
+        CanReadRefile:{
             type:Boolean,
             default:true,
         },
@@ -36,11 +36,11 @@ var InvitationsSchema = new Schema({
             type:Boolean,
             default:true,
         },
-        CanReadSideEffect:{
+        CanReadSymptoms:{
             type:Boolean,
             default:true,
         },
-        CanWriteSymtoms:{
+        CanWriteSymptoms:{
             type:Boolean,
             default:false,
         },
@@ -51,7 +51,7 @@ var InvitationsSchema = new Schema({
         CanReadSpacificMeds:[{
             Med:{
                 type:Schema.Types.ObjectId,
-                 ref:"UserMedcation",
+                 ref:"UserMedication",
             },
             CanRead:{
                 type:Boolean,
@@ -65,11 +65,11 @@ var InvitationsSchema = new Schema({
                 type:Boolean,
                 default:true,
             },
-            CanReadRefil:{
+            CanReadRefile:{
                 type:Boolean,
                 default:true,
             },
-            CanWriteRefil:{
+            CanWriteRefile:{
                 type:Boolean,
                 default:false,
             },

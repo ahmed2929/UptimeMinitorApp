@@ -168,7 +168,7 @@ exports.signUp = async (req, res) => {
 
    
 
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 201, req.t("registration_successful"));
   } catch (err) {
     // return error response
@@ -247,7 +247,7 @@ exports.logIn = async (req, res) => {
       },
       ShouldRestPassword:user.ShouldRestPassword
     };
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 200, data);
   } catch (err) {
     // return error response
@@ -384,7 +384,7 @@ exports.GenerateAccessResetPasswordToken= async (req, res) => {
 
    const token = GenerateToken(user._id)
 
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 200, {token});
   } catch (err) {
     // return error response
@@ -460,7 +460,7 @@ exports.ResetPassword = async (req, res) => {
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Object} req.body - request body
- * @param {string} req.body.verfiycode - verify code
+ * @param {string} req.body.verifyCode - verify code
  * @param {string} req.body.email - user email
  * @throws {Error} if the email is not found
  * @throws {Error} if the user is already verified
@@ -480,7 +480,7 @@ exports.ResetPassword = async (req, res) => {
 exports.VerifyAccount = async (req, res) => {
   try {
     const {
-      verfiycode,
+      verifyCode,
       email
     } = req.body;
   
@@ -501,8 +501,8 @@ exports.VerifyAccount = async (req, res) => {
 
 
      
-     if(user.VerifictionCode.toString()!==verfiycode.toString()){
-     console.log(user.VerifictionCode.toString(),verfiycode.toString())
+     if(user.VerifictionCode.toString()!==verifyCode.toString()){
+     console.log(user.VerifictionCode.toString(),verifyCode.toString())
         return errorResMsg(res, 406, req.t("verifyCode_is_not_valid"));
      }
      
@@ -627,7 +627,7 @@ exports.GenerateAccessToken = async (req, res) => {
     const data = {
       accessToken:token
     };
-    // return succesfull response
+    // return successful response
     return successResMsg(res, 200, data);
   } catch (err) {
     // return error response

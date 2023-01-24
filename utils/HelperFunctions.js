@@ -14,7 +14,8 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 const { resolve } = require('path');
 const NotificationMessages =require("../Messages/Notifications/index")
 const {sendNotification} =require("../config/SendNotification")
-
+const Profile = require('../DB/Schema/Profile');
+const Viewer =require('../DB/Schema/Viewers')
 // create refresh token
 
 /**
@@ -153,17 +154,19 @@ const getUserEmailFromId=async(id)=>{
         console.log(error)
         throw new Error(error)
     }
- }
  
- const GenerateOccurances=async (UserID,MedId,MedInfo,SchdulerId,OccrurencePattern,startDate,endDate,OccurancesData)=>{
+    }
+    
+ 
+ const GenerateOccurrences=async (UserID,MedId,MedInfo,SchedulerId,occurrencePattern,startDate,endDate,OccurrencesData)=>{
 
-    // write a function that will generate the occurance of the med
+    // write a function that will generate the Occurrence of the med
     // based on the pattern and the start and end date
     // the function will return an array of dates
-    // the array will be used to create the occurance in the database
+    // the array will be used to create the Occurrence in the database
     // the function will be called in the create med route
     // the function will be called in the update med route
-    // the function will be called in the update schduler route
+    // the function will be called in the update Scheduler route
 
     
     return new Promise((resolve,reject)=>{
@@ -182,10 +185,10 @@ const getUserEmailFromId=async(id)=>{
                 {
                     user:UserID,
                     Medication:MedId,
-                    Schduler:SchdulerId,
+                    Scheduler:SchedulerId,
                     MedInfo:{...MedInfo},
                     PlannedDateTime:new Date(baseDate),
-                    ...OccurancesData
+                    ...OccurrencesData
     
                 }
 
@@ -194,7 +197,7 @@ const getUserEmailFromId=async(id)=>{
                 
                 );
                 var result = new Date(baseDate);
-                result.setDate(result.getDate() + OccrurencePattern);
+                result.setDate(result.getDate() + occurrencePattern);
                 baseDate = result;
          
         }
@@ -205,15 +208,15 @@ const getUserEmailFromId=async(id)=>{
  }
 
 
- const GenerateOccurancesWithDays=async (UserID,MedId,MedInfo,SchdulerId,intervalDays,startDate,endDate,OccurancesData)=>{
+ const GenerateOccurrencesWithDays=async (UserID,MedId,MedInfo,SchedulerId,intervalDays,startDate,endDate,OccurrencesData)=>{
 
-    // write a function that will generate the occurance of the med
+    // write a function that will generate the Occurrence of the med
     // based on the pattern and the start and end date
     // the function will return an array of dates
-    // the array will be used to create the occurance in the database
+    // the array will be used to create the Occurrence in the database
     // the function will be called in the create med route
     // the function will be called in the update med route
-    // the function will be called in the update schduler route
+    // the function will be called in the update Scheduler route
 
     
     return new Promise((resolve,reject)=>{
@@ -241,10 +244,10 @@ const getUserEmailFromId=async(id)=>{
                 {
                     user:UserID,
                     Medication:MedId,
-                    Schduler:SchdulerId,
+                    Scheduler:SchedulerId,
                     MedInfo:{...MedInfo},
                     PlannedDateTime:new Date(baseDate),
-                    ...OccurancesData
+                    ...OccurrencesData
     
                 }
 
@@ -349,17 +352,17 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
             case "RefileAlert":
                 //i case of only IOS
                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    payload=NotificationMessages.RefileAlert_EN_APNS(profile.firstName,newInvetation._id)
+                    payload=NotificationMessages.RefileAlert_EN_APNS(profile.firstName,newInvitation._id)
                     await sendNotification(userprofile._id,payload,"IOS")
 
                 }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                payload=NotificationMessages.RefileAlert_EN_GCM(profile.firstName,newInvetation._id)
+                payload=NotificationMessages.RefileAlert_EN_GCM(profile.firstName,newInvitation._id)
                     //case of only android
                     await sendNotification(userprofile._id,payload,"Android")
 
                 }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                const IOS_payload=  NotificationMessages.RefileAlert_EN_APNS(profile.firstName,newInvetation._id)
-                const Android_payload=NotificationMessages.RefileAlert_EN_GCM(profile.firstName,newInvetation._id)
+                const IOS_payload=  NotificationMessages.RefileAlert_EN_APNS(profile.firstName,newInvitation._id)
+                const Android_payload=NotificationMessages.RefileAlert_EN_GCM(profile.firstName,newInvitation._id)
                 //case of both
                     await sendNotification(userprofile._id,IOS_payload,"IOS")
                     await sendNotification(userprofile._id,Android_payload,"Android")
@@ -458,17 +461,17 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
             case "RefileAlert":
                 //i case of only IOS
                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    payload=NotificationMessages.RefileAlert_AR_APNS(profile.firstName,newInvetation._id)
+                    payload=NotificationMessages.RefileAlert_AR_APNS(profile.firstName,newInvitation._id)
                     await sendNotification(userprofile._id,payload,"IOS")
 
                 }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                payload=NotificationMessages.RefileAlert_AR_GCM(profile.firstName,newInvetation._id)
+                payload=NotificationMessages.RefileAlert_AR_GCM(profile.firstName,newInvitation._id)
                     //case of only android
                     await sendNotification(userprofile._id,payload,"Android")
 
                 }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                const IOS_payload=  NotificationMessages.RefileAlert_AR_APNS(profile.firstName,newInvetation._id)
-                const Android_payload=NotificationMessages.RefileAlert_AR_GCM(profile.firstName,newInvetation._id)
+                const IOS_payload=  NotificationMessages.RefileAlert_AR_APNS(profile.firstName,newInvitation._id)
+                const Android_payload=NotificationMessages.RefileAlert_AR_GCM(profile.firstName,newInvitation._id)
                 //case of both
                     await sendNotification(userprofile._id,IOS_payload,"IOS")
                     await sendNotification(userprofile._id,Android_payload,"Android")
@@ -489,6 +492,60 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
 
 }
 
+const CheckRelationShipBetweenCareGiverAndDependent=async(ProfileID,id)=>{
+    try {
+          /*
+      ProfileID:the profileID
+      id:is the id extracted from the token
+      check for the CheckRelationShipBetweenCareGiverAndDependent 
+        return true if the RelationShip exist
+      
+      */
+       const profile =await Profile.findById(ProfileID)
+       if(!profile){
+         return false
+       }
+  
+       // get the viewer permissions
+       const viewerProfile =await Profile.findOne({
+       "Owner.User":id
+       })
+       
+       if(!viewerProfile){
+          return false
+       }
+  
+       const viewer =await Viewer.findOne({
+        ViewerProfile:viewerProfile._id,
+        DependentProfile:ProfileID
+       })
+       if(!viewer&&profile.Owner.User.toString()!==id){
+        return false;
+      }
+      
+      return [
+        viewer,
+        profile,
+        viewerProfile
+
+      ]
+
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+
+}
+
+const CareGiverCanAddMed=async()=>{
+
+}
+
+const CareGiverCanAddSymptoms=async()=>{
+
+}
+
 
 module.exports={
     GenerateToken,
@@ -497,7 +554,10 @@ module.exports={
     getUserEmailFromId,
     SendEmailToUser,
     UploadFileToAzureBlob,
-    GenerateOccurances,
-    GenerateOccurancesWithDays,
-    SendPushNotificationToUserRegardlessLangAndOs
+    GenerateOccurrences,
+    GenerateOccurrencesWithDays,
+    SendPushNotificationToUserRegardlessLangAndOs,
+    CheckRelationShipBetweenCareGiverAndDependent,
+    CareGiverCanAddMed,
+    CareGiverCanAddSymptoms
 }

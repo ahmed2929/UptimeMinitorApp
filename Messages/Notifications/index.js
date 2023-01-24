@@ -95,8 +95,8 @@ exports.CareGiverAcceptedInvitation_AR_GCM=(CareGiver,InvitationID)=>{
 exports.RefileAlert_EN_GCM=(patientName,MedName,MedID)=>{
     return {
         "notification":{
-            "title": `Refill Alert`,
-            "body": `${patientName} need to refill ${MedName}`
+            "title": `Refilel Alert`,
+            "body": `${patientName} need to Refilel ${MedName}`
         },
         "data":{
             "MedID": `${MedID}`
@@ -232,8 +232,8 @@ exports.RefileAlert_EN_APNS=(patientName,MedName,MedID)=>{
     return {
         "aps":{
             "alert":{
-                "title": `Refill Alert`,
-                "body": `${patientName} need to refill ${MedName}`
+                "title": `Refilel Alert`,
+                "body": `${patientName} need to Refilel ${MedName}`
             },
             "data":{
                 "MedID": `${MedID}`

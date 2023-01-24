@@ -5,13 +5,13 @@
  * 
  */
 
-const SchdulerSchema = require("../../../DB/Schema/Schduler");
-const UserMedcation = require("../../../DB/Schema/UserMedcation");
-const {UploadFileToAzureBlob,GenerateOccurances,GenerateOccurancesWithDays,GenerateRandomCode} =require("../../../utils/HelperFunctions")
-const Occurance = require("../../../DB/Schema/Occurances");
+const SchedulerSchema = require("../../../DB/Schema/Scheduler");
+const UserMedication = require("../../../DB/Schema/UserMedication");
+const {UploadFileToAzureBlob,GenerateOccurrences,GenerateOccurrencesWithDays,GenerateRandomCode} =require("../../../utils/HelperFunctions")
+const Occurrence = require("../../../DB/Schema/Occurrences");
 const mongoose = require("mongoose");
-const Dependent = require("../../../DB/Schema/DependetUser");
-const Invetation =require("../../../DB/Schema/invitations")
+const Dependent = require("../../../DB/Schema/DependentUser");
+const Invitation =require("../../../DB/Schema/invitations")
 const User = require("../../../DB/Schema/User");
 const Viewer =require("../../../DB/Schema/Viewers")
 const messages = require("../../../Messages/Email/index")
@@ -25,7 +25,7 @@ const {
 const Symptom = require("../../../DB/Schema/Symptoms");
 const Profile = require("../../../DB/Schema/Profile")
 const Permissions = require("../../../DB/Schema/Permissions");
-const { populate } = require("../../../DB/Schema/Schduler");
+const { populate } = require("../../../DB/Schema/Scheduler");
 
 
 
@@ -143,7 +143,7 @@ exports.CreateDependentA = async (req, res) => {
         const newViewer = new Viewer({
             ViewerProfile:ProfileID,
             CanWriteDoses:true,
-            CanWriteSymtoms:true
+            CanWriteSymptoms:true
             
         })
        // create a new profile for dependent user
@@ -301,7 +301,7 @@ exports.CreateDependentA = async (req, res) => {
         }
 
           
-      // store the image to aure
+      // store the image to azure
       let img;
       if(req.file){
         img = await UploadFileToAzureBlob(req.file)
@@ -316,7 +316,7 @@ exports.CreateDependentA = async (req, res) => {
           // case user is active
           if (user&&!user.temp) {
             /**
-             * user alreay exists
+             * user already exists
              * send notification to that user
              */
             // get user profile
@@ -326,12 +326,12 @@ exports.CreateDependentA = async (req, res) => {
             }
             //check if the invitation sent before
 
-            const invetation =await Invetation.find({
+            const Invitation =await Invitation.find({
                 From:ProfileID,
                 To:userprofile._id,
             })
 
-            if(invetation.length>0){
+            if(Invitation.length>0){
                 return errorResMsg(res, 400, req.t("invitation_sent_before"));
             }
             //create dependent user
@@ -350,7 +350,7 @@ exports.CreateDependentA = async (req, res) => {
                 img
             })
             // create new invitation
-            const newInvetation = new Invetation({
+            const newInvitation = new Invitation({
                 From:ProfileID,
                 To:userprofile._id,
                 Status:0,
@@ -361,21 +361,21 @@ exports.CreateDependentA = async (req, res) => {
 
             // save all the data
             await newDependentUser.save()
-            await newInvetation.save()
+            await newInvitation.save()
 
             // send notification to the user using email
 
             if(userprofile.Owner.User.lang==="en"){
               //  email   
-              const Invitation = messages.InvetationSentToExistentDependentUser_EN(profile.Owner.User.firstName,firstName);
+              const Invitation = messages.InvitationSentToExistentDependentUser_EN(profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,Invitation)
                }else{
-                const Invitation = messages.InvetationSentToExistentDependentUser_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
+                const Invitation = messages.InvitationSentToExistentDependentUser_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,Invitation)
                }
             // send notification to the user using push notification 
             await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile,"NewInvitationFromCareGiver",{
-              Invitation:newInvetation
+              Invitation:newInvitation
             })
 
             const responseData ={
@@ -456,10 +456,10 @@ exports.CreateDependentA = async (req, res) => {
                const ResetPasswordXpireDate =  Date.now()  + 8.64e+7 ;
                RestPasswordCode+=RestPasswordCode2;
                if(newUser.lang==="en"){
-                const Invitation = messages.InvetationSentToDependent_EN(RestPasswordCode,profile.Owner.User.firstName,firstName);
+                const Invitation = messages.InvitationSentToDependent_EN(RestPasswordCode,profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,Invitation)
                }else{
-                const Invitation = messages.InvetationSentToDependent_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
+                const Invitation = messages.InvitationSentToDependent_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,Invitation)
                }
           
@@ -469,7 +469,7 @@ exports.CreateDependentA = async (req, res) => {
 
                // register the invitation
                 // create new invitation
-            const newInvetation = new Invetation({
+            const newInvitation = new Invitation({
                 From:ProfileID,
                 To:newUserProfile._id,
                 Status:0,
@@ -483,7 +483,7 @@ exports.CreateDependentA = async (req, res) => {
             await newUser.save()
             await newUserProfile.save()
             await newDependentUser.save()
-            await newInvetation.save()
+            await newInvitation.save()
                  
     
         const responseData ={
@@ -499,7 +499,7 @@ exports.CreateDependentA = async (req, res) => {
             AccountType:1,
         }
     
-        // return succesfull response
+        // return successfully response
       return successResMsg(res, 200, {message:req.t("invitation_sent"),data:responseData});
       
     } catch (err) {
@@ -545,7 +545,7 @@ exports.CreateDependentA = async (req, res) => {
 @param {String} req.id - ID of the user who is trying to change the invitation status extracted from authorization header .
 @param {String} req.body.ProfileID - ID of the profile of the user who is trying to change the invitation status.
 @param {Number} req.body.Status - The status of the invitation. 0 for pending, 1 for confirmed, 2 for rejected.
-@param {String} req.body.invetationID - ID of the invitation that is being changed.
+@param {String} req.body.InvitationID - ID of the invitation that is being changed.
 @throws {Error} - if there is an error finding the user's profile
 @throws {Error} - if there is an error finding the invitation
 @throws {Error} - if there is an error finding the master profile
@@ -564,40 +564,40 @@ exports.CreateDependentA = async (req, res) => {
       const {
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
-        invetationID
+        InvitationID
 
         
        
       }=req.body
         // get the invitation
-        const invetation = await Invetation.findById(invetationID)
-        if(!invetation){
-            return errorResMsg(res, 400, req.t("invetation_not_found"));
+        const Invitation = await Invitation.findById(InvitationID)
+        if(!Invitation){
+            return errorResMsg(res, 400, req.t("Invitation_not_found"));
         }
         // get the master profile
-        const masterProfile = await Profile.findById(mongoose.Types.ObjectId(invetation.From))
+        const masterProfile = await Profile.findById(mongoose.Types.ObjectId(Invitation.From))
         if(!masterProfile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
-        // get the dependetProfile
-        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invetation.To))
+        // get the DependentProfile
+        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(Invitation.To))
         if(dependentProfile.Owner.User.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
-        if(ProfileID.toString()!=invetation.To.toString()){
+        if(ProfileID.toString()!=Invitation.To.toString()){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
       
-        // change the inviation status............................................................
-        if(invetation.Status!=0){
+        // change the invitation status............................................................
+        if(Invitation.Status!=0){
             return errorResMsg(res, 400, req.t("invitation_status_changed_before"));
         }
         //rejection case
         if(Status===2){
-            invetation.Status=2;
-            await invetation.save()
+            Invitation.Status=2;
+            await Invitation.save()
             // return reject confirmation
 
             return successResMsg(res, 200, {message:req.t("invitation_rejected")});
@@ -605,7 +605,7 @@ exports.CreateDependentA = async (req, res) => {
         }
         //acceptance case
         if(Status===1){
-            invetation.Status=1;
+            Invitation.Status=1;
             
            
             // create a new viewer for the master profile
@@ -616,25 +616,25 @@ exports.CreateDependentA = async (req, res) => {
              // add the dependent to the master profile
              masterProfile.Dependents.push({
                 Profile:dependentProfile._id,
-                Dependent: invetation.dependent,
+                Dependent: Invitation.dependent,
                 viewer:newViewer._id
             })
             // add the master to the dependent profile
             dependentProfile.Viewers.push({
-                Dependent:invetation.dependent._id,
+                Dependent:Invitation.dependent._id,
                 viewer:newViewer._id
 
             })
 
              // send notification to the user using push notification 
              await SendPushNotificationToUserRegardlessLangAndOs(dependentProfile,masterProfile,"DependentAcceptedInvitation",{
-              Invitation:invetation
+              Invitation:Invitation
             })
 
 
             await dependentProfile.save()
             await masterProfile.save()
-            await invetation.save()
+            await Invitation.save()
             await newViewer.save()
             // return accept confirmation
             return successResMsg(res, 200, {message:req.t("invitation_accepted")});
@@ -692,7 +692,7 @@ The filter can be based on the status, sent, and received parameters.
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
         sent,
-        recieved
+        received
 
        
       }=req.query
@@ -707,22 +707,22 @@ The filter can be based on the status, sent, and received parameters.
         if(profile.Owner.User.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
-        // get the invetations
-        let invetations;
-        //defult filter with all prametars
-        if(sent && recieved){
-            invetations = await Invetation.find({
+        // get the Invitations
+        let Invitations;
+        //default filter with all parameters
+        if(sent && received){
+            Invitations = await Invitation.find({
                 $or:[{From:ProfileID},{To:ProfileID}],
                 Status:Status||{ $exists:true}
             }).populate("dependent")
-        }else if(sent&&!recieved){
-            invetations = await Invetation.find({
+        }else if(sent&&!received){
+            Invitations = await Invitation.find({
                 From:ProfileID,
                 Status:Status||{ $exists:true}
             }).populate("dependent")
-        }else if(recieved&&!sent){
-            console.log("recieved will run")
-            invetations = await Invetation.find({
+        }else if(received&&!sent){
+            console.log("received will run")
+            Invitations = await Invitation.find({
                 To:ProfileID,
                 Status:Status||{ $exists:true}
             }).populate({
@@ -737,16 +737,16 @@ The filter can be based on the status, sent, and received parameters.
                 select:'name'
             })
         }else{
-            invetations = await Invetation.find({
+            Invitations = await Invitation.find({
                 $or:[{From:ProfileID},{To:ProfileID}],
                 Status:Status||{ $exists:true}
             }).populate("dependent")
         }
         responseData=[
-            ...invetations
+            ...Invitations
         ]
-        // return succesfull response
-        return successResMsg(res, 200, {message:req.t("invetations"),data:responseData});
+        // return successful response
+        return successResMsg(res, 200, {message:req.t("Invitations"),data:responseData});
       
     } catch (err) {
       // return error response
@@ -847,19 +847,19 @@ Add a new caregiver to a user's profile
     "CanWriteMeds": false,
     "CanReadDoses": false,
     "CanWriteDoses": false,
-    "CanReadRefil": false,
+    "CanReadRefile": false,
     "CanReadAllMeds": false,
-    "CanReadSideEffect": true,
+    "CanReadSymptoms": true,
     "CanAddMeds": true,
-    "CanWriteSymtoms": false,
+    "CanWriteSymptoms": false,
     "CanReadSpacificMeds": [
       {
         "Med": "63b69329424603fd6128b72c",
         "CanRead": true,
         "CanWrite": true,
         "CanReadDoses": true,
-        "CanReadRefil": true,
-        "CanWriteRefil": false,
+        "CanReadRefile": true,
+        "CanWriteRefile": false,
         "CanWriteDoses": false
       }
     ],
@@ -938,7 +938,7 @@ Add a new caregiver to a user's profile
         }
         
             /**
-             * user alreay exists
+             * user already exists
              * send notification to that user
              */
             // get user profile 
@@ -948,12 +948,12 @@ Add a new caregiver to a user's profile
             }
             //check if the invitation sent before
 
-            const invetation =await Invetation.find({
+            const Invitation =await Invitation.find({
                 From:ProfileID,
                 To:CareGiverprofile._id,
             })
 
-            if(invetation.length>0){
+            if(Invitation.length>0){
                 return errorResMsg(res, 400, req.t("invitation_sent_before"));
             }
             //create dependent user
@@ -979,7 +979,7 @@ Add a new caregiver to a user's profile
                 CanReadSpacificMeds=permissions.CanReadSpacificMeds
             }
             // create new invitation
-            const newInvetation = new Invetation({
+            const newInvitation = new Invitation({
                 From:ProfileID,
                 To:CareGiverprofile._id,
                 Status:0,
@@ -994,20 +994,20 @@ Add a new caregiver to a user's profile
 
             // save all the data
             await newDependentUser.save()
-            await newInvetation.save()
+            await newInvitation.save()
 
             // send notification to the user
 
             if(CareGiverprofile.Owner.User.lang==="en"){
-                const Invitation = messages.InvetationSentToExistentCareGiverUser_EN(profile.Owner.User.firstName,user.firstName);
+                const Invitation = messages.InvitationSentToExistentCareGiverUser_EN(profile.Owner.User.firstName,user.firstName);
                 await SendEmailToUser(email,Invitation)
                }else{
-                const Invitation = messages.InvetationSentToExistentCareGiverUser_AR(RestPasswordCode,profile.Owner.User.firstName,user.firstName);
+                const Invitation = messages.InvitationSentToExistentCareGiverUser_AR(RestPasswordCode,profile.Owner.User.firstName,user.firstName);
                 await SendEmailToUser(email,Invitation)
                }
 
                await SendPushNotificationToUserRegardlessLangAndOs(profile,CareGiverprofile,"NewInvitationFromDependent",{
-                Invitation:newInvetation
+                Invitation:newInvitation
               })
 
             const responseData ={
@@ -1063,7 +1063,7 @@ Add a new caregiver to a user's profile
 @param {String} req.id - ID of the user who is trying to change the invitation status extracted from authorization header .
 @param {String} req.body.ProfileID - ID of the profile of the user who is trying to change the invitation status.
 @param {Number} req.body.Status - The status of the invitation. 0 for pending, 1 for confirmed, 2 for rejected.
-@param {String} req.body.invetationID - ID of the invitation that is being changed.
+@param {String} req.body.InvitationID - ID of the invitation that is being changed.
 @throws {Error} - if there is an error finding the user's profile
 @throws {Error} - if there is an error finding the invitation
 @throws {Error} - if there is an error finding the master profile
@@ -1085,39 +1085,39 @@ Add a new caregiver to a user's profile
       const {
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
-        invetationID
+        InvitationID
 
         
        
       }=req.body
         // get the invitation
-        const invetation = await Invetation.findById(invetationID)
-        if(!invetation){
-            return errorResMsg(res, 400, req.t("invetation_not_found"));
+        const Invitation = await Invitation.findById(InvitationID)
+        if(!Invitation){
+            return errorResMsg(res, 400, req.t("Invitation_not_found"));
         }
         // get the caregiver profile
-        const CareGiverProfile = await Profile.findById(mongoose.Types.ObjectId(invetation.To))
+        const CareGiverProfile = await Profile.findById(mongoose.Types.ObjectId(Invitation.To))
         if(!CareGiverProfile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
-        // get the dependetProfile
-        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invetation.From))
+        // get the DependentProfile
+        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(Invitation.From))
         if(CareGiverProfile.Owner.User.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
-        if(ProfileID.toString()!=invetation.To.toString()){
+        if(ProfileID.toString()!=Invitation.To.toString()){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
-        if(invetation.Status!=0){
+        if(Invitation.Status!=0){
             return errorResMsg(res, 400, req.t("invitation_status_changed_before"));
         }
-        // change the inviation status............................................................
+        // change the invitation status............................................................
         //rejection case
         if(Status===2){
-            invetation.Status=2;
-            await invetation.save()
+            Invitation.Status=2;
+            await Invitation.save()
             // return reject confirmation
 
             return successResMsg(res, 200, {message:req.t("invitation_rejected")});
@@ -1125,11 +1125,11 @@ Add a new caregiver to a user's profile
         }
         //acceptance case
         if(Status===1){
-            invetation.Status=1;
+            Invitation.Status=1;
             
               //get careGiver permissions
               const permissions = {
-                ... invetation.permissions
+                ... Invitation.permissions
              }
           
                // create new viewer
@@ -1143,25 +1143,25 @@ Add a new caregiver to a user's profile
             // add the dependent to the master profile
             CareGiverProfile.Dependents.push({
                 Profile:dependentProfile._id,
-                Dependent: invetation.dependent,
+                Dependent: Invitation.dependent,
                 viewer:newViewer._id
             })
           
             // add the master to the dependent profile
             dependentProfile.Viewers.push({
                 viewer:newViewer._id,
-                Dependent:invetation.dependent
+                Dependent:Invitation.dependent
 
             })
             // save all the data
             await newViewer.save()
             await dependentProfile.save()
             await CareGiverProfile.save()
-            await invetation.save()
+            await Invitation.save()
             // return accept confirmation
 
             await SendPushNotificationToUserRegardlessLangAndOs(CareGiverProfile,dependentProfile,"CareGiverAcceptedInvitation",{
-              Invitation:invetation
+              Invitation:Invitation
             })
 
             return successResMsg(res, 200, {message:req.t("invitation_accepted")});
@@ -1283,19 +1283,19 @@ Permissions=
     "CanWriteMeds": false,
     "CanReadDoses": false,
     "CanWriteDoses": false,
-    "CanReadRefil": false,
+    "CanReadRefile": false,
     "CanReadAllMeds": false,
-    "CanReadSideEffect": true,
+    "CanReadSymptoms": true,
     "CanAddMeds": true,
-    "CanWriteSymtoms": false,
+    "CanWriteSymptoms": false,
     "CanReadSpacificMeds": [
       {
         "Med": "63b69329424603fd6128b72c",
         "CanRead": true,
         "CanWrite": true,
         "CanReadDoses": true,
-        "CanReadRefil": true,
-        "CanWriteRefil": false,
+        "CanReadRefile": true,
+        "CanWriteRefile": false,
         "CanWriteDoses": false
       }
     ],
@@ -1334,19 +1334,19 @@ exports.EditCareGiverPermissions = async (req, res) => {
     "CanWriteMeds": false,
     "CanReadDoses": false,
     "CanWriteDoses": false,
-    "CanReadRefil": false,
+    "CanReadRefile": false,
     "CanReadAllMeds": false,
-    "CanReadSideEffect": true,
+    "CanReadSymptoms": true,
     "CanAddMeds": true,
-    "CanWriteSymtoms": false,
+    "CanWriteSymptoms": false,
     "CanReadSpacificMeds": [
       {
         "Med": "63b69329424603fd6128b72c",
         "CanRead": true,
         "CanWrite": true,
         "CanReadDoses": true,
-        "CanReadRefil": true,
-        "CanWriteRefil": false,
+        "CanReadRefile": true,
+        "CanWriteRefile": false,
         "CanWriteDoses": false
       }
     ],
@@ -1381,11 +1381,11 @@ exports.EditCareGiverPermissions = async (req, res) => {
       relationship.CanWriteMeds=Permissions.CanWriteMeds||relationship.CanWriteMeds
       relationship.CanReadDoses=Permissions.CanReadDoses||relationship.CanReadDoses
       relationship.CanWriteDoses=Permissions.CanWriteDoses||relationship.CanWriteDoses
-      relationship.CanReadRefil=Permissions.CanReadRefil||relationship.CanReadRefil
+      relationship.CanReadRefile=Permissions.CanReadRefile||relationship.CanReadRefile
       relationship.CanReadAllMeds=Permissions.CanReadAllMeds||relationship.CanReadAllMeds
-      relationship.CanReadSideEffect=Permissions.CanReadSideEffect||relationship.CanReadSideEffect
+      relationship.CanReadSymptoms=Permissions.CanReadSymptoms||relationship.CanReadSymptoms
       relationship.CanAddMeds=Permissions.CanAddMeds||relationship.CanAddMeds
-      relationship.CanWriteSymtoms=Permissions.CanWriteSymtoms||relationship.CanWriteSymtoms
+      relationship.CanWriteSymptoms=Permissions.CanWriteSymptoms||relationship.CanWriteSymptoms
       relationship.CanReadSpacificMeds=Permissions.CanReadSpacificMeds||relationship.CanReadSpacificMeds
       relationship.notify=Permissions.notify||relationship.notify
      
@@ -1625,7 +1625,7 @@ exports.DeleteInvitation = async (req, res) => {
       }
      
       // get the invitation
-      const invitation = await Invetation.findOneAndDelete({
+      const invitation = await Invitation.findOneAndDelete({
         _id:InvitationID,
         From:ProfileID,
         Status:0 // still pending
