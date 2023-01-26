@@ -106,7 +106,9 @@ exports.getReport=async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
+
       })
   
       if(!viewer&&profile.Owner.User.toString()!==id){
@@ -370,7 +372,8 @@ exports.getReport=async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
       })
   
       if(!viewer&&profile.Owner.User.toString()!==id){

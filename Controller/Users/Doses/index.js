@@ -111,7 +111,8 @@ exports.EditSingleDose=async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
       })
   
       if(!viewer&&profile.Owner.User.toString()!==id){
@@ -244,7 +245,9 @@ exports.EditSingleDose=async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
+
       })
   
       if(!viewer&&profile.Owner.User.toString()!==id){
@@ -386,7 +389,9 @@ exports.EditSingleDose=async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
+
       })
       if(!viewer&&profile.Owner.User.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -539,7 +544,9 @@ exports.EditSingleDose=async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
+
       })
       if(!viewer&&profile.Owner.User.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -697,7 +704,9 @@ exports.EditSingleDose=async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
+
       })
       if(!viewer&&profile.Owner.User.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -738,7 +747,8 @@ exports.EditSingleDose=async (req, res) => {
       
         // get all my dependents
       const mydependents =await Viewer.find({
-        ViewerProfile:viewerProfile._id
+        ViewerProfile:viewerProfile._id,
+        IsDeleted:false
       })
       
       const dependentsProfiles =mydependents.filter(elem=>{
@@ -898,7 +908,8 @@ exports.EditSingleDose=async (req, res) => {
 
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
-     DependentProfile:ProfileID
+     DependentProfile:ProfileID,
+     IsDeleted:false
     })
     if(!viewer&&profile.Owner.User.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));

@@ -77,6 +77,10 @@ var ViewerSchema = new Schema({
         type:Boolean,
         default:true
     },
+    IsDeleted:{
+        type:Boolean,
+        default:false
+    }
  
 
  

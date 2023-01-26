@@ -64,6 +64,9 @@ var OccurrencesSchema = new Schema({
   EditedBy:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'Profile'
+  },
+  DosageID:{
+    type:mongoose.Schema.Types.ObjectId,
   }
 
  

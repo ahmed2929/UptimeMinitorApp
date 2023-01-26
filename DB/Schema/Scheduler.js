@@ -52,6 +52,10 @@ var Scheduler = new Schema({
         },
         DateTime:{
           type:Date
+        },
+        isDeleted:{
+          type:Boolean,
+          default:false
         }
 
       }
@@ -70,6 +74,10 @@ var Scheduler = new Schema({
     CreatorProfile:{
       type:mongoose.Schema.Types.ObjectId,
       ref:'Profile'
+    },
+    GenerateAutoOccurrence:{
+      type:Boolean,
+      default:false
     }
  
 

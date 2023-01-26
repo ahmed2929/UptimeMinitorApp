@@ -12,6 +12,10 @@ const BaseUrl=`${process.env.BaseUrl}/api/v1/`
 
 const User = require("../../DB/Schema/User");
 const {ConnetToDB,CloseDBConnection} =require("../../DB/Server/index")
+const UserMedication=require("../../DB/Schema/UserMedication")
+const Scheduler =require("../../DB/Schema/Scheduler")
+const Occurrences =require("../../DB/Schema/Occurrences");
+const { default: axios } = require("axios");
 let token,refreshToken,testEmail="jest33@jest.com",testMobileNumber="025184875145";
 let testPassword="123456789";
 let VerifiedAccount ="jest5@jest.com"
@@ -41,23 +45,21 @@ describe("Medication Test Suit ", () => {
 
     test("create new medication case every day ", () => {
 
-        data.append('name', 'jest test every day');
-            data.append('type', 'pill');
-            data.append('strength', '20');
-            data.append('unit', 'g');
-            data.append('quantity', '25');
-            data.append('instructions', 'test instruction');
-            data.append('condition', 'testcondition');
-            data.append('Scheduler', '{\n  "StartDate": 1674383236586,\n  "EndDate": 1675202400000,\n  "AsNeeded": false,\n  "ScheduleType": "2",\n  "DaysInterval": null,\n  "SpecificDays":null,\n  \n  "dosage": [\n    {\n      "dose": 2,\n      "DateTime": 1674460659117\n    },\n    {\n      "dose": 1,\n      "DateTime": 1674460659117\n    }\n  ]\n}');
-            data.append('externalInfo', '{"DrugCode":"H21-5135-05410-01"}');
-           // data.append('img', fs.createReadStream('/home/ahmed/Downloads/paracetamol.jpeg')); img ignored in this test
-            data.append('ProfileID', ProfileID);
-            data.append('Refillable', 'true');
-            data.append('RefileLevel', '5');
+                data.append('name', 'jest test every day');
+                data.append('type', 'pill');
+                data.append('strength', '20');
+                data.append('unit', 'g');
+                data.append('quantity', '25');
+                data.append('instructions', 'test instruction');
+                data.append('condition', 'testcondition');
+                data.append('Scheduler', '{\n  "StartDate": 1672524000000,\n  "EndDate": null,\n  "AsNeeded": false,\n  "ScheduleType": "2",\n  "DaysInterval": null,\n  "SpecificDays":null,\n  \n  "dosage": [\n    {\n      "dose": 2,\n      "DateTime": 1674460659117\n    },\n    {\n      "dose": 1,\n      "DateTime": 1674460659117\n    }\n  ]\n}');
+                data.append('externalInfo', '{"DrugCode":"H21-5135-05410-01"}');
+                data.append('ProfileID', ProfileID);
+                data.append('Refillable', 'true');
+                data.append('RefileLevel', '5');
 
-
-        return axiosInstance.post(BaseUrl+"medication/create/new/med", {
-           data:data
+        return axios.post(BaseUrl+"medication/create/new/med", {
+           data
 
         },
         {
@@ -69,99 +71,26 @@ describe("Medication Test Suit ", () => {
         
         
         ).then((res) => {
+            console.log(res)
             expect(res.status).toBe(200)
            
         }).catch((err) => {
-            console.log(err.response.data)
+            console.log(err.response.data.errors)
             expect(err.response.status).toBe(422)
         })
     })
 
-    it("check failure of verify account with wrong otp", () => {
-        return axiosInstance.post(BaseUrl+"auth/verifyaccount", 
-        {
-            "otp":"123456",
-            "email":testEmail
-          }
-        
-        
-        
-        ).then((res) => {
-            expect(res.status).toBe(200)
-        }).catch((err) => {
-            expect(err.response.status).toBe(422)
-        })
-    })
-
-    
-    it("resend activation otp", () => {
-        return axiosInstance.post(BaseUrl+"auth/resend/activation/code", 
-        {
-            "email":testEmail
-          }
-        
-        
-        
-        ).then((res) => {
-            expect(res.status).toBe(200)
-        }).catch((err) => {
-            expect(err.response.status).toBe(200)
-        })
-    })
-    
-    // test rest password logic
-    describe("rest password logic",()=>{
-        it("send rest password code", () => {
-            return axiosInstance.post(BaseUrl+"auth/send/restpassword/code", 
-            {
-                "email":testEmail
-              }
-            
-            
-            
-            ).then((res) => {
-                expect(res.status).toBe(200)
-            }).catch((err) => {
-                expect(err.response.status).toBe(200)
-            })
-        })
-        it("check failure of rest password with wrong otp", () => {
-            return axiosInstance.post(BaseUrl+"auth/generate/restpassword/token", 
-            {
-                "otp":"123456",
-                "email":testEmail,
-               
-              }
-            
-            
-            
-            ).then((res) => {
-                expect(res.status).toBe(200)
-            }).catch((err) => {
-                expect(err.response.status).toBe(422)
-            })
-        })
-        it("resend rest password otp", () => {
-            return axiosInstance.post(BaseUrl+"auth/send/restpassword/code", 
-            {
-                "email":testEmail
-              }
-            
-            
-            
-            ).then((res) => {
-                expect(res.status).toBe(200)
-            }).catch((err) => {
-                expect(err.response.status).toBe(200)
-            })
-        })
-
-    })
+  
 
    
     
     afterAll(async() => {
-        await User.findOneAndDelete({email:testEmail})
+       const deletedMed= await UserMedication.findOneAndDelete({ProfileID:ProfileID})
+        const deletedScheduler= await Scheduler.findOneAndDelete({ProfileID:ProfileID})
+        const deletedOccurrences= await Occurrences.findOneAndDelete({ProfileID:ProfileID})
+        console.log("deletedMed",deletedMed)
+        console.log('deletedScheduler',deletedScheduler)
+        console.log("deletedOccurrences",deletedOccurrences)
        await mongoose.disconnect();
       });
        

@@ -266,8 +266,8 @@ const getUserEmailFromId=async(id)=>{
 
 const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfileObj,notificationMessage,payloadData)=>{
     try {
-        userprofile=ToProfileObj
-        profile=FromProfileObj
+       let userprofile=ToProfileObj
+       let profile=FromProfileObj
     if(userprofile.lang.toLowerCase()==="en"){
         let payload;
         // notification prepare device type
@@ -517,7 +517,8 @@ const CheckRelationShipBetweenCareGiverAndDependent=async(ProfileID,id)=>{
   
        const viewer =await Viewer.findOne({
         ViewerProfile:viewerProfile._id,
-        DependentProfile:ProfileID
+        DependentProfile:ProfileID,
+        IsDeleted:false
        })
        if(!viewer&&profile.Owner.User.toString()!==id){
         return false;
@@ -547,6 +548,58 @@ const CareGiverCanAddSymptoms=async()=>{
 }
 
 
+const CompareOldSchedulerWithTheNewScheduler=async(jsonScheduler,OldScheduler)=>{
+    if(!jsonScheduler.EndDate){
+        jsonScheduler.EndDate=OldScheduler.EndDate
+    }
+    //compare days Specific days array not that it maybe in the OldScheduler is null and in json scheduler is unddifined and in this case they should be equals
+    if(jsonScheduler.SpecificDays&&OldScheduler.SpecificDays){
+        if(jsonScheduler.SpecificDays.length!==OldScheduler.SpecificDays.length){
+            return false
+        }
+        for (let i = 0; i < jsonScheduler.SpecificDays.length; i++) {
+            if(jsonScheduler.SpecificDays[i]!==OldScheduler.SpecificDays[i]){
+                return false
+            }
+
+        }
+    }else if(jsonScheduler.SpecificDays&&!OldScheduler.SpecificDays){
+        return false
+    }else if(!jsonScheduler.SpecificDays&&OldScheduler.SpecificDays){
+        return false
+    }
+
+    
+   
+    console.log("CompareOldSchedulerWithTheNewScheduler",jsonScheduler,OldScheduler)
+    if (new Date(jsonScheduler.StartDate).getTime() !== new Date(OldScheduler.StartDate).getTime() ||
+       new Date(jsonScheduler.EndDate).getTime() !== new Date(OldScheduler.EndDate).getTime() ||
+        jsonScheduler.AsNeeded !== OldScheduler.AsNeeded ||
+        jsonScheduler.ScheduleType !== OldScheduler.ScheduleType ||
+        jsonScheduler.DaysInterval !== OldScheduler.DaysInterval 
+
+        ) {
+      return false;
+    }
+    // Compare the dosage array
+    if (jsonScheduler.dosage.length !== OldScheduler.dosage.length) {
+      return false;
+    }
+    for (let i = 0; i < jsonScheduler.dosage.length; i++) {
+        console.log(jsonScheduler.dosage[i].dose , OldScheduler.dosage[i].dose )
+      if (jsonScheduler.dosage[i].dose !== OldScheduler.dosage[i].dose ||
+        new Date(jsonScheduler.dosage[i].DateTime).getTime() !== new Date(OldScheduler.dosage[i].DateTime).getTime()) {
+        return false;
+      }
+    }
+    return true;
+
+
+
+       
+  
+}
+
 module.exports={
     GenerateToken,
     GenerateRandomCode,
@@ -559,5 +612,6 @@ module.exports={
     SendPushNotificationToUserRegardlessLangAndOs,
     CheckRelationShipBetweenCareGiverAndDependent,
     CareGiverCanAddMed,
-    CareGiverCanAddSymptoms
+    CareGiverCanAddSymptoms,
+    CompareOldSchedulerWithTheNewScheduler
 }

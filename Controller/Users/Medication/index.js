@@ -8,7 +8,7 @@
 
 const SchedulerSchema = require("../../../DB/Schema/Scheduler");
 const UserMedication = require("../../../DB/Schema/UserMedication");
-const {UploadFileToAzureBlob,GenerateOccurrences,GenerateOccurrencesWithDays,CheckRelationShipBetweenCareGiverAndDependent} =require("../../../utils/HelperFunctions")
+const {UploadFileToAzureBlob,GenerateOccurrences,GenerateOccurrencesWithDays,CheckRelationShipBetweenCareGiverAndDependent,CompareOldSchedulerWithTheNewScheduler} =require("../../../utils/HelperFunctions")
 const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
@@ -192,7 +192,7 @@ exports.CreateNewMed = async (req, res) => {
         Scheduler,
         type,
         ProfileID,
-        Refilelable,
+        Refillable,
         RefileLevel
       }=req.body
       
@@ -256,7 +256,7 @@ exports.CreateNewMed = async (req, res) => {
         ProfileID,
         CreatorProfile:viewerProfile._id,
         Refile:{
-          Refilelable,
+          Refillable,
           RefileLevel
         }
         
@@ -278,7 +278,10 @@ exports.CreateNewMed = async (req, res) => {
       }
       // create Scheduler 
       let jsonScheduler=JSON.parse(Scheduler)
-     
+     // check if no end date is provided then make GenerateAutoOccurrence to true
+      if(!jsonScheduler.EndDate&&jsonScheduler.ScheduleType!="1"){
+        jsonScheduler.GenerateAutoOccurrence=true
+      }
      // validate Scheduler 
      const ValidateScheduler= await CreateNewScheduler(jsonScheduler,newMed,id,ProfileID,viewerProfile,req,res)
 
@@ -433,7 +436,7 @@ exports.CreateNewMed = async (req, res) => {
         Scheduler,
         type,
         ProfileID,
-        Refilelable,
+        Refillable,
         RefileLevel
       }=req.body
   
@@ -503,7 +506,7 @@ exports.CreateNewMed = async (req, res) => {
           type:type||oldMed.type,
           EditedBy:viewerProfile._id,
           Refile:{
-            Refilelable:Refilelable||oldMed.Refile.Refilelable,
+            Refillable:Refillable||oldMed.Refile.Refillable,
             RefileLevel:RefileLevel||oldMed.Refile.RefileLevel
           }
         },{new:true})
@@ -534,24 +537,73 @@ exports.CreateNewMed = async (req, res) => {
         if(!Scheduler){
           return successResMsg(res, 200, {message:req.t("Medication_updated"),data:editedMed});
         }
-  
-  
-  
-       const SchedulerId=editedMed.Scheduler._id
+        
+        // check if the Scheduler sent with the request is the same as the one in the database
+        const SchedulerId=editedMed.Scheduler._id
   
         // edit schdule
       const OldScheduler = await SchedulerSchema.findById(SchedulerId)
+      console.log("Scheduler ",Scheduler)
+      const jsonScheduler=JSON.parse(Scheduler)
+      console.log("OldScheduler",OldScheduler.dosage)
+      console.log("jsonScheduler",jsonScheduler.dosage)
       if(!OldScheduler){
         return errorResMsg(res, 404, req.t("Scheduler_not_found"));
       }
      
-      // delete all the future Occurrences
+      const isTheSame=await CompareOldSchedulerWithTheNewScheduler(jsonScheduler,OldScheduler)
+      if(isTheSame){
+        console.log("is the same runs")
+        return successResMsg(res, 200, {message:req.t("Medication_updated"),data:editedMed});
+      }
+      // in case that the dose is in the past and is taken or confirmed the dose will be the same and the new Occurrence will be generated from the next day
+      // in case that the dose is in the past and is not taken or confirmed the dose will be edited and the new Occurrence will start the next day
+
+      const endOfToday = new Date();
+          endOfToday.setHours(23, 59, 59, 999);
+
+      // get every dose Occurrence till the end of today and update it if its edited
+        for await (const dose of jsonScheduler.dosage) {
+          const queryDate =new Date()
+        
+          
+            nextDay=new Date()
+            nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+           
+          if(dose._id){
+            await Occurrence.updateMany({
+              Medication: editedMed._id.toString(),
+              PlannedDateTime: {$gte:queryDate,$lt:nextDay},
+              Status: { $in: [0, 1, 3, 5] },
+              DosageID:dose._id
+            }, {
+              $set: { MedInfo: MedInfo,PlannedDateTime:dose.DateTime,PlannedDose:dose.dose }
+            });
+  
+          }
+        }
+
+
+        
+
+  
+  
+      // delete all the future Occurrences after today
       console.log("SchedulerId",SchedulerId)
-     const deleted= await Occurrence.deleteMany({Medication:editedMed._id.toString(),PlannedDateTime:{$gte:new Date().toISOString()}})
+     const deleted= await Occurrence.deleteMany({Medication:editedMed._id.toString(),PlannedDateTime:{$gte:endOfToday}})
      console.log("deleted",deleted) 
     
-      console.log("Scheduler ",Scheduler)
-      const jsonScheduler=JSON.parse(Scheduler)
+      
+
+
+       // check if no end date is provided then make GenerateAutoOccurrence to true
+       if(!jsonScheduler.EndDate&&jsonScheduler.ScheduleType!="1"){
+        jsonScheduler.GenerateAutoOccurrence=true
+        }else{
+        jsonScheduler.GenerateAutoOccurrence=false
+        }
+
+
   
       MedInfo.ScheduleType= jsonScheduler.ScheduleType
   
@@ -582,8 +634,18 @@ exports.CreateNewMed = async (req, res) => {
       //     return errorResMsg(res, 400, req.t("end_date_before_start_date"));
       //   }
         
+      //check if EndDate is less than StartDate
   
       // }
+
+       //check if EndDate is less than StartDate
+        if(jsonScheduler.EndDate){
+          const startDate=jsonScheduler.StartDate||new Date(OldScheduler.StartDate).getTime()
+          if((+jsonScheduler.EndDate)<(+startDate)){
+            return errorResMsg(res, 400, req.t("end_date_before_start_date"));
+          }
+        }
+
   // validate dose if its not as needed
       if(jsonScheduler.ScheduleType){
         if(jsonScheduler.ScheduleType!="1"){
@@ -670,18 +732,66 @@ exports.CreateNewMed = async (req, res) => {
        // generate occurrences data
    
        const occurrences=[]
-       for(const doseElement of jsonScheduler.dosage){
-   
+       for(let doseElement of jsonScheduler.dosage){
+        
+        //if dose already existed (has _id filed ) then the occurrences will start from tomorrow
+        //and the start date must be in the past and its end date is still in the future
+        if(doseElement._id&&new Date(doseElement.DateTime)<=endOfToday){
+          if(!jsonScheduler.EndDate||new Date(jsonScheduler.EndDate)>=endOfToday){
+            const date2=new Date(doseElement.DateTime)
+            const tomorrow=new Date()
+            tomorrow.setDate(tomorrow.getDate()+1)
+            tomorrow.setHours(0, 0, 0, 0);
+            let hours = date2.getHours();
+            let minutes = date2.getMinutes();
+            let seconds = date2.getSeconds();
+  
+            tomorrow.setHours(hours);
+            tomorrow.setMinutes(minutes);
+            tomorrow.setSeconds(seconds);
+  
+            doseElement.DateTime=tomorrow
+  
+          }
+
+        }
+
+        if(!doseElement._id){
+          OldScheduler.dosage.push(doseElement)
+          doseElement=OldScheduler.dosage[OldScheduler.dosage.length-1]
+        }
+
+        if(doseElement.isDeleted){
+          const index = OldScheduler.dosage.findIndex((dose)=>{
+            console.log("dose._id",dose._id)
+            console.log("doseElement._id",doseElement._id)
+            if(dose._id==doseElement._id){
+              return true
+            }
+          })
+          console.log("index",index)
+          OldScheduler.dosage[index].isDeleted=true;
+          await Occurrence.updateMany({DosageID:doseElement._id},{
+            $set:{
+              isSuspended:true
+            }
+          })
+          continue;
+        }
+
          const OccurrencesData={
-           PlannedDose:doseElement.dose,
-           ProfileID
+          PlannedDose:doseElement.dose,
+          ProfileID,
+          DosageID:doseElement._id,
+          Scheduler:newScheduler._id,
+          CreatorProfile:viewerProfile._id
          }
          const start=new Date(doseElement.DateTime)
          
          if(!newScheduler.EndDate){
    
-           var result = new Date(newScheduler.StartDate);
-           result.setMonth(result.getMonth() + 3);
+           var result = new Date(OldScheduler.EndDate);
+        
    
            end=result
          }else{
@@ -707,15 +817,72 @@ exports.CreateNewMed = async (req, res) => {
    
          // case user choose spacic days
          const occurrences=[]
-       for(const doseElement of jsonScheduler.dosage){
+       for(let doseElement of jsonScheduler.dosage){
+
+
+          //if dose already existed (has _id filed ) then the occurrences will start from tomorrow
+        //and the start date must be in the past and its end date is still in the future
+        if(doseElement._id&&new Date(doseElement.DateTime)<=endOfToday){
+          if(!jsonScheduler.EndDate||new Date(jsonScheduler.EndDate)>=endOfToday){
+            const date2=new Date(doseElement.DateTime)
+            const tomorrow=new Date()
+            tomorrow.setDate(tomorrow.getDate()+1)
+            tomorrow.setHours(0, 0, 0, 0);
+            let hours = date2.getHours();
+            let minutes = date2.getMinutes();
+            let seconds = date2.getSeconds();
+  
+            tomorrow.setHours(hours);
+            tomorrow.setMinutes(minutes);
+            tomorrow.setSeconds(seconds);
+  
+            doseElement.DateTime=tomorrow
+  
+          }
+
+        }
+
+
+        if(!doseElement._id){
+          OldScheduler.dosage.push(doseElement)
+          doseElement=OldScheduler.dosage[OldScheduler.dosage.length-1]
+        }
+
+        if(doseElement.isDeleted){
+          const index = OldScheduler.dosage.findIndex((dose)=>{
+            console.log("dose._id",dose._id)
+            console.log("doseElement._id",doseElement._id)
+            if(dose._id==doseElement._id){
+              return true
+            }
+          })
+          OldScheduler.dosage[index].isDeleted=true;
+          await Occurrence.updateMany({DosageID:doseElement._id},{
+            $set:{
+              isSuspended:true
+            }
+          })
+          continue;
+        }
+
    
          const OccurrencesData={
-           PlannedDose:doseElement.dose,
-            ProfileID
+          PlannedDose:doseElement.dose,
+          ProfileID,
+          DosageID:doseElement._id,
+          Scheduler:newScheduler._id,
+          CreatorProfile:viewerProfile._id
          }
          const start=new Date(doseElement.DateTime)
          
-         let  end=newScheduler.EndDate
+
+         let  end
+         if(!newScheduler.EndDate){
+          end=OldScheduler.EndDate
+         }else{
+            end=newScheduler.EndDate
+         }
+        
    
          
    
@@ -736,12 +903,31 @@ exports.CreateNewMed = async (req, res) => {
        
      console.log("newScheduler",)
   
-    const resulta= await SchedulerSchema.findByIdAndUpdate(SchedulerId,{
-        ...newScheduler,
-        StartDate:new Date(newScheduler.StartDate)
-      })
-       
-      console.log("result",resulta)
+    
+      
+     
+
+      OldScheduler.dosage.forEach(dose => {
+      if(dose._id){
+        // update the dose object that has _id = dose._id
+        OldScheduler.dosage.forEach(dose2 => {
+          if(dose2._id==dose._id){
+            dose2.dose=dose.dose
+            dose2.DateTime=dose.DateTime
+          }
+        })
+      }
+     });
+     OldScheduler.StartDate=jsonScheduler.StartDate
+      OldScheduler.EndDate=jsonScheduler.EndDate
+      OldScheduler.ScheduleType=jsonScheduler.ScheduleType
+      OldScheduler.DaysInterval=jsonScheduler.DaysInterval
+      OldScheduler.SpecificDays=jsonScheduler.SpecificDays
+      OldScheduler.AsNeeded=jsonScheduler.AsNeeded
+
+    
+      await OldScheduler.save()
+      
      
   
      
@@ -826,7 +1012,9 @@ exports.CreateNewMed = async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
+
       })
   
       if(!viewer&&profile.Owner.User.toString()!==id){
@@ -987,7 +1175,8 @@ exports.CreateNewMed = async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
       })
   
       if(!viewer&&profile.Owner.User.toString()!==id){

@@ -94,7 +94,8 @@ exports.CreateSymptom = async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
       })
       if(!viewer&&profile.Owner.User.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -219,7 +220,8 @@ exports.CreateSymptom = async (req, res) => {
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID
+       DependentProfile:ProfileID,
+       IsDeleted:false
       })
   
       if(!viewer&&profile.Owner.User.toString()!==id){
@@ -383,7 +385,8 @@ exports.EditSymptom = async (req, res) => {
 
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
-     DependentProfile:ProfileID
+     DependentProfile:ProfileID,
+     IsDeleted:false
     })
     if(!viewer&&profile.Owner.User.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -521,7 +524,9 @@ exports.DeleteSymptom = async (req, res) => {
 
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
-     DependentProfile:ProfileID
+     DependentProfile:ProfileID,
+     IsDeleted:false
+
     })
     if(!viewer&&profile.Owner.User.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));

@@ -32,9 +32,9 @@ const CreateNewScheduler=async(jsonScheduler,newMed,id,ProfileID,viewerProfile,r
     }
 
   if(jsonScheduler.EndDate){
-    if((+jsonScheduler.EndDate)<DateTime.getTime()){
-      return errorResMsg(res, 400, req.t("end_date_in_the_past"));
-    }
+    // if((+jsonScheduler.EndDate)<DateTime.getTime()){
+    //   return errorResMsg(res, 400, req.t("end_date_in_the_past"));
+    // }
 
     if((+jsonScheduler.EndDate)<(+jsonScheduler.StartDate)){
       return errorResMsg(res, 400, req.t("end_date_before_start_date"));
@@ -85,9 +85,16 @@ const CreateNewScheduler=async(jsonScheduler,newMed,id,ProfileID,viewerProfile,r
 
 
   if(!jsonScheduler.EndDate){
-    var result = new Date(jsonScheduler.StartDate);
-    result.setMonth(result.getMonth() + 3);
-    jsonScheduler.EndDate=result
+    if(new Date(jsonScheduler.StartDate)<new Date()){
+      var result = new Date();
+      result.setMonth(result.getMonth() + 3);
+      jsonScheduler.EndDate=result  
+    }else{
+      var result = new Date(jsonScheduler.StartDate);
+      result.setMonth(result.getMonth() + 3);
+      jsonScheduler.EndDate=result
+    }
+  
     
   }
 
@@ -119,7 +126,9 @@ const CreateNewScheduler=async(jsonScheduler,newMed,id,ProfileID,viewerProfile,r
 }
 
 const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res)=>{
-     // create Occurrences
+  console.log("jsonScheduler",jsonScheduler.dosage) 
+  console.log("newScheduler",newScheduler.dosage)  
+  // create Occurrences
       /**
        *  -date and time are represented in ms format
        *  -med take time is extracted from startDate ms 
@@ -138,8 +147,8 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
       // get get start and end date
       try {
 
-        let startDate=jsonScheduler.StartDate
-        let endDate=jsonScheduler.EndDate
+        let startDate=newScheduler.StartDate
+        let endDate=newScheduler.EndDate
         let occurrencePattern;
         if(!startDate){
           return errorResMsg(res, 400, req.t("start_date_required"));
@@ -147,39 +156,49 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
         }
       
         // get scheuler senario 
-        if(!jsonScheduler.ScheduleType){
+        if(!newScheduler.ScheduleType){
           return errorResMsg(res, 400, req.t("Scheduler_type_required"));
           
         }
         // get occurrence pattern
         // the fowllowing code must rurns in case 2 and 3 only
-        if(jsonScheduler.ScheduleType=='2'||jsonScheduler.ScheduleType=='3'){
+        if(newScheduler.ScheduleType=='2'||newScheduler.ScheduleType=='3'){
     
         //case every day
-        if(jsonScheduler.ScheduleType=='2'){ 
+        if(newScheduler.ScheduleType=='2'){ 
           occurrencePattern=1
-        }else if(jsonScheduler.ScheduleType=='3'){ //case days interval
-          occurrencePattern= Number(jsonScheduler.DaysInterval)
+        }else if(newScheduler.ScheduleType=='3'){ //case days interval
+          occurrencePattern= Number(newScheduler.DaysInterval)
         }
         // generate occurrences data
     
         const occurrences=[]
-        for(const doseElement of jsonScheduler.dosage){
+        for(const doseElement of newScheduler.dosage){
     
           const OccurrencesData={
             PlannedDose:doseElement.dose,
-            ProfileID
+            ProfileID,
+            DosageID:doseElement._id,
+            Scheduler:newScheduler._id,
+            CreatorProfile:viewerProfile._id
           }
           const start=new Date(doseElement.DateTime)
           let end;
-          if(!jsonScheduler.EndDate){
-    
-            var result = new Date(start);
-            result.setMonth(result.getMonth() + 3);
+          if(!newScheduler.EndDate){
+            var result
+            if(new Date(jsonScheduler.StartDate)<new Date()){
+               result = new Date();
+              result.setMonth(result.getMonth() + 3);
+              jsonScheduler.EndDate=result  
+            }else{
+               result = new Date(jsonScheduler.StartDate);
+              result.setMonth(result.getMonth() + 3);
+              jsonScheduler.EndDate=result
+            }
     
             end=result
           }else{
-            end=new Date(jsonScheduler.EndDate)
+            end=new Date(newScheduler.EndDate)
     
           }
        
@@ -197,25 +216,45 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
      
         
     
-        }else if (jsonScheduler.ScheduleType=='0'){
+        }else if (newScheduler.ScheduleType=='0'){
     
           // case user choose specific days
           const occurrences=[]
-        for(const doseElement of jsonScheduler.dosage){
+        for(const doseElement of newScheduler.dosage){
     
           const OccurrencesData={
             PlannedDose:doseElement.dose,
             ProfileID,
-            CreatorProfile:viewerProfile._id
+            CreatorProfile:viewerProfile._id,
+            DosageID:doseElement._id,
+            Scheduler:newScheduler._id
           }
           const start=new Date(doseElement.DateTime)
           
-         
+          let end;
+          if(!newScheduler.EndDate){
+            var result
+            if(new Date(jsonScheduler.StartDate)<new Date()){
+              result = new Date();
+             result.setMonth(result.getMonth() + 3);
+             jsonScheduler.EndDate=result  
+           }else{
+              result = new Date(jsonScheduler.StartDate);
+             result.setMonth(result.getMonth() + 3);
+             jsonScheduler.EndDate=result
+           }
+ 
+    
+            end=result
+          }else{
+            end=new Date(newScheduler.EndDate)
+    
+          }
             EndOfCycle=new Date(end)
     
           
     
-          const intervalDays=jsonScheduler.SpecificDays
+          const intervalDays=newScheduler.SpecificDays
           
           const newOccurrences=await GenerateOccurrencesWithDays(id,newMed._id,MedInfo,newScheduler._id,intervalDays,start,EndOfCycle,OccurrencesData)
           occurrences.push(...newOccurrences)
@@ -228,7 +267,7 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
     
     
     
-        }else if(jsonScheduler.ScheduleType=='1'){
+        }else if(newScheduler.ScheduleType=='1'){
           // as needed
           newScheduler.AsNeeded=true
     

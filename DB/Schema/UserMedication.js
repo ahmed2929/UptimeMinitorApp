@@ -63,7 +63,7 @@ var MedicationSchema = new Schema({
     ref:'Profile'
   },
   Refile:{
-    Refilelable:{
+    Refillable:{
       type:Boolean,
       default:false
     },
@@ -72,10 +72,7 @@ var MedicationSchema = new Schema({
      
     }
   },
-  GenerateAutoOccurrence:{
-    type:Boolean,
-    default:false
-  }
+ 
 
   
 

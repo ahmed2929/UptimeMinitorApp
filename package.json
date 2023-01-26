@@ -4,7 +4,8 @@
   "description": "",
   "main": "app",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest --watchAll --verbose tests"
   },
   "author": "voithy",
   "license": "ISC",
