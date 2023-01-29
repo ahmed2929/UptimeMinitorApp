@@ -344,7 +344,7 @@ exports.CreateSymptom = async (req, res) => {
 
 
 exports.EditSymptom = async (req, res) => {
- 
+ console.log("edit symptom")
   try {
 
     const {id} =req.id
@@ -431,7 +431,7 @@ exports.EditSymptom = async (req, res) => {
       return errorResMsg(res, 400, req.t("symptom_is_deleted"));
     }
     // update the symptom
-
+console.log("will update")
     symptom.img=img||symptom.img
     symptom.EditedBy=viewerProfile._id
     symptom.Type=Type||symptom.Type

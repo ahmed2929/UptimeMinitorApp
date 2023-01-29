@@ -72,6 +72,11 @@ var MedicationSchema = new Schema({
      
     }
   },
+  SchedulerHistory:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Scheduler'
+
+  }]
  
 
   

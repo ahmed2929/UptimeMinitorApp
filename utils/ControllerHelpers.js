@@ -174,7 +174,20 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
     
         const occurrences=[]
         for(const doseElement of newScheduler.dosage){
-    
+          
+          let startDate = new Date(+newScheduler.StartDate);
+          let DoseTime = new Date(+doseElement.DateTime);
+
+          let hours = DoseTime.getHours();
+          let minutes = DoseTime.getMinutes();
+          let seconds = DoseTime.getSeconds();
+
+          startDate.setHours(hours);
+          startDate.setMinutes(minutes);
+          startDate.setSeconds(seconds);
+
+
+
           const OccurrencesData={
             PlannedDose:doseElement.dose,
             ProfileID,
@@ -182,7 +195,7 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
             Scheduler:newScheduler._id,
             CreatorProfile:viewerProfile._id
           }
-          const start=new Date(doseElement.DateTime)
+          const start=new Date(startDate)
           let end;
           if(!newScheduler.EndDate){
             var result
@@ -221,7 +234,16 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
           // case user choose specific days
           const occurrences=[]
         for(const doseElement of newScheduler.dosage){
-    
+          let startDate = new Date(+newScheduler.StartDate);
+          let DoseTime = new Date(+doseElement.DateTime);
+
+          let hours = DoseTime.getHours();
+          let minutes = DoseTime.getMinutes();
+          let seconds = DoseTime.getSeconds();
+
+          startDate.setHours(hours);
+          startDate.setMinutes(minutes);
+          startDate.setSeconds(seconds);
           const OccurrencesData={
             PlannedDose:doseElement.dose,
             ProfileID,
@@ -229,7 +251,7 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
             DosageID:doseElement._id,
             Scheduler:newScheduler._id
           }
-          const start=new Date(doseElement.DateTime)
+          const start=new Date(startDate)
           
           let end;
           if(!newScheduler.EndDate){
@@ -272,9 +294,9 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
           newScheduler.AsNeeded=true
     
         }
-        var endAfter3Month = new Date(startDate);
-        endAfter3Month .setMonth(endAfter3Month .getMonth() + 3);
-        newScheduler.EndDate=jsonScheduler.EndDate||endAfter3Month
+        // var endAfter3Month = new Date(startDate);
+        // endAfter3Month .setMonth(endAfter3Month .getMonth() + 3);
+        // newScheduler.EndDate=jsonScheduler.EndDate||endAfter3Month
         return newScheduler;
 
         

@@ -21,8 +21,6 @@ router.post(
 router.put(
     "/edit",
     upload.fields([{name:"img",maxCount:1},{name:"voice",maxCount:1}]),
-    validation.EditSymptom,
-    validation.validate,
     IsAuth(),
     SymptomController.EditSymptom
 )

@@ -403,7 +403,7 @@ exports.CreateNewMed = async (req, res) => {
   exports.EditMed=async (req, res) => {
   
     /** edit med and schdule api
-     * -this api sholud be called when user needs to edit med or its schdule
+     * -this api should be called when user needs to edit med or its schdule
      * -the caller must be the med creator or has a permission
      * -medId and schdule id is required
      * -that data to be edit
@@ -511,7 +511,7 @@ exports.CreateNewMed = async (req, res) => {
           }
         },{new:true})
         newMed=editedMed
-        // genrate MedInfo snapshot
+        // generate MedInfo snapshot
         const MedInfo={
           img:editedMed.img,
           strength:editedMed.strength,
@@ -559,377 +559,71 @@ exports.CreateNewMed = async (req, res) => {
       // in case that the dose is in the past and is taken or confirmed the dose will be the same and the new Occurrence will be generated from the next day
       // in case that the dose is in the past and is not taken or confirmed the dose will be edited and the new Occurrence will start the next day
 
-      const endOfToday = new Date();
-          endOfToday.setHours(23, 59, 59, 999);
+      const endOfYesterday = new Date();
+      endOfYesterday.setDate(endOfYesterday.getDate() - 1);
+      endOfYesterday.setHours(23, 59, 59, 999);
 
-      // get every dose Occurrence till the end of today and update it if its edited
-        for await (const dose of jsonScheduler.dosage) {
-          const queryDate =new Date()
-        
-          
-            nextDay=new Date()
-            nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
-           
-          if(dose._id){
-            await Occurrence.updateMany({
-              Medication: editedMed._id.toString(),
-              PlannedDateTime: {$gte:queryDate,$lt:nextDay},
-              Status: { $in: [0, 1, 3, 5] },
-              DosageID:dose._id
-            }, {
-              $set: { MedInfo: MedInfo,PlannedDateTime:dose.DateTime,PlannedDose:dose.dose }
-            });
-  
-          }
-        }
-
-
-        
-
-  
-  
-      // delete all the future Occurrences after today
+      // delete all the future Occurrences including today if its not 2 or 4
       console.log("SchedulerId",SchedulerId)
-     const deleted= await Occurrence.deleteMany({Medication:editedMed._id.toString(),PlannedDateTime:{$gte:endOfToday}})
+     const deleted= await Occurrence.deleteMany({
+      Medication:editedMed._id.toString(),
+      PlannedDateTime:{$gte:endOfYesterday},
+       Status: { $in: [0, 1, 3, 5] }})
      console.log("deleted",deleted) 
-    
+    //make the Scheduler as archived 
+    const archived=await SchedulerSchema.findByIdAndUpdate(SchedulerId,{
+      Archived:true
+    },{new:true})
       
+    // add the archived scheduler to med archived history
 
+    editedMed.SchedulerHistory.push(archived._id);
+    
+    //generate new Scheduler
 
-       // check if no end date is provided then make GenerateAutoOccurrence to true
-       if(!jsonScheduler.EndDate&&jsonScheduler.ScheduleType!="1"){
+      // create Scheduler 
+     // check if no end date is provided then make GenerateAutoOccurrence to true
+      if(!jsonScheduler.EndDate&&jsonScheduler.ScheduleType!="1"){
         jsonScheduler.GenerateAutoOccurrence=true
-        }else{
-        jsonScheduler.GenerateAutoOccurrence=false
-        }
+      }
+     // validate Scheduler 
+     const ValidateScheduler= await CreateNewScheduler(jsonScheduler,newMed,id,ProfileID,viewerProfile,req,res)
 
 
-  
-      MedInfo.ScheduleType= jsonScheduler.ScheduleType
-  
-      // validate schdule data
-      // check if StartDate in the past 
-      const DateTime = new Date()
-      // if((+jsonScheduler.StartDate)<DateTime.getTime()){
-      //   return errorResMsg(res, 400, req.t("start_date_in_the_past"));
-      // }
-  
-      // validate schdule if exist
-  
-      if(jsonScheduler.ScheduleType){
-        if(jsonScheduler.ScheduleType!="1"&&jsonScheduler.ScheduleType!="2"&&
-        jsonScheduler.ScheduleType!="3"&&jsonScheduler.ScheduleType!="0"){
-          return errorResMsg(res, 400, req.t("invalid_schedule_type"));
-        }
-      }
-  
-    
-  
-      // if(jsonScheduler.EndDate){
-      //   // if((+jsonScheduler.EndDate)<DateTime.getTime()){
-      //   //   return errorResMsg(res, 400, req.t("end_date_in_the_past"));
-      //   // }
-  
-      //   if((+jsonScheduler.EndDate)<(+OldScheduler.StartDate)){
-      //     return errorResMsg(res, 400, req.t("end_date_before_start_date"));
-      //   }
-        
-      //check if EndDate is less than StartDate
-  
-      // }
-
-       //check if EndDate is less than StartDate
-        if(jsonScheduler.EndDate){
-          const startDate=jsonScheduler.StartDate||new Date(OldScheduler.StartDate).getTime()
-          if((+jsonScheduler.EndDate)<(+startDate)){
-            return errorResMsg(res, 400, req.t("end_date_before_start_date"));
-          }
-        }
-
-  // validate dose if its not as needed
-      if(jsonScheduler.ScheduleType){
-        if(jsonScheduler.ScheduleType!="1"){
-          if(!jsonScheduler.dosage){
-            return errorResMsg(res, 400, req.t("no_dosage_provided"));
-          }
-          if(jsonScheduler.dosage.length===0){
-            return errorResMsg(res, 400, req.t("no_dosage_provided"));
-          }
-          jsonScheduler.dosage.forEach(dose => {
-    
-            if(dose.dose<1){
-              return errorResMsg(res, 400, req.t("invalid_dose"));
-            }
-            // if(+(dose.DateTime)<DateTime.getTime()){
-            //   return errorResMsg(res, 400, req.t("dose_date_in_the_past"));
-            // }
-    
-          });
-    
-        }
-  
-  
-      // validate specific days if its not as needed
-      if(jsonScheduler.ScheduleType=="0"){
-        if(!jsonScheduler.SpecificDays){
-          return errorResMsg(res, 400, req.t("no_specific_days_provided"));
-        }
-        if(jsonScheduler.SpecificDays.length===0){
-          return errorResMsg(res, 400, req.t("no_specific_days_provided"));
-        }
-  
-      }
-      // validate occurrence pattern if its not as needed
-      if(jsonScheduler.ScheduleType=="3"){
-        if(!jsonScheduler.DaysInterval){
-          return errorResMsg(res, 400, req.t("invalid_occurrence_pattern"));
-        }
-        if(jsonScheduler.DaysInterval<2){
-          return errorResMsg(res, 400, req.t("invalid_occurrence_pattern"));
-        }
-  
-      }
-      }
+      // create Occurrences
+    const newScheduler= await CreateOccurrences(jsonScheduler,ValidateScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res)
      
   
+      // save med and Scheduler
   
-      // saved old Scheduler into history array and update the new one
-      console.log("jsonScheduler.startDate",new Date(jsonScheduler.StartDate))
-     const newScheduler=jsonScheduler
-      console.log("newScheduler.startDate",new Date(newScheduler.StartDate))
-        var endAfter3Month = new Date(newScheduler.StartDate);
-        endAfter3Month .setMonth(endAfter3Month .getMonth() + 3);
-        newScheduler.EndDate=jsonScheduler.EndDate||endAfter3Month
-      
-
-      
-     // create new Occurrences
+      editedMed.Scheduler=newScheduler._id
+      await newScheduler.save()
+     await editedMed.save()
   
-       // get get start and end date
-       let startDate=jsonScheduler.StartDate
-       let endDate=jsonScheduler.EndDate
-       let occurrencePattern;
-       if(!startDate){
-         return errorResMsg(res, 400, req.t("start_date_required"));
-         
+       // give the med creator full access for that med
+       // if the med creator is the parent make Refile and doses true
+       if(profile.Owner.User==id){
+        if(viewer){
+          viewer.CanReadSpacificMeds.push({
+            Med:newMed._id,
+            Refile:true,
+            Doses:true
+           })
+        }
+        
+       }else{
+        if(viewer){
+          viewer.CanReadSpacificMeds.push({
+            Med:newMed._id
+           })
+           await viewer.save()
+        }
+        
        }
      
-       // get schule senario 
-       if(!jsonScheduler.ScheduleType){
-         return errorResMsg(res, 400, req.t("Scheduler_type_required"));
-         
-       }
-       // get occurrence pattern
-       // the fowllowing code must rurns in case 2 and 3 only
-       if(jsonScheduler.ScheduleType=='2'||jsonScheduler.ScheduleType=='3'){
-   
-       //case every day
-       if(jsonScheduler.ScheduleType=='2'){ 
-         occurrencePattern=1
-       }else if(jsonScheduler.ScheduleType=='3'){ //case days interval
-         occurrencePattern=jsonScheduler.DaysInterval
-       }
-       // generate occurrences data
-   
-       const occurrences=[]
-       for(let doseElement of jsonScheduler.dosage){
-        
-        //if dose already existed (has _id filed ) then the occurrences will start from tomorrow
-        //and the start date must be in the past and its end date is still in the future
-        if(doseElement._id&&new Date(doseElement.DateTime)<=endOfToday){
-          if(!jsonScheduler.EndDate||new Date(jsonScheduler.EndDate)>=endOfToday){
-            const date2=new Date(doseElement.DateTime)
-            const tomorrow=new Date()
-            tomorrow.setDate(tomorrow.getDate()+1)
-            tomorrow.setHours(0, 0, 0, 0);
-            let hours = date2.getHours();
-            let minutes = date2.getMinutes();
-            let seconds = date2.getSeconds();
-  
-            tomorrow.setHours(hours);
-            tomorrow.setMinutes(minutes);
-            tomorrow.setSeconds(seconds);
-  
-            doseElement.DateTime=tomorrow
-  
-          }
-
-        }
-
-        if(!doseElement._id){
-          OldScheduler.dosage.push(doseElement)
-          doseElement=OldScheduler.dosage[OldScheduler.dosage.length-1]
-        }
-
-        if(doseElement.isDeleted){
-          const index = OldScheduler.dosage.findIndex((dose)=>{
-            console.log("dose._id",dose._id)
-            console.log("doseElement._id",doseElement._id)
-            if(dose._id==doseElement._id){
-              return true
-            }
-          })
-          console.log("index",index)
-          OldScheduler.dosage[index].isDeleted=true;
-          await Occurrence.updateMany({DosageID:doseElement._id},{
-            $set:{
-              isSuspended:true
-            }
-          })
-          continue;
-        }
-
-         const OccurrencesData={
-          PlannedDose:doseElement.dose,
-          ProfileID,
-          DosageID:doseElement._id,
-          Scheduler:newScheduler._id,
-          CreatorProfile:viewerProfile._id
-         }
-         const start=new Date(doseElement.DateTime)
-         
-         if(!newScheduler.EndDate){
-   
-           var result = new Date(OldScheduler.EndDate);
-        
-   
-           end=result
-         }else{
-           end=new Date(newScheduler.EndDate)
-   
-         }
-         
-         
-         const newOccurrences=await GenerateOccurrences(id,editedMed._id,MedInfo,newScheduler._id,occurrencePattern,start,end,OccurrencesData)
-         occurrences.push(...newOccurrences)
-   
-   
-       };
-   
-       // write occurrences to database
-       await Occurrence.insertMany(occurrences)
-   
-   
-    
-       
-   
-       }else if (jsonScheduler.ScheduleType=='0'){
-   
-         // case user choose spacic days
-         const occurrences=[]
-       for(let doseElement of jsonScheduler.dosage){
-
-
-          //if dose already existed (has _id filed ) then the occurrences will start from tomorrow
-        //and the start date must be in the past and its end date is still in the future
-        if(doseElement._id&&new Date(doseElement.DateTime)<=endOfToday){
-          if(!jsonScheduler.EndDate||new Date(jsonScheduler.EndDate)>=endOfToday){
-            const date2=new Date(doseElement.DateTime)
-            const tomorrow=new Date()
-            tomorrow.setDate(tomorrow.getDate()+1)
-            tomorrow.setHours(0, 0, 0, 0);
-            let hours = date2.getHours();
-            let minutes = date2.getMinutes();
-            let seconds = date2.getSeconds();
-  
-            tomorrow.setHours(hours);
-            tomorrow.setMinutes(minutes);
-            tomorrow.setSeconds(seconds);
-  
-            doseElement.DateTime=tomorrow
-  
-          }
-
-        }
-
-
-        if(!doseElement._id){
-          OldScheduler.dosage.push(doseElement)
-          doseElement=OldScheduler.dosage[OldScheduler.dosage.length-1]
-        }
-
-        if(doseElement.isDeleted){
-          const index = OldScheduler.dosage.findIndex((dose)=>{
-            console.log("dose._id",dose._id)
-            console.log("doseElement._id",doseElement._id)
-            if(dose._id==doseElement._id){
-              return true
-            }
-          })
-          OldScheduler.dosage[index].isDeleted=true;
-          await Occurrence.updateMany({DosageID:doseElement._id},{
-            $set:{
-              isSuspended:true
-            }
-          })
-          continue;
-        }
-
-   
-         const OccurrencesData={
-          PlannedDose:doseElement.dose,
-          ProfileID,
-          DosageID:doseElement._id,
-          Scheduler:newScheduler._id,
-          CreatorProfile:viewerProfile._id
-         }
-         const start=new Date(doseElement.DateTime)
-         
-
-         let  end
-         if(!newScheduler.EndDate){
-          end=OldScheduler.EndDate
-         }else{
-            end=newScheduler.EndDate
-         }
-        
-   
-         
-   
-         const intervalDays=jsonScheduler.SpecificDays
-         
-         const newOccurrences=await GenerateOccurrencesWithDays(id,editedMed._id,MedInfo,newScheduler._id,intervalDays,start,end,OccurrencesData)
-         occurrences.push(...newOccurrences)
-   
-   
-       };
-   
-       // write occurrences to database
-       await Occurrence.insertMany(occurrences)
-   
-   
-       }
-  
-       
-     console.log("newScheduler",)
-  
-    
       
-     
 
-      OldScheduler.dosage.forEach(dose => {
-      if(dose._id){
-        // update the dose object that has _id = dose._id
-        OldScheduler.dosage.forEach(dose2 => {
-          if(dose2._id==dose._id){
-            dose2.dose=dose.dose
-            dose2.DateTime=dose.DateTime
-          }
-        })
-      }
-     });
-     OldScheduler.StartDate=jsonScheduler.StartDate
-      OldScheduler.EndDate=jsonScheduler.EndDate
-      OldScheduler.ScheduleType=jsonScheduler.ScheduleType
-      OldScheduler.DaysInterval=jsonScheduler.DaysInterval
-      OldScheduler.SpecificDays=jsonScheduler.SpecificDays
-      OldScheduler.AsNeeded=jsonScheduler.AsNeeded
 
-    
-      await OldScheduler.save()
-      
-     
-  
      
       // return successful response
       return successResMsg(res, 200, {message:req.t("Scheduler_Updated")});
@@ -1211,7 +905,8 @@ exports.CreateNewMed = async (req, res) => {
       // delete all future occurrences
       await Occurrence.deleteMany({Medication:MedId,PlannedDateTime:{$gt:new Date()}})
   
-      // update medication deleted flage
+      // update medication deleted flag
+      console.log(Scheduler)
       Medication.isDeleted=true;
       Scheduler.isDeleted=true;
   

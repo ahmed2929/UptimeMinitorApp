@@ -53,10 +53,7 @@ var Scheduler = new Schema({
         DateTime:{
           type:Date
         },
-        isDeleted:{
-          type:Boolean,
-          default:false
-        }
+      
 
       }
     ],
@@ -76,6 +73,10 @@ var Scheduler = new Schema({
       ref:'Profile'
     },
     GenerateAutoOccurrence:{
+      type:Boolean,
+      default:false
+    },
+    Archived:{
       type:Boolean,
       default:false
     }

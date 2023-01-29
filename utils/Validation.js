@@ -488,16 +488,6 @@ check('StartedIn')
  .isString()  // Make sure it's a string
  .notEmpty(),  // Make sure it's not empty
 
-// Validate the quantity field
-check('StartedIn')
-.optional()
- .isInt()  // Make sure it's an integer
- .custom((StartedIn) => {
-   if (StartedIn < 1) {
-     throw new Error('StartedIn invalid');
-   }
-   return true;
- }),
 
 // Validate the instructions field
 check('Severity')
@@ -505,7 +495,7 @@ check('Severity')
 .isInt()  // Make sure it's an integer
 .withMessage("Severity_is_invalid")
 
-    ]
+]
 }
 
  

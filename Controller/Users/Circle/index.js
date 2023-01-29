@@ -84,18 +84,19 @@ exports.CreateDependentA = async (req, res) => {
       }=req.body
   
         // check if the user has a profile
-        const profile = await Profile.findById(ProfileID)
+        const profile = await Profile.findById(ProfileID).populate("Owner.User")
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         // check if the user if the user is the owner of that profile
-        if(profile.Owner.User.toString() !== id){
+        if(profile.Owner.User._id.toString() !== id){
             return errorResMsg(res, 400, req.t("Unauthorized"));
         }
 
         if(profile.Owner.User.email=== email){
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
        }
+       console.log("usr is  ",profile.Owner.User)
        if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
         return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
      }
@@ -570,6 +571,7 @@ exports.CreateDependentA = async (req, res) => {
        
       }=req.body
         // get the invitation
+      
         const invitation = await Invitation.findById(InvitationID)
         if(!invitation){
             return errorResMsg(res, 400, req.t("Invitation_not_found"));
