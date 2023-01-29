@@ -591,8 +591,28 @@ exports.CreateNewMed = async (req, res) => {
 
 
       // create Occurrences
-    const newScheduler= await CreateOccurrences(jsonScheduler,ValidateScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res)
-     
+    const newScheduler= await CreateOccurrences(jsonScheduler,ValidateScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res,true)
+    
+    // delete the new dose if there is a dose in that time
+    // get doses of today that is taken or rejected
+    // end of today
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const doses=await Occurrence.find({
+      Medication:editedMed._id.toString(),
+      PlannedDateTime:{$gte:endOfYesterday,$lte:endOfToday},
+      Status: { $in: [2,4] }
+
+    })
+     for await(const singleDose of doses){
+      await Occurrence.deleteMany({
+        Medication:editedMed._id.toString(),
+        PlannedDateTime:singleDose.PlannedDateTime,
+        Status: { $in: [0, 1, 3, 5] }
+      })
+
+    }
   
       // save med and Scheduler
   

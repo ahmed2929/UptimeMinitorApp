@@ -376,7 +376,14 @@ exports.CreateDependentA = async (req, res) => {
                }
             // send notification to the user using push notification 
             await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile,"NewInvitationFromCareGiver",{
-              Invitation:newInvitation
+              Invitation:newInvitation,
+              ProfileInfoOfSender:{
+                firstName:profile.Owner.User.firstName,
+                lastName:profile.Owner.User.lastName,
+                img:profile.Owner.User.img,
+                email:profile.Owner.User.email,
+                ProfileID:profile._id,
+              }
             })
 
             const responseData ={
@@ -630,7 +637,14 @@ exports.CreateDependentA = async (req, res) => {
 
              // send notification to the user using push notification 
              await SendPushNotificationToUserRegardlessLangAndOs(dependentProfile,masterProfile,"DependentAcceptedInvitation",{
-              Invitation:invitation
+              Invitation:invitation,
+              ProfileInfoOfSender:{
+                firstName:dependentProfile.Owner.User.firstName,
+                lastName:dependentProfile.Owner.User.lastName,
+                img:dependentProfile.Owner.User.img,
+                email:dependentProfile.Owner.User.email,
+                ProfileID:dependentProfile._id,
+              }
             })
 
 
@@ -1009,7 +1023,14 @@ Add a new caregiver to a user's profile
                }
 
                await SendPushNotificationToUserRegardlessLangAndOs(profile,CareGiverprofile,"NewInvitationFromDependent",{
-                Invitation:newInvitation
+                Invitation:newInvitation,
+                ProfileInfoOfSender:{
+                  firstName:profile.Owner.User.firstName,
+                  lastName:profile.Owner.User.lastName,
+                  img:profile.Owner.User.img,
+                  email:profile.Owner.User.email,
+                  ProfileID:profile._id,
+                }
               })
 
             const responseData ={
@@ -1163,7 +1184,14 @@ Add a new caregiver to a user's profile
             // return accept confirmation
 
             await SendPushNotificationToUserRegardlessLangAndOs(CareGiverProfile,dependentProfile,"CareGiverAcceptedInvitation",{
-              Invitation:Invitation
+              Invitation:invitation,
+              ProfileInfoOfSender:{
+                firstName:CareGiverProfile.Owner.User.firstName,
+                lastName:CareGiverProfile.Owner.User.lastName,
+                img:CareGiverProfile.Owner.User.img,
+                email:CareGiverProfile.Owner.User.email,
+                ProfileID:CareGiverProfile._id,
+              },
             })
 
             return successResMsg(res, 200, {message:req.t("invitation_accepted")});

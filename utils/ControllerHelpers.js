@@ -125,7 +125,7 @@ const CreateNewScheduler=async(jsonScheduler,newMed,id,ProfileID,viewerProfile,r
 
 }
 
-const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res)=>{
+const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res,editApi)=>{
   console.log("jsonScheduler",jsonScheduler.dosage) 
   console.log("newScheduler",newScheduler.dosage)  
   // create Occurrences
@@ -177,6 +177,20 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
           
           let startDate = new Date(+newScheduler.StartDate);
           let DoseTime = new Date(+doseElement.DateTime);
+
+          if(editApi){
+            const today=new Date()
+            today.setHours(0, 0, 0, 0);
+
+            if(startDate<today){
+              startDate=today
+            }
+
+            }
+
+
+          
+
 
           let hours = DoseTime.getHours();
           let minutes = DoseTime.getMinutes();

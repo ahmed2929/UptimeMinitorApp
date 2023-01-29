@@ -21,6 +21,11 @@ router.get(
 );
 
 
+router.get(
+    "/notifications",
+    IsAuth(),
+    generalController.Notification
+);
 
 
 

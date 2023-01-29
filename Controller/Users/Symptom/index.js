@@ -180,7 +180,7 @@ exports.CreateSymptom = async (req, res) => {
  * 
  * @returns {Object} - Returns symptoms of that date range
  * @description 
- *    change dose status
+ *    return symptom with a date range and not deleted
      * ********************************
      * logic
         return symptom with a date range and not deleted

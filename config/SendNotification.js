@@ -1,10 +1,24 @@
 const azure = require('azure-sb');
 const hubName = process.env.AzureNotificationHubName;
 const connectionString = process.env.AzureNotificationHubConnectionString;
-const sendNotification= async(profileId, message,pns)=>{
+const Notification = require('../DB/Schema/Notifications')
+const sendNotification= async(profileId, payload,pns,NotificationActionType,NotificationData)=>{
     // pns is device os
     profileId=profileId.toString()
-    console.log("sendNotification",profileId,payload,pns)
+    console.log("sendNotification",profileId,payload,pns);
+
+    // save Notification to db
+    const notification = new Notification({
+        ProfileID:profileId,
+        data:NotificationData,
+        action:NotificationActionType
+        
+    })
+    await notification.save()
+
+
+
+
   // Create a NotificationHubClient
   
   const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
