@@ -1,4 +1,4 @@
-exports.NewInvitationFromCareGiver_EN_GCM=(InvitationFrom,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromCareGiver_EN_GCM=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `new invitation from ${InvitationFrom}`,
@@ -6,11 +6,12 @@ exports.NewInvitationFromCareGiver_EN_GCM=(InvitationFrom,InvitationID,Notificat
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
-exports.NewInvitationFromCareGiver_AR_GCM=(InvitationFrom,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromCareGiver_AR_GCM=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": ` بارسال دعوة ${InvitationFrom} قام`,
@@ -18,13 +19,14 @@ exports.NewInvitationFromCareGiver_AR_GCM=(InvitationFrom,InvitationID,Notificat
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
 
 
-exports.DependentAcceptedInvitation_EN_GCM=(DependentName,InvitationID,NotificationActionType)=>{
+exports.DependentAcceptedInvitation_EN_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `${DependentName}, accepted your invitation`,
@@ -32,11 +34,12 @@ exports.DependentAcceptedInvitation_EN_GCM=(DependentName,InvitationID,Notificat
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
-exports.DependentAcceptedInvitation_AR_GCM=(DependentName,InvitationID,NotificationActionType)=>{
+exports.DependentAcceptedInvitation_AR_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `${DependentName}, قبل دعوتك`,
@@ -44,12 +47,13 @@ exports.DependentAcceptedInvitation_AR_GCM=(DependentName,InvitationID,Notificat
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
 
-exports.NewInvitationFromDependent_EN_GCM=(DependentName,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromDependent_EN_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `${DependentName}, sent you invitation`,
@@ -57,11 +61,12 @@ exports.NewInvitationFromDependent_EN_GCM=(DependentName,InvitationID,Notificati
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
-exports.NewInvitationFromDependent_AR_GCM=(DependentName,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromDependent_AR_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `${DependentName}, بارسال دعوة`,
@@ -69,12 +74,13 @@ exports.NewInvitationFromDependent_AR_GCM=(DependentName,InvitationID,Notificati
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
 
-exports.CareGiverAcceptedInvitation_EN_GCM=(CareGiver,InvitationID,NotificationActionType)=>{
+exports.CareGiverAcceptedInvitation_EN_GCM=(CareGiver,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `${CareGiver}, accepted your invitation`,
@@ -82,12 +88,13 @@ exports.CareGiverAcceptedInvitation_EN_GCM=(CareGiver,InvitationID,NotificationA
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
 
-exports.CareGiverAcceptedInvitation_AR_GCM=(CareGiver,InvitationID,NotificationActionType)=>{
+exports.CareGiverAcceptedInvitation_AR_GCM=(CareGiver,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `${CareGiver}, قبل دعوتك`,
@@ -95,12 +102,13 @@ exports.CareGiverAcceptedInvitation_AR_GCM=(CareGiver,InvitationID,NotificationA
         },
         "data":{
             "InvitationID": `${InvitationID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
 
-exports.RefileAlert_EN_GCM=(patientName,MedName,MedID,NotificationActionType)=>{
+exports.RefileAlert_EN_GCM=(patientName,MedName,MedID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `Refilel Alert`,
@@ -108,12 +116,13 @@ exports.RefileAlert_EN_GCM=(patientName,MedName,MedID,NotificationActionType)=>{
         },
         "data":{
             "MedID": `${MedID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
 
-exports.RefileAlert_AR_GCM=(patientName,MedName,MedID,NotificationActionType)=>{
+exports.RefileAlert_AR_GCM=(patientName,MedName,MedID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
             "title": `تنبيه إعادة التعبئة`,
@@ -121,7 +130,8 @@ exports.RefileAlert_AR_GCM=(patientName,MedName,MedID,NotificationActionType)=>{
         },
         "data":{
             "MedID": `${MedID}`,
-            "NotificationActionType":`${NotificationActionType}`
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
         }
     }
 }
@@ -129,7 +139,7 @@ exports.RefileAlert_AR_GCM=(patientName,MedName,MedID,NotificationActionType)=>{
 
 /////////////////////////////////////////IOS/////////////////////////////////////////
 
-exports.NewInvitationFromCareGiver_EN_APNS=(InvitationFrom,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromCareGiver_EN_APNS=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -138,14 +148,15 @@ exports.NewInvitationFromCareGiver_EN_APNS=(InvitationFrom,InvitationID,Notifica
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
                 
             }
         }
     }
 }
 
-exports.NewInvitationFromCareGiver_AR_APNS=(InvitationFrom,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromCareGiver_AR_APNS=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -154,13 +165,14 @@ exports.NewInvitationFromCareGiver_AR_APNS=(InvitationFrom,InvitationID,Notifica
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
 
-exports.DependentAcceptedInvitation_EN_APNS=(DependentName,InvitationID,NotificationActionType)=>{
+exports.DependentAcceptedInvitation_EN_APNS=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -169,13 +181,14 @@ exports.DependentAcceptedInvitation_EN_APNS=(DependentName,InvitationID,Notifica
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
 
-exports.DependentAcceptedInvitation_AR_APNS=(DependentName,InvitationID,NotificationActionType)=>{
+exports.DependentAcceptedInvitation_AR_APNS=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -184,12 +197,13 @@ exports.DependentAcceptedInvitation_AR_APNS=(DependentName,InvitationID,Notifica
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
-exports.NewInvitationFromDependent_EN_APNS=(DependentName,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromDependent_EN_APNS=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -198,12 +212,13 @@ exports.NewInvitationFromDependent_EN_APNS=(DependentName,InvitationID,Notificat
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
-exports.NewInvitationFromDependent_AR_APNS=(DependentName,InvitationID,NotificationActionType)=>{
+exports.NewInvitationFromDependent_AR_APNS=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -212,13 +227,14 @@ exports.NewInvitationFromDependent_AR_APNS=(DependentName,InvitationID,Notificat
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
 
-exports.CareGiverAcceptedInvitation_EN_APNS=(CareGiver,InvitationID,NotificationActionType)=>{
+exports.CareGiverAcceptedInvitation_EN_APNS=(CareGiver,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -227,13 +243,14 @@ exports.CareGiverAcceptedInvitation_EN_APNS=(CareGiver,InvitationID,Notification
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
 
-exports.CareGiverAcceptedInvitation_AR_APNS=(CareGiver,InvitationID,NotificationActionType)=>{
+exports.CareGiverAcceptedInvitation_AR_APNS=(CareGiver,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -242,12 +259,13 @@ exports.CareGiverAcceptedInvitation_AR_APNS=(CareGiver,InvitationID,Notification
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
-exports.RefileAlert_EN_APNS=(patientName,MedName,MedID,NotificationActionType)=>{
+exports.RefileAlert_EN_APNS=(patientName,MedName,MedID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -256,12 +274,13 @@ exports.RefileAlert_EN_APNS=(patientName,MedName,MedID,NotificationActionType)=>
             },
             "data":{
                 "MedID": `${MedID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }
 }
-exports.RefileAlert_AR_APNS=(patientName,MedName,MedID,NotificationActionType)=>{
+exports.RefileAlert_AR_APNS=(patientName,MedName,MedID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
@@ -270,7 +289,8 @@ exports.RefileAlert_AR_APNS=(patientName,MedName,MedID,NotificationActionType)=>
             },
             "data":{
                 "MedID": `${MedID}`,
-                "NotificationActionType":`${NotificationActionType}`
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
             }
         }
     }

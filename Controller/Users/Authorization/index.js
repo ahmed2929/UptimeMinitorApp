@@ -604,10 +604,11 @@ exports.GenerateAccessToken = async (req, res) => {
 
     // create user token
     const token = GenerateToken(user._id)
-
+    const refreshToken = GenerateRefreshToken(user._id)
     // create data to be returned
     const data = {
-      accessToken:token
+      accessToken:token,
+      refreshToken:refreshToken
     };
     // return successful response
     return successResMsg(res, 200, data);

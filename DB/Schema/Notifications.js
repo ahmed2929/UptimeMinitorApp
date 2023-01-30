@@ -16,7 +16,12 @@ data:{
  },
  action:{
      type:String,
- }
+ },
+ Seen:{
+  type:Boolean,
+  default:false
+}
+
 
   
  

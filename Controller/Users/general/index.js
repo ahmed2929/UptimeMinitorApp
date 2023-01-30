@@ -78,7 +78,7 @@ exports.SearchForMed = async (req, res) => {
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
  * @param {string} req.query.ProfileID - Profile ID of the user
- * @param {number} req.body.page - number of the page (pagination logic)
+ * @param {number} req.query.page - number of the page (pagination logic)
  * 
  * @throws {Error} if the user does not have a profile
  * @throws {Error} if the user is not the owner of the profile  
@@ -150,6 +150,73 @@ exports.Notification = async (req, res) => {
   }
 };
 
+
+
+
+/**
+ * make notification as seen 
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Notification
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.query.ProfileID - Profile ID of the user
+ * @param {number} req.body.NotificationID - number of the page (pagination logic)
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile  
+ * 
+ * 
+ * @returns {Object} - Returns success message
+ * @description 
+ *     get the notification and make Seen value to true
+       
+ * 
+ */
+
+
+
+exports.MakeNotificationSeen = async (req, res) => {
+ 
+  try {
+
+    const {id} =req.id
+    const {ProfileID,NotificationID}=req.body
+   
+
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    
+    if(profile.Owner.User.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    // update notification seen status
+    const notification =await NotificationSchema.findById(NotificationID)
+    if(!notification){
+      return errorResMsg(res, 400, req.t("Notification_not_found"));
+    }
+    if(notification.ProfileID.toString()!=ProfileID.toString()){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    notification.Seen=true;
+    await notification.save()
+
+   
+
+    
+       
+    return successResMsg(res, 200, {message:req.t("Notification_status_changed")});
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
 
 
 

@@ -374,6 +374,8 @@ exports.CreateDependentA = async (req, res) => {
                 const invitation = messages.InvitationSentToExistentDependentUser_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
                 await SendEmailToUser(email,invitation)
                }
+
+        
             // send notification to the user using push notification 
             await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile,"NewInvitationFromCareGiver",{
               Invitation:newInvitation,

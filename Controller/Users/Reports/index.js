@@ -199,14 +199,27 @@ exports.getReport=async (req, res) => {
        const responseData=[];
    
        for (const elem of doses) {
-         const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength")
+         const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity")
+         .populate("Scheduler")
+         .select("dosage")
+         let DosePerDay=med.Scheduler.dosage.length||0
+         
          responseData.push({
-           med:med,
+           med:{
+              _id:elem._id.Medication,
+              name:med.name,
+              strength:med.strength,  
+              unit:med.unit,
+              img:med.img,
+              quantity:med.quantity
+
+           },
            confirmed:elem.confirmed,
            rejected:elem.rejected,
            other:elem.other,
            total:elem.total,
-            ignored:elem.ignored
+            ignored:elem.ignored,
+            DosePerDay
          })
        }
    
@@ -279,14 +292,30 @@ exports.getReport=async (req, res) => {
       const responseData=[];
   
       for (const elem of doses) {
-        const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength")
+        const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity")
+        .populate("Scheduler")
+        .select("dosage")
+        let DosePerDay=med.Scheduler.dosage.length||0
+        
+       
+
+       
         responseData.push({
-          med:med,
+          med:{
+            _id:elem._id.Medication,
+            name:med.name,
+            strength:med.strength,  
+            unit:med.unit,
+            img:med.img,
+            quantity:med.quantity
+
+         },
           confirmed:elem.confirmed,
           rejected:elem.rejected,
           other:elem.other,
           total:elem.total,
-          ignored:elem.ignored
+          ignored:elem.ignored,
+          DosePerDay
         })
       }
   

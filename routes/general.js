@@ -26,6 +26,11 @@ router.get(
     IsAuth(),
     generalController.Notification
 );
+router.post(
+    "/make/notification/seen",
+    IsAuth(),
+    generalController.MakeNotificationSeen
+);
 
 
 
