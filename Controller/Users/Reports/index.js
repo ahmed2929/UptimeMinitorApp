@@ -103,6 +103,9 @@ exports.getReport=async (req, res) => {
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
   
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
@@ -222,10 +225,34 @@ exports.getReport=async (req, res) => {
             DosePerDay
          })
        }
+       const result = responseData.reduce((acc, item) => {
+        acc.confirmed += item.confirmed;
+        acc.rejected += item.rejected;
+        acc.other += item.other;
+        acc.total += item.total;
+        return acc;
+      }, { confirmed: 0, rejected: 0, other: 0 ,total:0});
+      
+     const Adherence=result.confirmed/result.total*100||0
+      let TotalNumberOFMeds=responseData.length
+      console.log(TotalNumberOFMeds)
+      console.log(result)
+      const editedData={
+          MedsData:responseData,
+          TotalNumberOFMeds,
+          Statics:result,
+          Adherence:Adherence.toFixed(2)
+  
+        
+  
+        
+      
+
+      }
+  
    
-    
-       // return successful response
-       return successResMsg(res, 200, {message:req.t("Success"),data:responseData});
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Success"),data:editedData});
   
     }else if(hasSpacificReadPermissions.length>0){
       // case spacific permission
@@ -315,13 +342,36 @@ exports.getReport=async (req, res) => {
           other:elem.other,
           total:elem.total,
           ignored:elem.ignored,
-          DosePerDay
+          DosePerDay,
         })
+      }
+
+      const result = responseData.reduce((acc, item) => {
+        acc.confirmed += item.confirmed;
+        acc.rejected += item.rejected;
+        acc.other += item.other;
+        acc.total += item.total;
+        return acc;
+      }, { confirmed: 0, rejected: 0, other: 0 ,total:0});
+      
+     
+      let TotalNumberOFMeds=responseData.length
+      const Adherence=result.confirmed/result.total*100||0
+
+      console.log(result)
+      const editedData={
+        MedsData:responseData,
+        TotalNumberOFMeds,
+        Statics:result,
+        Adherence:Adherence.toFixed(2)
+
+      
+
       }
   
    
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Success"),data:responseData});
+      return successResMsg(res, 200, {message:req.t("Success"),data:editedData});
     }else{
       return errorResMsg(res, 401, req.t("Unauthorized"));
     }
@@ -389,7 +439,10 @@ exports.getReport=async (req, res) => {
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
@@ -398,7 +451,9 @@ exports.getReport=async (req, res) => {
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID,

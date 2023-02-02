@@ -99,14 +99,24 @@ exports.EditSingleDose=async (req, res) => {
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
   
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
       })
-      
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
   
       const viewer =await Viewer.findOne({
@@ -241,6 +251,9 @@ exports.EditSingleDose=async (req, res) => {
       
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
   
       const viewer =await Viewer.findOne({
@@ -377,7 +390,9 @@ exports.EditSingleDose=async (req, res) => {
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
@@ -386,7 +401,9 @@ exports.EditSingleDose=async (req, res) => {
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID,
@@ -532,7 +549,9 @@ exports.EditSingleDose=async (req, res) => {
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
@@ -542,6 +561,9 @@ exports.EditSingleDose=async (req, res) => {
          return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
   
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID,
@@ -692,7 +714,9 @@ exports.EditSingleDose=async (req, res) => {
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
@@ -701,7 +725,9 @@ exports.EditSingleDose=async (req, res) => {
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID,
@@ -896,16 +922,20 @@ exports.EditSingleDose=async (req, res) => {
     if(!profile){
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
-
+    if(profile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
     // get the viewer permissions
     const viewerProfile =await Profile.findOne({
     "Owner.User":id
     })
-    
+   
     if(!viewerProfile){
        return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
-
+    if(viewerProfile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
      DependentProfile:ProfileID,

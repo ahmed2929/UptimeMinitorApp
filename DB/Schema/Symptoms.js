@@ -22,7 +22,6 @@ var SymptomsSchema = new Schema({
   },
     Severity:{
     type:Number, // 0 mild ,1 monderate, 2 severe
-    required:true
     
     },
     StartedIn:{ //default is the current date

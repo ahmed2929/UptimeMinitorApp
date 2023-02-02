@@ -54,29 +54,7 @@ var ProfileSchema = new Schema({
         type:Boolean,
         default:false
     },
-    firstName:{
-        type:String,
-       
-    },
-    lastName:{
-        type:String,
-       
-    },
-    email:{
-        type:String,
-     
-
-    },
-    mobileNumber:{
-        countryCode:{
-          type:String,
-
-        },
-        phoneNumber:{
-          type:String,
-      
-        }
-      },
+ 
     lang:{
         type:String,
         default:"en"
@@ -98,10 +76,25 @@ var ProfileSchema = new Schema({
             DeviceToken:{
                 type:String,
                 required:true
+            },
+            NotificationRegister:{
+               type: Object
             }
         }]
 
+    },
+    Deleted:{
+        type:Boolean,
+        default:false
+    },
+    gender:{
+        type:Number, //0:male,1:female
+    },
+    DateOfBirth:{
+        type:Date,
+        
     }
+
 
  
  

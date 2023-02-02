@@ -10,7 +10,7 @@ const User = require("../../../DB/Schema/User");
 const Profile = require("../../../DB/Schema/Profile");
 const messages = require("../../../Messages/Email/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
-const {RegisterAndroidDevice,RegisterIOSDevice} =require("../../../config/SendNotification")
+const {RegisterAndroidDevice,RegisterIOSDevice,DeleteRegistration} =require("../../../config/SendNotification")
 const {
   successResMsg,
   errorResMsg
@@ -81,10 +81,6 @@ exports.signUp = async (req, res) => {
       Owner:{
         User:newUser._id
       },
-      firstName:req.body.firstName,
-      lastName:req.body.lastName,
-      email:req.body.email,
-      mobileNumber:req.body.mobileNumber,
       lang:req.body.lang||"en",      
 
     })
@@ -186,25 +182,28 @@ exports.logIn = async (req, res) => {
       // return error message if password is wrong
       return errorResMsg(res, 401, req.t("Incorrect_email_or_password"));
     }
+    const userProfile=await Profile.findById(user.profile)
 
     if(DeviceToken&&DeviceToken.length>0&&DeviceOs&&DeviceOs.length>0){
-      const userProfile=await Profile.findById(user.profile)
+     
       // and new DeviceToken and DeviceOs into the userProfile.NotificationInfo if the DeviceToken and os does not exist in the array
+    let NotificationRegister;
       if(!userProfile.NotificationInfo.DevicesTokens.some((item)=>item.DeviceToken===DeviceToken&&item.DeviceOs===DeviceOs)){
-        userProfile.NotificationInfo.DevicesTokens.push({
-          DeviceToken,
-          DeviceOs
-        })
         // assign the new device to the user profile 
         if(DeviceOs==="IOS"){
           userProfile.NotificationInfo.IOS=true
-         await RegisterIOSDevice(user.profile,DeviceToken)
+          NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
         }else if(DeviceOs==="Android"){
           userProfile.NotificationInfo.Android=true
-          await RegisterAndroidDevice(user.profile,DeviceToken)
+          NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
         }else{
           return errorResMsg(res, 401, req.t("Invalid_os_type"));
         }
+        userProfile.NotificationInfo.DevicesTokens.push({
+          DeviceToken,
+          DeviceOs,
+          NotificationRegister
+        })
         await userProfile.save()
       
       }
@@ -224,9 +223,12 @@ exports.logIn = async (req, res) => {
         email:user.email,
         lang:user.lang,
         verified:user.verified,
-        profile:user.profile
+        profile:user.profile,
+        img:user.img,
+
         
       },
+      NotificationInfo:userProfile.NotificationInfo.DevicesTokens,
       ShouldRestPassword:user.ShouldRestPassword
     };
     // return successfully response
@@ -548,7 +550,13 @@ exports.ResendVerificationCode = async (req, res) => {
 
      const verificationCode = await GenerateRandomCode(2);
      const verificationExpiryDate =  Date.now()  + 8.64e+7 ;
-     const verificationMessage = messages.verifyAccount_EN(verificationCode);
+      let verificationMessage;
+      if(user.lang==="en"){
+        verificationMessage = messages.verifyAccount_EN(verificationCode);
+      }else{
+        verificationMessage = messages.verifyAccount_AR(verificationCode);
+      }
+     
 
 
     user.verificationCode=verificationCode;
@@ -618,3 +626,64 @@ exports.GenerateAccessToken = async (req, res) => {
   }
 };
 
+
+/**
+ * logout user
+ *
+ * @function
+ * @memberof controllers
+ * @memberof Auth
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Object} req.body - request body
+ * @param {string} req.body.ProfileID - user profile id
+ * @returns {string} - success message
+ *
+   * @description
+   logout user
+   */
+      exports.logOut = async (req, res) => {
+ 
+        try {
+          const {
+            ProfileID,
+            DeviceToken
+          
+          } = req.body;
+          const {id} =req.id
+
+          const profile =await Profile.findById(ProfileID)
+    
+          if(!profile){
+            return errorResMsg(res, 400, req.t("Profile_not_found"));
+          }
+    
+          if(profile.Deleted){
+            return errorResMsg(res, 400, req.t("Profile_not_found"));
+          }
+    
+          if(profile.Owner.User.toString()!==id){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+          }
+          //delete device token from NotificationInfo.DevicesTokens if DeviceToken === DeviceToken
+          
+          const index = profile.NotificationInfo.DevicesTokens.findIndex((elem)=>{
+            return elem.DeviceToken===DeviceToken
+          })
+          const RegistrationObject= profile.NotificationInfo.DevicesTokens[index].NotificationRegister
+          if(index!==-1){
+            profile.NotificationInfo.DevicesTokens.splice(index,1)
+            await profile.save()
+          }
+          // unregister user profile id from azure notification hub
+          const result=await DeleteRegistration(RegistrationObject.RegistrationId,profile._id)
+
+          console.log(result)
+         
+          return successResMsg(res, 200, {message:req.t("user_logged_out")});
+        } catch (err) {
+          // return error response
+          console.log(err)
+          return errorResMsg(res, 500, err);
+        }
+      };

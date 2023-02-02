@@ -48,6 +48,11 @@ router.post(
     validation.validate,
     userController.logIn
 );
+router.post(
+    "/logout",
+    IsAuth(),
+    userController.logOut
+);
 
 
 /**

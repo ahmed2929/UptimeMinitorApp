@@ -67,27 +67,29 @@ const sendNotification= async(profileId, payload,pns)=>{
 }
 
 const RegisterAndroidDevice= async (profileId, deviceToken)=>{
-    // Create a NotificationHubClient
-    const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
-  
-    // Register the device with the profile ID
-    return new Promise((resolve,reject)=>{
-        notificationHubService.gcm.createNativeRegistration(deviceToken, [profileId],(error,result)=>{
-            if(!error){
-            console.log(`Device with token ${deviceToken} registered with profile ID ${profileId}`);
-            resolve(result);
-            }
-            else{
-            console.log(error);
-            reject(error);
-            }
-        })
-    })
-  }
+  // Create a NotificationHubClient
+  const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
 
+  // Register the device with the profile ID
+  return new Promise((resolve,reject)=>{
+
+      notificationHubService.gcm.createNativeRegistration(deviceToken,[profileId],(error,result)=>{
+          if(!error){
+          console.log(`Device with token ${deviceToken} registered with profile ID ${profileId}`);
+          resolve(result);
+          }
+          else{
+          console.log(error);
+          reject(error);
+          }
+      })
+  })
+}
 
   const RegisterIOSDevice= async (profileId, deviceToken)=>{
     // Create a NotificationHubClient
+   
+
     const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
     
   // Register the device with the profile ID
@@ -106,10 +108,37 @@ const RegisterAndroidDevice= async (profileId, deviceToken)=>{
  
   }
 
+  const DeleteRegistration= async (registrationId, tag)=>{
+    // Create a NotificationHubClient
+   
+
+    const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
+    
+  // Register the device with the profile ID
+  return new Promise((resolve,reject)=>{
+  
+
+notificationHubService.deleteRegistration(registrationId, tag, function (error,result) {
+  if (!error) {
+    console.log(`Tag "${tag}" successfully unregistered`);
+    resolve(result);
+  }else{
+    console.log(error);
+    reject(error);
+  }
+});
+
+
+  })
+ 
+  }
+
+
 
 module.exports = {
 sendNotification,
 RegisterAndroidDevice,
-RegisterIOSDevice
+RegisterIOSDevice,
+DeleteRegistration
 
 };

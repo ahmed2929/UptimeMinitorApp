@@ -5,10 +5,12 @@
  * @namespace general
  * 
  */
+const bcrypt = require("bcryptjs");
 const User = require("../../../DB/Schema/User");
 const MedRecommendation = require("../../../DB/Schema/MedRecommendation");
 const NotificationSchema = require("../../../DB/Schema/Notifications");
 const Profile = require("../../../DB/Schema/Profile");
+const {UploadFileToAzureBlob}=require("../../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
@@ -115,6 +117,9 @@ exports.Notification = async (req, res) => {
     if(!profile){
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
+    if(profile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
     
     if(profile.Owner.User.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -191,7 +196,9 @@ exports.MakeNotificationSeen = async (req, res) => {
     if(!profile){
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
-    
+    if(profile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
     if(profile.Owner.User.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }

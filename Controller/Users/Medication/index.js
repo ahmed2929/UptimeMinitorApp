@@ -377,24 +377,11 @@ exports.CreateNewMed = async (req, res) => {
  * 
  * @returns {Object} - Returns edited med
  * @description 
- *      edit med and schdule api
-     * -this api sholud be called when user needs to edit med or its schdule
-     * -the caller must be the med creator or has a permission
-     * -medId and schdule id is required
-     * -that data to be edit
-     * ********************************
-     * logic
-     * ********************************
-     * 1- make sure that the caller is the med creator or has a permission
-     * 2- make sure that the med id and shcdule id is valid
-     * 3- retrive the med and edit it 
-     * 4- retrive the schdule and edit it
-     * 5- edit all the future Occurrence if it changed
-     * 
-     * 
-     * 
-     *
-       
+ *   this api is used to edit med
+ * if the Scheduler is changed then 
+ * -all the future doses will be deleted started from today if its status is not taken or rejected
+ * -new doses will be generated based on the Scheduler type
+ * 
        
  * 
  */
@@ -402,23 +389,7 @@ exports.CreateNewMed = async (req, res) => {
 
   exports.EditMed=async (req, res) => {
   
-    /** edit med and schdule api
-     * -this api should be called when user needs to edit med or its schdule
-     * -the caller must be the med creator or has a permission
-     * -medId and schdule id is required
-     * -that data to be edit
-     * ********************************
-     * logic
-     * ********************************
-     * 1- make sure that the caller is the med creator or has a permission
-     * 2- make sure that the med id and shcdule id is valid
-     * 3- retrive the med and edit it 
-     * 4- retrive the schdule and edit it
-     * 5- edit all the future Occurrence if it changed
-     * 
-     * 
-     * 
-     */
+ 
     try {
   
       const {id} =req.id
@@ -714,7 +685,9 @@ exports.CreateNewMed = async (req, res) => {
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
@@ -722,6 +695,9 @@ exports.CreateNewMed = async (req, res) => {
       
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
   
       const viewer =await Viewer.findOne({
@@ -878,6 +854,9 @@ exports.CreateNewMed = async (req, res) => {
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
   
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
@@ -886,7 +865,9 @@ exports.CreateNewMed = async (req, res) => {
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-  
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID,

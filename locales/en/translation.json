@@ -83,7 +83,14 @@
     "Invitation_can_not_be_deleted":"Invitation_can_not_be_deleted",
     "Invitation_deleted_Successfully":"Invitation_deleted_Successfully",
     "Invitation_not_found":"Invitation_not_found",
-    "Notification_status_changed":"Notification_status_changed"
+    "Notification_status_changed":"Notification_status_changed",
+    "profile_info_updated":"profile_info_updated",
+    "Invalid_Password":"Invalid_Password",
+    "Password_changed":"Password_changed",
+    "Email_already_exists":"Email_already_exists",
+    "OPT_has_sent":"OPT_has_sent",
+    "Email_Not_found":"Email_Not_found",
+    "Profile_Deleted":"Profile_Deleted"
     
 
 

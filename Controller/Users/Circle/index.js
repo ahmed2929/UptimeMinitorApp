@@ -88,6 +88,10 @@ exports.CreateDependentA = async (req, res) => {
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
+        if(profile.Deleted){
+          return errorResMsg(res, 400, req.t("Profile_not_found"));
+        }
+  
         // check if the user if the user is the owner of that profile
         if(profile.Owner.User._id.toString() !== id){
             return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -278,6 +282,10 @@ exports.CreateDependentA = async (req, res) => {
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
+        if(profile.Deleted){
+          return errorResMsg(res, 400, req.t("Profile_not_found"));
+        }
+  
         // check if the user if the user is the owner of that profile
         if(profile.Owner.User._id.toString() !== id){
             return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -375,7 +383,7 @@ exports.CreateDependentA = async (req, res) => {
                 await SendEmailToUser(email,invitation)
                }
 
-        
+              
             // send notification to the user using push notification 
             await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile,"NewInvitationFromCareGiver",{
               Invitation:newInvitation,
@@ -722,6 +730,10 @@ The filter can be based on the status, sent, and received parameters.
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
+        if(profile.Deleted){
+          return errorResMsg(res, 400, req.t("Profile_not_found"));
+        }
+  
         if(profile.Owner.User.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
@@ -824,17 +836,30 @@ retrieves the dependents of the user from from the viewer collection which depen
           
         }).populate({
             path:"Dependents.viewer",
-        })
+        }).populate({
+          path:"Dependents.Profile",
+          select:'Deleted',
+      
+      
+      })
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
+        if(profile.Deleted){
+          return errorResMsg(res, 400, req.t("Profile_not_found"));
+        }
+  
         if(profile.Owner.User._id.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
        
+         
+        const filteredData=profile.Dependents.filter((item)=>{
+          return !item.Profile.Deleted
+        })
 
         responseData=[
-            ...profile.Dependents
+            ...filteredData
         ]
         // return successfully response
         return successResMsg(res, 200, {message:req.t("dependent"),data:responseData});
@@ -920,6 +945,10 @@ Add a new caregiver to a user's profile
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
+        if(profile.Deleted){
+          return errorResMsg(res, 400, req.t("Profile_not_found"));
+        }
+  
        // check if the user if the user is the owner of that profile
         if(profile.Owner.User._id.toString() !== id){
             return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -963,6 +992,9 @@ Add a new caregiver to a user's profile
             const CareGiverprofile = await Profile.findById(user.profile).populate("Owner.User")
             if(!CareGiverprofile){
                 return errorResMsg(res, 400, req.t("profile_not_found"));
+            }
+            if(CareGiverprofile.Deleted){
+              return errorResMsg(res, 400, req.t("Profile_not_found"));
             }
             //check if the invitation sent before
 
@@ -1259,10 +1291,10 @@ retrieves the dependents of the user from the viewer collection which master pro
         }
         const profile = await Profile.findById(ProfileID).populate({
             path: 'Viewers.viewer',
-            select: 'ViewerProfile',
+            
             populate: {
                 path: 'ViewerProfile',
-                select:'User',
+                select:'User Deleted',
                 populate:{
                     path:'Owner.User',
                     select:'firstName lastName nickName img email mobileNumber'
@@ -1273,16 +1305,22 @@ retrieves the dependents of the user from the viewer collection which master pro
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
+        if(profile.Deleted){
+          return errorResMsg(res, 400, req.t("Profile_not_found"));
+        }
+  
         if(profile.Owner.User._id.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
        
         // get user profile dependents
         
-
+        const filteredData=profile.Viewers.filter(elem=>{
+          return !elem.viewer.ViewerProfile.Deleted
+        })
 
         responseData=[
-            ...profile.Viewers
+            ...filteredData
         ]
         // return sucess response
         return successResMsg(res, 200, {message:req.t("caregivers"),data:responseData});
@@ -1396,6 +1434,10 @@ exports.EditCareGiverPermissions = async (req, res) => {
       if(!profile){
           return errorResMsg(res, 400, req.t("profile_not_found"));
       }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
       if(profile.Owner.User._id.toString()!=id){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
@@ -1489,6 +1531,10 @@ exports.DeleteCareGiverPermissions = async (req, res) => {
       if(!profile){
           return errorResMsg(res, 400, req.t("profile_not_found"));
       }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
       if(profile.Owner.User._id.toString()!=id){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
@@ -1576,6 +1622,10 @@ exports.DeleteDependent = async (req, res) => {
       if(!profile){
           return errorResMsg(res, 400, req.t("profile_not_found"));
       }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
       if(profile.Owner.User._id.toString()!=id){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
@@ -1662,6 +1712,10 @@ exports.DeleteInvitation = async (req, res) => {
       if(!profile){
           return errorResMsg(res, 400, req.t("profile_not_found"));
       }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
       if(profile.Owner.User._id.toString()!=id){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }

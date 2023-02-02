@@ -70,7 +70,10 @@ var userSchema = new Schema({
   ShouldRestPassword:{
     type:Boolean,
     default:false
-  }
+  },
+  img:{
+    type:String,
+},
 
  
  
