@@ -204,6 +204,7 @@ exports.getReport=async (req, res) => {
        for (const elem of doses) {
          const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity")
          .populate("Scheduler")
+          .populate("user")
          .select("dosage")
          let DosePerDay=med.Scheduler.dosage.length||0
          
@@ -214,7 +215,10 @@ exports.getReport=async (req, res) => {
               strength:med.strength,  
               unit:med.unit,
               img:med.img,
-              quantity:med.quantity
+              quantity:med.quantity,
+              StartDate:med.Scheduler.StartDate,
+              EndDate:med.Scheduler.EndDate,
+              GenerateAutoOccurrence:med.Scheduler.GenerateAutoOccurrence,
 
            },
            confirmed:elem.confirmed,
@@ -222,6 +226,8 @@ exports.getReport=async (req, res) => {
            other:elem.other,
            total:elem.total,
             ignored:elem.ignored,
+            userFirstName:med.user.firstName,
+            userLastName:med.user.lastName,
             DosePerDay
          })
        }
@@ -321,6 +327,7 @@ exports.getReport=async (req, res) => {
       for (const elem of doses) {
         const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity")
         .populate("Scheduler")
+        .populate("user")
         .select("dosage")
         let DosePerDay=med.Scheduler.dosage.length||0
         
@@ -334,7 +341,10 @@ exports.getReport=async (req, res) => {
             strength:med.strength,  
             unit:med.unit,
             img:med.img,
-            quantity:med.quantity
+            quantity:med.quantity,
+            StartDate:med.Scheduler.StartDate,
+            EndDate:med.Scheduler.EndDate,
+            GenerateAutoOccurrence:med.Scheduler.GenerateAutoOccurrence,
 
          },
           confirmed:elem.confirmed,
@@ -342,6 +352,8 @@ exports.getReport=async (req, res) => {
           other:elem.other,
           total:elem.total,
           ignored:elem.ignored,
+          userFirstName:med.user.firstName,
+          userLastName:med.user.lastName,
           DosePerDay,
         })
       }
