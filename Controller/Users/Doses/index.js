@@ -370,7 +370,8 @@ exports.EditSingleDose=async (req, res) => {
       let {
       OccurrenceId,
       Status,
-      ProfileID
+      ProfileID,
+      RejectionStatus
       }=req.body
   
       // check for permission
@@ -470,7 +471,11 @@ exports.EditSingleDose=async (req, res) => {
       }
       
       // change dose status
-      
+
+      if(Status==4&&RejectionStatus){
+        dose.RejectionStatus=RejectionStatus
+      }
+
      dose.Status=Status
       await dose.save()
   

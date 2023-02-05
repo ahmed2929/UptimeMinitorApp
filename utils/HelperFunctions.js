@@ -116,14 +116,29 @@ const getUserEmailFromId=async(id)=>{
  const SendEmailToUser=async(email,message)=>{
    
     try {
-        const mailOptions = {
-            from: process.env.EmailSender,
-            to: email,
-            subject: "voithy",
-            html: message,
+        // const mailOptions = {
+        //     from: process.env.EmailSender,
+        //     to: email,
+        //     subject: "voithy",
+        //     html: message,
+        //   };
+        const emailMessage = {
+            sender: "DoNotReply@voithy.com",
+            content: {
+              subject: "voithy",
+                html: message,
+            },
+            recipients: {
+              to: [
+                {
+                  email: email,
+                },
+              ],
+            },
+          
           };
-      
-         await mail.sendMail(mailOptions, function (err, info) {
+          
+         await mail.send(emailMessage, function (err, info) {
             if (err) {
               console.log(err)
               throw new Error(err)

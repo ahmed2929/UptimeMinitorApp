@@ -431,11 +431,6 @@ check('Type')
  .notEmpty(),  // Make sure it's not empty
 
 // Validate the strength field
-check('Description')
-.exists()
-.isString()  // Make sure it's a string
-.notEmpty(),  // Make sure it's not empty
-
 // Validate the unit field
 check('StartedIn')
 .exists()
@@ -453,11 +448,7 @@ check('StartedIn')
    return true;
  }),
 
-// Validate the instructions field
-check('Severity')
-.exists()
-.isInt()  // Make sure it's an integer
-.withMessage("Severity_is_invalid")
+
 
     ]
 }
@@ -477,10 +468,7 @@ check('Type')
  .notEmpty(),  // Make sure it's not empty
 
 // Validate the strength field
-check('Description')
-.optional()
-.isString()  // Make sure it's a string
-.notEmpty(),  // Make sure it's not empty
+
 
 // Validate the unit field
 check('StartedIn')
@@ -490,10 +478,6 @@ check('StartedIn')
 
 
 // Validate the instructions field
-check('Severity')
-.optional()
-.isInt()  // Make sure it's an integer
-.withMessage("Severity_is_invalid")
 
 ]
 }

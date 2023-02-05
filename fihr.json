@@ -1,0 +1,228 @@
+{
+    "resourceType": "Patient",
+    "id": "Patient1",
+    "name": [
+      {
+        "given": [
+          "John"
+        ],
+        "family": "Doe"
+      }
+    ],
+    "gender": "male",
+    "address": [
+      {
+        "line": [
+          "123 Main Street"
+        ],
+        "city": "Anytown",
+        "state": "USA"
+      }
+    ],
+    "telecom": [
+      {
+        "system": "phone",
+        "value": "555-555-5555"
+      }
+    ],
+    "birthDate": "1988-07-01",
+    "medicationStatement": [
+      {
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "198326",
+              "display": "Acetaminophen 500mg tablet"
+            }
+          ],
+          "text": "Acetaminophen (Tylenol) 500mg"
+        },
+        "doseAndRate": [
+          {
+            "doseQuantity": {
+              "value": 1,
+              "unit": "tablet",
+              "system": "http://unitsofmeasure.org",
+              "code": "TBLT"
+            },
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                  "code": "ordered"
+                }
+              ]
+            }
+          }
+        ],
+        "timing": {
+          "repeat": {
+            "frequency": 4,
+            "period": 6,
+            "periodUnit": "h"
+          }
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386053000",
+                "display": "Pain"
+              }
+            ]
+          }
+        ],
+        "status": "active"
+      },
+      {
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "846235",
+              "display": "Amlodipine 10mg tablet"
+            }
+          ],
+          "text": "Amlodipine (Norvasc) 10mg"
+        },
+        "doseAndRate": [
+          {
+            "doseQuantity": {
+              "value": 1,
+              "unit": "tablet",
+              "system": "http://unitsofmeasure.org",
+              "code": "TBLT"
+            },
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                  "code": "ordered"
+                }
+              ]
+            }
+          }
+        ],
+        "timing": {
+            "repeat": {
+              "frequency": 1,
+              "period": 1,
+              "periodUnit": "d"
+            }
+          },
+          "reasonCode": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "38341003",
+                  "display": "Hypertension"
+                }
+              ]
+            }
+          ],
+          "status": "active"
+        },
+        {
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "102390",
+                "display": "Atorvastatin 20mg tablet"
+              }
+            ],
+            "text": "Atorvastatin (Lipitor) 20mg"
+          },
+          "doseAndRate": [
+            {
+              "doseQuantity": {
+                "value": 1,
+                "unit": "tablet",
+                "system": "http://unitsofmeasure.org",
+                "code": "TBLT"
+              },
+              "type": {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                    "code": "ordered"
+                  }
+                ]
+              }
+            }
+          ],
+          "timing": {
+            "repeat": {
+              "frequency": 1,
+              "period": 1,
+              "periodUnit": "d"
+            }
+          },
+          "reasonCode": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "185739006",
+                  "display": "High cholesterol"
+                }
+              ]
+            }
+          ],
+          "status": "active"
+        },
+        {
+          "medicationCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code": "719892",
+                "display": "Metformin 1000mg tablet"
+              }
+            ],
+            "text": "Metformin (Glucophage) 1000mg"
+          },
+          "doseAndRate": [
+            {
+              "doseQuantity": {
+                "value": 1,
+                "unit": "tablet",
+                "system": "http://unitsofmeasure.org",
+                "code": "TBLT"
+              },
+              "type": {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                    "code": "ordered"
+                  }
+                ]
+              }
+            }
+          ],
+          "timing": {
+            "repeat": {
+              "frequency": 2,
+              "period": 1,
+              "periodUnit": "d"
+            }
+          },
+          "reasonCode": [
+            {
+              "coding": [
+                {
+                  
+                  "system": "http://snomed.info/sct",
+              "code": "73211009",
+              "display": "Type 2 diabetes mellitus"
+            }
+          ]
+        }
+      ],
+      "status": "active"
+    }
+  ]
+}

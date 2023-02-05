@@ -67,6 +67,10 @@ var OccurrencesSchema = new Schema({
   },
   DosageID:{
     type:mongoose.Schema.Types.ObjectId,
+  },
+  RejectionStatus:{
+    type:Number,
+    //0 i didnt remember/busy,1:medicine is out of stock,2:no need anymore to take this dose 3:shows symptom and side effects,:4cost,5:medicine is far from my side,6:other
   }
 
  
