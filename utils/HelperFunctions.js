@@ -195,8 +195,20 @@ const getUserEmailFromId=async(id)=>{
         var endDayResultWithOneDay = new Date(endDate);
         endDayResultWithOneDay.setDate(endDayResultWithOneDay.getDate() + 1);
         endDate = endDayResultWithOneDay;
+        console.log("startDate is :",startDate)
+        console.log("occurence generation started :",baseDate)
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
 
         while (baseDate <= endDate ) {
+            let Status=0
+            if(new Date(baseDate)<new Date(oneHourAgo)){
+                Status=3
+            }else if(new Date(baseDate)<new Date(HalfAnHourAgo)){
+                Status=5
+            }else if (new Date(baseDate)<new Date()){
+                Status=1
+            }
             finalArrObj.push(
                 {
                     user:UserID,
@@ -204,6 +216,7 @@ const getUserEmailFromId=async(id)=>{
                     Scheduler:SchedulerId,
                     MedInfo:{...MedInfo},
                     PlannedDateTime:new Date(baseDate),
+                    Status:Status,
                     ...OccurrencesData
     
                 }
@@ -253,7 +266,17 @@ const getUserEmailFromId=async(id)=>{
             console.log(shouldAdded)
             console.log("dayna,e",dayName)
             console.log("intervalDays",intervalDays)
-            
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+            const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+            let Status=0
+            if(new Date(baseDate)<new Date(oneHourAgo)){
+                Status=3
+            }else if(new Date(baseDate)<new Date(HalfAnHourAgo)){
+                Status=5
+            }else if (new Date(baseDate)<new Date()){
+                Status=1
+            }
             if(shouldAdded){
 
             finalArrObj.push(
@@ -263,6 +286,7 @@ const getUserEmailFromId=async(id)=>{
                     Scheduler:SchedulerId,
                     MedInfo:{...MedInfo},
                     PlannedDateTime:new Date(baseDate),
+                    Status:Status,
                     ...OccurrencesData
     
                 }
@@ -497,7 +521,50 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                     await sendNotification(userprofile._id,Android_payload,"Android",6,payloadData)
                 } 
             break;
+            case "NewSymptom":
+                 //i case of only IOS
+                    if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                        //save notification in db
+                        const notification = new Notification({
+                            ProfileID:userprofile._id,
+                            data:payloadData,
+                            action:8
+                            
+                        })
+                        await notification.save()
+                        payload=NotificationMessages.NewSymptom_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                        await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
 
+                    }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                        //save notification in db
+                        const notification = new Notification({
+                            ProfileID:userprofile._id,
+                            data:payloadData,
+                            action:8
+                            
+                        })
+                        await notification.save()
+                        payload=NotificationMessages.NewSymptom_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                        await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+
+                    }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                     //save notification in db
+                     const notification = new Notification({
+                        ProfileID:userprofile._id,
+                        data:payloadData,
+                        action:8
+                        
+                    })
+                    await notification.save()   
+                    const IOS_payload=NotificationMessages.NewSymptom_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+
+                    const Android_payload=NotificationMessages.NewSymptom_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                    //case of both
+                        await sendNotification(userprofile._id,IOS_payload,"IOS",8,payloadData)
+                        await sendNotification(userprofile._id,Android_payload,"Android",8,payloadData)
+                    } 
+                break;
+            
             default:
                 break;
 
@@ -719,6 +786,50 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                     await sendNotification(userprofile._id,Android_payload,"Android",6,payloadData)
                 } 
             break;
+            case "NewSymptom":
+                //i case of only IOS
+                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:8
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewSymptom_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
+
+                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:8
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewSymptom_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+
+                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                    //save notification in db
+                    const notification = new Notification({
+                       ProfileID:userprofile._id,
+                       data:payloadData,
+                       action:8
+                       
+                   })
+                   await notification.save()   
+                   const IOS_payload=NotificationMessages.NewSymptom_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+
+                   const Android_payload=NotificationMessages.NewSymptom_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                   //case of both
+                       await sendNotification(userprofile._id,IOS_payload,"IOS",8,payloadData)
+                       await sendNotification(userprofile._id,Android_payload,"Android",8,payloadData)
+                   } 
+               break;
+           
 
             default:
                 break;

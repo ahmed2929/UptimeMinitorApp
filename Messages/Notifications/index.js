@@ -136,6 +136,36 @@ exports.RefileAlert_AR_GCM=(patientName,MedName,MedID,NotificationActionType,Not
     }
 }
 
+exports.NewSymptom_EN_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "notification":{
+           
+                "title": `patient has new symptom`,
+                "body": `${patientName} has new symptom `
+            },
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            
+        }
+    }
+}
+
+exports.NewSymptom_AR_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "notification":{
+            "title": `المريض لديه عرض جديد`,
+                "body": `${patientName} لديه عرض جديد`
+            },
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            
+        }
+    }
+}
 
 /////////////////////////////////////////IOS/////////////////////////////////////////
 
@@ -289,6 +319,37 @@ exports.RefileAlert_AR_APNS=(patientName,MedName,MedID,NotificationActionType,No
             },
             "data":{
                 "MedID": `${MedID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            }
+        }
+    }
+}
+
+exports.NewSymptom_EN_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "aps":{
+            "alert":{
+                "title": `patient has new symptom`,
+                "body": `${patientName} has new symptom `
+            },
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            }
+        }
+    }
+}
+exports.NewSymptom_AR_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "aps":{
+            "alert":{
+                "title": `المريض لديه عرض جديد`,
+                "body": `${patientName} لديه عرض جديد`
+            },
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
                 "NotificationActionType":`${NotificationActionType}`,
                 "NotificationID":`${NotificationID}`
             }

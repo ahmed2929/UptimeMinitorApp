@@ -10,6 +10,8 @@
 
 const {UploadFileToAzureBlob} =require("../../../utils/HelperFunctions")
 const Viewer =require("../../../DB/Schema/Viewers")
+const {SendPushNotificationToUserRegardlessLangAndOs} =require("../../../utils/HelperFunctions")
+
 const {
   successResMsg,
   errorResMsg
@@ -153,6 +155,27 @@ exports.CreateSymptom = async (req, res) => {
     const responseData={
       ...newSymton._doc,
     }
+    //send notification to his care circle
+    const careCircle =await Viewer.find({
+      DependentProfile:ProfileID,
+      IsDeleted:false,
+      CanViewSymptoms:true,
+      notify:true
+    })
+    .populate("ViewerProfile")
+    for await (const viewer of careCircle) {
+      await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"NewSymptom",{
+        SymptomId:newSymton._id,
+        ProfileInfoOfSender:{
+          firstName:profile.Owner.User.firstName,
+          lastName:profile.Owner.User.lastName,
+          img:profile.Owner.User.img,
+          email:profile.Owner.User.email,
+          ProfileID:profile._id,
+        }
+      })
+    }
+
       // return successful response
       return successResMsg(res, 200, {message:req.t("symtom_created"),data:responseData});
       

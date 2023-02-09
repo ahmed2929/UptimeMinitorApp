@@ -285,7 +285,8 @@ exports.CreateNewMed = async (req, res) => {
      // validate Scheduler 
      const ValidateScheduler= await CreateNewScheduler(jsonScheduler,newMed,id,ProfileID,viewerProfile,req,res)
 
-
+      console.log("ValidateScheduler **************",ValidateScheduler)
+      console.log("jsonScheduler **************",ValidateScheduler)
       // create Occurrences
     const newScheduler= await CreateOccurrences(jsonScheduler,ValidateScheduler,id,newMed,MedInfo,ProfileID,viewerProfile,req,res)
      
@@ -735,26 +736,86 @@ exports.CreateNewMed = async (req, res) => {
     // case general permission
     if(hasGeneralReadPermissions){
       const Medication =await UserMedication.find({
-        ProfileID
+        ProfileID,
+        isDeleted:false
   
       })
       .populate("Scheduler")
       
+      const editedMedications=[]
+      for await(const med of Medication){
+        const doses=await Occurrence.find({
+          Medication:med._id.toString(),
+          Scheduler:med.Scheduler._id,
+          PlannedDateTime:{$gte:new Date()},
+          isSuspended:true
+        })
+        if(doses.length>0){
+          
+         
+          editedMedications.push({
+            ...med._doc,
+            hasSuspendedDoses:true
+          })
+        }else{
+         
+          editedMedications.push({
+            
+              ...med._doc,
+              hasSuspendedDoses:false
+            
+          })
+        }
+
+      }
+
+      
+      
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Success"),data:Medication});
+      return successResMsg(res, 200, {message:req.t("Success"),data:editedMedications});
   
     }else if(hasSpacificReadPermissions.length>0){
       // case spacific permission
       const Medication =await UserMedication.find({
         ProfileID,
-        _id:{$in:hasSpacificReadPermissions}
+        _id:{$in:hasSpacificReadPermissions},
+        isDeleted:false
       })
       .populate("Scheduler")
+
+      const editedMedications=[]
+      for await(const med of Medication){
+        const doses=await Occurrence.find({
+          Medication:med._id.toString(),
+          Scheduler:med.Scheduler._id,
+          PlannedDateTime:{$gte:new Date()},
+          isSuspended:true
+        })
+        if(doses.length>0){
+          
+          
+          editedMedications.push({
+            
+            ...med._doc,
+            hasSuspendedDoses:true
+          
+        })
+        }else{
+          
+          editedMedications.push({
+            
+            ...med._doc,
+            hasSuspendedDoses:false
+          
+        })
+        }
+
+      }
 
 
       
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Success"),data:Medication});
+      return successResMsg(res, 200, {message:req.t("Success"),data:editedMedications});
     }else{
       return errorResMsg(res, 401, req.t("Unauthorized"));
     }

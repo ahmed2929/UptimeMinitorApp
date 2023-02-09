@@ -36,7 +36,7 @@ const sendNotification= async(profileId, payload,pns)=>{
   return new Promise((resolve,reject)=>{
     if(pns==="IOS"){
       const iosTags = [profileId];
-      notificationHubService.send(payload, iosTags, (error,result)=>{
+      notificationHubService.apns.send(payload, iosTags, (error,result)=>{
         if(!error){
         console.log(`iOS Notification sent to ${result.targetCount} devices`);
         resolve(result);
@@ -48,7 +48,7 @@ const sendNotification= async(profileId, payload,pns)=>{
       });
     }else if(pns==="Android"){
       const androidTags = [profileId];
-      notificationHubService.send(payload, androidTags, (error,result)=>{
+      notificationHubService.gcm.send(payload, androidTags, (error,result)=>{
         if(!error){
         console.log(`Android Notification sent to ${result.targetCount} devices`);
         resolve(result);

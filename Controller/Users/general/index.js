@@ -133,6 +133,10 @@ exports.Notification = async (req, res) => {
           
 
           }).countDocuments();
+          const totalNumberOfUnseen = await NotificationSchema.find({
+            ProfileID:ProfileID,
+            Seen:false
+            }).countDocuments();
           const notifications = await NotificationSchema.find({
             ProfileID:ProfileID
           
@@ -144,6 +148,7 @@ exports.Notification = async (req, res) => {
          
            const results= {
                 total:totalItems,
+                unSeen:totalNumberOfUnseen,
                 notifications
               }
        

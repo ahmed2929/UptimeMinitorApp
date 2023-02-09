@@ -156,7 +156,7 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
         }
       
         // get scheuler senario 
-        if(!newScheduler.ScheduleType){
+        if(!newScheduler.ScheduleType&&newScheduler.ScheduleType!=0){
           return errorResMsg(res, 400, req.t("Scheduler_type_required"));
           
         }
@@ -177,20 +177,14 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
           
           let startDate = new Date(+newScheduler.StartDate);
           let DoseTime = new Date(+doseElement.DateTime);
-
+          console.log("StartDate",startDate)
+          console.log("json startdate",+newScheduler.StartDate)
           if(editApi){
             const today=new Date()
             today.setHours(0, 0, 0, 0);
 
             if(startDate<today){
               startDate=today
-            }
-
-            }
-
-
-          
-
 
           let hours = DoseTime.getHours();
           let minutes = DoseTime.getMinutes();
@@ -199,6 +193,13 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
           startDate.setHours(hours);
           startDate.setMinutes(minutes);
           startDate.setSeconds(seconds);
+
+            }
+
+            }else{
+              startDate=new Date(+doseElement.DateTime);
+            }
+
 
 
 
@@ -228,7 +229,8 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
             end=new Date(newScheduler.EndDate)
     
           }
-       
+          
+          console.log("srart date will be ", start)
           
           const newOccurrences=await GenerateOccurrences(id,newMed._id,MedInfo,newScheduler._id,occurrencePattern,start,end,OccurrencesData,req,res)
           occurrences.push(...newOccurrences);
@@ -243,13 +245,20 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
      
         
     
-        }else if (newScheduler.ScheduleType=='0'){
+        }else if (newScheduler.ScheduleType=='0'||newScheduler.ScheduleType==0){
     
           // case user choose specific days
           const occurrences=[]
         for(const doseElement of newScheduler.dosage){
           let startDate = new Date(+newScheduler.StartDate);
           let DoseTime = new Date(+doseElement.DateTime);
+
+          if(editApi){
+            const today=new Date()
+            today.setHours(0, 0, 0, 0);
+
+            if(startDate<today){
+              startDate=today
 
           let hours = DoseTime.getHours();
           let minutes = DoseTime.getMinutes();
@@ -258,6 +267,13 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
           startDate.setHours(hours);
           startDate.setMinutes(minutes);
           startDate.setSeconds(seconds);
+
+            }
+
+            }else{
+              startDate=new Date(+doseElement.DateTime);
+            }
+
           const OccurrencesData={
             PlannedDose:doseElement.dose,
             ProfileID,
