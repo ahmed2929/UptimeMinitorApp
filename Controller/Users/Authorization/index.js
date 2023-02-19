@@ -169,6 +169,7 @@ exports.logIn = async (req, res) => {
     console.log("email is ",email)
     const user = await User.findOne({
       email,
+      IsDependent:false
     }).select("+password");
     console.log("user i s ",user)
     if(!user){

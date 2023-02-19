@@ -6,21 +6,20 @@ const Schema = mongoose.Schema;
 var userSchema = new Schema({
   firstName:{
     type:String,
-    required:true,
+  
 
   },
   lastName:{
     type:String,
-    required:true,
+    
   },
   email: {
     type: String,
     trim: true,
     lowercase: true,
-    unique: true,
-    index:true,
-    required: 'Email address is required',
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
+   
+
   },
   
   password: {
@@ -42,11 +41,11 @@ var userSchema = new Schema({
   mobileNumber:{
     countryCode:{
       type:String,
-      required:true,
+    
     },
     phoneNumber:{
       type:String,
-      required:true
+     
     }
   },
   RestPasswordCode:{
@@ -73,7 +72,21 @@ var userSchema = new Schema({
   },
   img:{
     type:String,
-},
+    default:null
+  },
+  IsDependent:{
+    type:Boolean,
+    default:false
+  },
+  MasterUsers:[{
+    type:Schema.Types.ObjectId,
+    ref:"User",
+}],
+MasterProfiles:[{
+    type:Schema.Types.ObjectId,
+    ref:"Profile",
+}]
+
 
  
  

@@ -62,6 +62,85 @@ exports.InvitationSentToExistentDependentUser_EN = (InvitationFrom,userName) => 
        
 `}
 
+exports.InvitationSentToCareGiverToBeMaster_EN = (InvitationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to be your master </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+       
+`}
+
+exports.InvitationSentToCareGiverToBeMaster_AR = (InvitationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to be your master (arabic) </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+       
+`}
+
+
+exports.InvitationSentToMyDependent_EN = (InvitationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent  invitation to be a caregiver to one of your dependents </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+       
+`}
+exports.InvitationSentToMyDependent_AR= (InvitationFrom,userName) => {
+	return `
+    <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
+    <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
+        
+        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent  invitation to be a caregiver to one of your dependents (arabic version) </p>
+
+    
+        <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
+            
+        
+        </p>
+        
+       
+        </div>
+    </div>
+</div>
+       
+`}
 
 exports.InvitationSentToExistentDependentUser_AR= (InvitationFrom,userName) => {
 	return `

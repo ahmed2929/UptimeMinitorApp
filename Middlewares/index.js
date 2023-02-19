@@ -19,6 +19,7 @@ const Medication =require("../routes/medication")
 const Symptom =require("../routes/symptom")
 const Reports =require("../routes/reports")
 const Settings =require("../routes/settings")
+const OwnerShip =require("../routes/OwnerShip")
 // set localiztion config
 i18next.use(Backend).use(i18nextMiddleware.LanguageDetector)
 .init({
@@ -108,6 +109,7 @@ app.get("/", (req, res) => {
   app.use("/api/v1/symptom",Symptom)
   app.use("/api/v1/report",Reports)
   app.use("/api/v1/settings",Settings)
+  app.use("/api/v1/ownership",OwnerShip)
 
   
 

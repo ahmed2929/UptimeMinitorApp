@@ -2,10 +2,11 @@ const azure = require('azure-sb');
 const hubName = process.env.AzureNotificationHubName;
 const connectionString = process.env.AzureNotificationHubConnectionString;
 const Notification = require('../DB/Schema/Notifications')
-const sendNotification= async(profileId, payload,pns)=>{
+const sendNotification= async(profileId, message,pns)=>{
+  console.log("sendNotification",profileId,message,pns);
     // pns is device os
     profileId=profileId.toString()
-    console.log("sendNotification",profileId,payload,pns);
+    console.log("sendNotification",profileId,message,pns);
 
  
 
@@ -34,11 +35,14 @@ const sendNotification= async(profileId, payload,pns)=>{
   //   }
   // };
   return new Promise((resolve,reject)=>{
+    console.log("send notification runs")
+    const tag = profileId;
+
     if(pns==="IOS"){
-      const iosTags = [profileId];
-      notificationHubService.apns.send(payload, iosTags, (error,result)=>{
+    
+      notificationHubService.apns.send(tag,message, (error,result)=>{
         if(!error){
-        console.log(`iOS Notification sent to ${result.targetCount} devices`);
+        console.log(`iOS Notification sent to ${result} devices`);
         resolve(result);
         }
         else{
@@ -47,9 +51,11 @@ const sendNotification= async(profileId, payload,pns)=>{
         }
       });
     }else if(pns==="Android"){
-      const androidTags = [profileId];
-      notificationHubService.gcm.send(payload, androidTags, (error,result)=>{
+      console.log("Android tag",tag)
+      notificationHubService.gcm.send(tag,message,(error,result)=>{
         if(!error){
+        console.log("result",result)
+          
         console.log(`Android Notification sent to ${result.targetCount} devices`);
         resolve(result);
         }

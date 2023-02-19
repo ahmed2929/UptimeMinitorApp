@@ -76,7 +76,11 @@ var MedicationSchema = new Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'Scheduler'
 
-  }]
+  }],
+  Ringtone:{
+    type:String,
+    default:'default'
+  }
  
 
   

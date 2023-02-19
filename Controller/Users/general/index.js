@@ -151,6 +151,8 @@ exports.Notification = async (req, res) => {
                 unSeen:totalNumberOfUnseen,
                 notifications
               }
+    
+    // return successful response
        
     return successResMsg(res, 200, {data:results});
   } catch (err) {

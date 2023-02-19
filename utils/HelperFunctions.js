@@ -17,6 +17,10 @@ const {sendNotification} =require("../config/SendNotification")
 const Profile = require('../DB/Schema/Profile');
 const Viewer =require('../DB/Schema/Viewers')
 const Notification = require('../DB/Schema/Notifications')
+const mongoose = require('mongoose');
+const Occurrence = require("../DB/Schema/Occurrences");
+const Symptom = require("../DB/Schema/Symptoms");
+
 // create refresh token
 
 /**
@@ -564,7 +568,49 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                         await sendNotification(userprofile._id,Android_payload,"Android",8,payloadData)
                     } 
                 break;
-            
+                case "NewInvitationToBeMasterUser":
+                    //i case of only IOS
+                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:9
+                               
+                           })
+                           await notification.save()
+                           payload=NotificationMessages.NewInvitationFromCareGiver_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
+                           await sendNotification(userprofile._id,payload,"IOS",9,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:9
+                               
+                           })
+                           await notification.save()
+                       payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
+                           //case of only android
+                           await sendNotification(userprofile._id,payload,"Android",9,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                        //save notification in db
+                        const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:9
+                           
+                       })
+                       await notification.save()   
+                       const IOS_payload=  NotificationMessages.NewInvitationFromCareGiver_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
+                       const Android_payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
+                       //case of both
+                           await sendNotification(userprofile._id,IOS_payload,"IOS",9,payloadData)
+                           await sendNotification(userprofile._id,Android_payload,"Android",9,payloadData)
+                       } 
+                   break;
             default:
                 break;
 
@@ -959,6 +1005,371 @@ const CompareOldSchedulerWithTheNewScheduler=async(jsonScheduler,OldScheduler)=>
   
 }
 
+const IsMasterOwnerToThatProfile=async(CallerID,DependentProfile)=>{
+    try {
+      if(!DependentProfile.MasterUsers){
+        return false
+      }
+      if(!DependentProfile.MasterUsers.includes(mongoose.Types.ObjectId(CallerID))){
+        return false
+      }
+     return true;
+
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+
+}
+
+const GetDosesForProfileID=async(ProfileID,startDate,EndDate)=>{
+    try {
+        const CallerDoses =await Occurrence.find({
+            ProfileID:ProfileID,
+            PlannedDateTime:{$gte:startDate,$lt:EndDate},
+            isSuspended:false
+      
+          }).select(
+            "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID"
+          ).populate("Scheduler")
+          
+          return CallerDoses
+
+
+    } catch (error) {
+        console.log(error)
+        
+    }
+
+}
+
+const GetDosesForListOfProfiles=async(ProfileIDs,startDate,EndDate)=>{
+    try {
+        const GroupedDoses =await Occurrence.aggregate([
+            {
+              $match: {
+                ProfileID: { $in: ProfileIDs },
+                PlannedDateTime: { $gte: startDate, $lt: new Date(+EndDate) },
+                isSuspended: false,
+              },
+            },
+            {
+              $lookup: {
+                from: "profiles",
+                localField: "ProfileID",
+                foreignField: "_id",
+                as: "profile",
+              },
+            },
+            {
+              $unwind: "$profile",
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "profile.Owner.User",
+                foreignField: "_id",
+                as: "user",
+              },
+            },
+            {
+              $unwind: "$user",
+            },
+            {
+              $lookup: {
+                from: "schedulers",
+                localField: "Scheduler",
+                foreignField: "_id",
+                as: "scheduler",
+              },
+            },
+            {
+              $unwind: "$scheduler",
+            },
+            {
+              $group: {
+                _id: "$ProfileID",
+                doses: {
+                  $push: {
+                    PlannedDateTime: "$PlannedDateTime",
+                    PlannedDose: "$PlannedDose",
+                    Status: "$Status",
+                    Medication: "$Medication",
+                    Scheduler: "$scheduler",
+                    MedInfo: "$MedInfo",
+                    _id: "$_id",
+                   
+                  },
+                },
+                owner: {
+                  $first: "$user",
+                },
+                profile: {
+                  $first: "$profile",
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                ProfileID: "$_id",
+                doses: 1,
+                owner: {
+                  firstName: "$owner.firstName",
+                  lastName: "$owner.lastName",
+                  email: "$owner.email",
+                  img:"$owner.img"
+                },
+                dependantName: "$profile.dependantName",
+              },
+            },
+          ]);
+          return GroupedDoses
+
+
+    } catch (error) {
+        console.log(error)
+        
+    }
+
+}
+
+
+const GetDosesForListOfMedications=async(MedicationIDSList,startDate,EndDate)=>{
+    try {
+        const GroupedDoses =await Occurrence.aggregate([
+            {
+              $match: {
+                Medication: { $in: MedicationIDSList },
+                PlannedDateTime: { $gte: startDate, $lt: new Date(+EndDate) },
+                isSuspended: false,
+              },
+            },
+            {
+              $lookup: {
+                from: "profiles",
+                localField: "ProfileID",
+                foreignField: "_id",
+                as: "profile",
+              },
+            },
+            {
+              $unwind: "$profile",
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "profile.Owner.User",
+                foreignField: "_id",
+                as: "user",
+              },
+            },
+            {
+              $unwind: "$user",
+            },
+            {
+              $lookup: {
+                from: "schedulers",
+                localField: "Scheduler",
+                foreignField: "_id",
+                as: "scheduler",
+              },
+            },
+            {
+              $unwind: "$scheduler",
+            },
+            {
+              $group: {
+                _id: "$ProfileID",
+                doses: {
+                  $push: {
+                    PlannedDateTime: "$PlannedDateTime",
+                    PlannedDose: "$PlannedDose",
+                    Status: "$Status",
+                    Medication: "$Medication",
+                    Scheduler: "$scheduler",
+                    MedInfo: "$MedInfo",
+                    _id: "$_id",
+                   
+                  },
+                },
+                owner: {
+                  $first: "$user",
+                },
+                profile: {
+                  $first: "$profile",
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                ProfileID: "$_id",
+                doses: 1,
+                owner: {
+                  firstName: "$owner.firstName",
+                  lastName: "$owner.lastName",
+                  email: "$owner.email",
+                  img:"$owner.img"
+                },
+                dependantName: "$profile.dependantName",
+              },
+            },
+          ]);
+          return GroupedDoses
+
+
+    } catch (error) {
+        console.log(error)
+        
+    }
+
+}
+
+const BindNickNameWithDependent=async(DependentsList,NickNameMap)=>{
+    try {
+       const result=await DependentsList.map(elem=>{
+        const clonedObject = JSON.parse(JSON.stringify(elem));
+        return {
+            ...clonedObject,
+            DependentProfileNickName:NickNameMap[clonedObject.ProfileID]
+        }
+       })
+       return result
+
+    } catch (error) {
+        console.log(error)
+        
+    }
+
+}
+
+const BindNickNameWithDependentSymptom=async(DependentsList,NickNameMap)=>{
+  try {
+     const result=await DependentsList.map(elem=>{
+      const clonedObject = JSON.parse(JSON.stringify(elem));
+      return {
+          ...clonedObject,
+          DependentProfileNickName:NickNameMap[clonedObject.Profile]
+      }
+     })
+     return result
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+
+const GetSymptomForProfileID=async(ProfileID,startDate,EndDate)=>{
+    try {
+        const symptoms =await Symptom.find({
+            Profile:ProfileID,
+            StartedIn:{
+              $gte:new Date(+startDate),
+              $lte:new Date (+EndDate)
+            },
+            isDeleted:false
+      
+          }).select("-User")
+          return symptoms
+
+
+    } catch (error) {
+        console.log(error)
+        
+    }
+
+}
+
+const GetSymptomForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
+    try {
+      const symptoms = await Symptom.aggregate([
+        {
+          $match: {
+            Profile: { $in: ProfileIDsList },
+            StartedIn: {
+              $gte: new Date(+startDate),
+              $lte: new Date(+EndDate)
+            },
+            isDeleted: false
+          }
+        },
+        {
+          $lookup: {
+            from: "profiles",
+            localField: "Profile",
+            foreignField: "_id",
+            as: "profile",
+          },
+        },
+        {
+          $unwind: "$profile",
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "profile.Owner.User",
+            foreignField: "_id",
+            as: "user",
+          },
+         
+        },
+        {
+          $unwind: "$user",
+        },
+  
+        {
+          $group: {
+            _id: "$Profile",
+            Symptoms: {
+              $push: {
+                StartedIn: "$StartedIn",
+                img: "$img",
+                Type: "$Type",
+                Description: "$Description",
+                Severity:"$Severity",
+                VoiceRecord:"$VoiceRecord",
+                Profile:"$Profile",
+                CreatorProfile:"$CreatorProfile",
+                EditedBy:"$EditedBy",
+                _id: "$_id",
+               
+              },
+            },
+            owner: {
+              $first: "$user",
+            },
+            profile: {
+              $first: "$profile",
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            Profile: "$_id",
+            Symptoms: 1,
+            owner: {
+              firstName: "$owner.firstName",
+              lastName: "$owner.lastName",
+              email: "$owner.email",
+              img:"$owner.img"
+            },
+          },
+        },
+      ]);
+      
+    return symptoms
+
+    } catch (error) {
+        console.log(error)
+        
+    }
+
+}
 module.exports={
     GenerateToken,
     GenerateRandomCode,
@@ -972,5 +1383,13 @@ module.exports={
     CheckRelationShipBetweenCareGiverAndDependent,
     CareGiverCanAddMed,
     CareGiverCanAddSymptoms,
-    CompareOldSchedulerWithTheNewScheduler
+    CompareOldSchedulerWithTheNewScheduler,
+    IsMasterOwnerToThatProfile,
+    GetDosesForProfileID,
+    GetDosesForListOfProfiles,
+    GetDosesForListOfMedications,
+    BindNickNameWithDependent,
+    GetSymptomForProfileID,
+    GetSymptomForProfileIDList,
+    BindNickNameWithDependentSymptom
 }

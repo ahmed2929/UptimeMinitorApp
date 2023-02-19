@@ -15,6 +15,12 @@ const {
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 const Profile = require("../../../DB/Schema/Profile")
+const {
+   GetDosesForProfileID,
+  GetDosesForListOfProfiles,
+  GetDosesForListOfMedications,
+  BindNickNameWithDependent
+} =require("../../../utils/HelperFunctions")
 
 
 
@@ -146,9 +152,9 @@ exports.EditSingleDose=async (req, res) => {
         
       }
       //case the owner dont has write permission
-      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-        return errorResMsg(res, 401, req.t("Unauthorized"));
-      }
+      // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      //   return errorResMsg(res, 401, req.t("Unauthorized"));
+      // }
   
   
       // start edit Occurrence
@@ -283,9 +289,9 @@ exports.EditSingleDose=async (req, res) => {
         
       }
       //case the owner dont has write permission
-      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-        return errorResMsg(res, 401, req.t("Unauthorized"));
-      }
+      // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      //   return errorResMsg(res, 401, req.t("Unauthorized"));
+      // }
   
   
       
@@ -432,9 +438,9 @@ exports.EditSingleDose=async (req, res) => {
         
       }
       //case the owner dont has write permission
-      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-        return errorResMsg(res, 401, req.t("Unauthorized"));
-      }
+      // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      //   return errorResMsg(res, 401, req.t("Unauthorized"));
+      // }
   
   
   
@@ -621,7 +627,7 @@ exports.EditSingleDose=async (req, res) => {
     
         }).select(
           "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id"
-        )
+        ).populate("Scheduler")
           // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:doses});
       }else if(hasSpacificReadPermissions.length>0){ //has spacific permission
@@ -634,7 +640,7 @@ exports.EditSingleDose=async (req, res) => {
     
         }).select(
           "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id"
-        )
+        ).populate("Scheduler")
        
           // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:doses});
@@ -709,7 +715,7 @@ exports.EditSingleDose=async (req, res) => {
       EndDate
       }=req.query
   
-               /*
+      /*
       
       check permission 
       
@@ -733,36 +739,12 @@ exports.EditSingleDose=async (req, res) => {
       if(viewerProfile.Deleted){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-      const viewer =await Viewer.findOne({
-       ViewerProfile:viewerProfile._id,
-       DependentProfile:ProfileID,
-       IsDeleted:false
-
-      })
-      if(!viewer&&profile.Owner.User.toString()!==id){
+      
+      if(profile.Owner.User.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
-      // check if the user is the owner and has write permission or can add meds
-        //case the owner dont has write permission
-        if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
-          return errorResMsg(res, 401, req.t("Unauthorized"));
-        }
-        let hasGeneralReadPermissions;
-        let hasSpacificReadPermissions;
-        if(profile.Owner.User.toString()===id){
-          hasGeneralReadPermissions=true
-        }else{
-          hasGeneralReadPermissions=viewer.CanReadDoses;
-          hasSpacificReadPermissions=viewer.CanReadSpacificMeds.map(elem=>{
-           if(elem.CanReadDoses){
-             return elem.Med
-           }
-         });
-        }
+     
       
-  
-  
-  
       // get Occurrences which equal today
       if(!date){
         date=new Date()
@@ -774,77 +756,58 @@ exports.EditSingleDose=async (req, res) => {
         nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
         }else{
         nextDay=EndDate
-        }
-      
-        // get all my dependents
-      const mydependents =await Viewer.find({
+      }
+
+      const MyDependents =await Viewer.find({
         ViewerProfile:viewerProfile._id,
         IsDeleted:false
       })
-      
-      const dependentsProfiles =mydependents.filter(elem=>{
+      const NickNameHashTable={}
+      MyDependents.forEach(element => {
+        NickNameHashTable[`${element.DependentProfile}`]=element.DependentProfileNickName
+      });
+      const dependentsProfiles =MyDependents.filter(elem=>{
         return elem.CanReadDoses;
       })
       const dependentsProfilesIDs =dependentsProfiles.map(elem=>{
         return elem.DependentProfile
       })
-      // push the viewer profile to dependentsProfileIDs
-      dependentsProfilesIDs.push(viewerProfile._id)
-  
-      // get general permissions doses
-      const generalDoses =await Occurrence.find({
-        ProfileID:{$in:dependentsProfilesIDs},
-        PlannedDateTime:{$gte:queryDate,$lt:nextDay},
-        isSuspended:false
-  
-      }).select(
-        "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID"
-      )
-      .populate({
-        path:"ProfileID",
-        select:"Owner.User",
-        populate:{
-          path:"Owner.User",
-          select:"firstName lastName email"
-        }
-  
-      })
-  
-      // get doses which i has read permissions to
-      const dependentsWithSpacific =mydependents.filter(elem=>{
+
+      const DependentsWithSpacificMeds =MyDependents.filter(elem=>{
         return !elem.CanReadDoses;
       })
-      const dependentsSpacificMeds =[]
+      const DependentsSpacificMedsIDS =[]
       
-      dependentsWithSpacific.forEach(dependent=>{
+      DependentsWithSpacificMeds.forEach(dependent=>{
         dependent.CanReadSpacificMeds.forEach(elem=>{
           if(elem.CanReadDoses){
-            dependentsSpacificMeds.push(elem.Med)
+            DependentsSpacificMedsIDS.push(elem.Med)
           }
         })
   
       })
-      const spacificDoses =await Occurrence.find({
-        PlannedDateTime:{$gte:queryDate,$lt:nextDay},
-        isSuspended:false,
-        Medication:{$in:dependentsSpacificMeds}
+      // get caller doses
+      const MyDoses =await GetDosesForProfileID(ProfileID,queryDate,nextDay)
+      // get Dependents Doses that has a general read perm
+      const DependentsGeneralDoses =await GetDosesForListOfProfiles(dependentsProfilesIDs,queryDate,nextDay) 
+      // get specific Meds
+      const DependentsSpacificDoses =await GetDosesForListOfMedications(DependentsSpacificMedsIDS,queryDate,nextDay) 
+      console.log(DependentsSpacificDoses)
+      // bind nickname with dependent
+
+      const BindNickNameWithDependentList =await BindNickNameWithDependent([...DependentsGeneralDoses,...DependentsSpacificDoses],NickNameHashTable) 
+
+    
+     
   
-      })
-      .select("PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID")
-      .populate({
-        path:"ProfileID",
-        select:"Owner",
-        populate:{
-          path:"Owner.User",
-          select:"firstName lastName email"
-        }
+  const finalResult={
+    CallerDoses:MyDoses,
+    DependentsDoses:BindNickNameWithDependentList
+  }
+
+
   
-      })
-      
-  const doses=[...generalDoses,...spacificDoses]
-  
-  
-    return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+    return successResMsg(res, 200, {message:req.t("Success"),data:finalResult});
   
      
       
@@ -857,6 +820,11 @@ exports.EditSingleDose=async (req, res) => {
     }
   };
   
+
+
+  
+  
+
 
 
  /**
@@ -967,9 +935,9 @@ exports.EditSingleDose=async (req, res) => {
       
     }
     //case the owner dont has write permission
-    if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-      return errorResMsg(res, 401, req.t("Unauthorized"));
-    }
+    // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+    //   return errorResMsg(res, 401, req.t("Unauthorized"));
+    // }
 
   // generate a new dose
   const newDose =new Occurrence({

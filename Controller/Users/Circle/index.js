@@ -17,7 +17,7 @@ const Viewer =require("../../../DB/Schema/Viewers")
 const messages = require("../../../Messages/Email/index")
 const NotificationMessages=require("../../../Messages/Notifications/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
-const {SendPushNotificationToUserRegardlessLangAndOs} =require("../../../utils/HelperFunctions")
+const {SendPushNotificationToUserRegardlessLangAndOs,IsMasterOwnerToThatProfile} =require("../../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
@@ -78,7 +78,8 @@ exports.CreateDependentA = async (req, res) => {
         nickName,
         email,
         phoneNumber,
-        countryCode
+        countryCode,
+       
         
        
       }=req.body
@@ -96,19 +97,26 @@ exports.CreateDependentA = async (req, res) => {
         if(profile.Owner.User._id.toString() !== id){
             return errorResMsg(res, 400, req.t("Unauthorized"));
         }
-
-        if(profile.Owner.User.email=== email){
+        console.log("profile.Owner.User.email",profile.Owner.User.email)
+        console.log("email",email)
+        if(email){
+          if(profile.Owner.User.email=== email){
+            return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
+         }
+        }
+     
+      if(phoneNumber){
+        if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
        }
-       console.log("usr is  ",profile.Owner.User)
-       if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
-        return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
-     }
+      }
+     
 
         // check for  email and mobile if it provided
         if(email){
             const emailExist = await User.findOne({
-                email:email
+                email:email,
+                
             })
             if(emailExist){
                 return errorResMsg(res, 400, req.t("email_exist"));
@@ -118,7 +126,7 @@ exports.CreateDependentA = async (req, res) => {
             phoneNumber:phoneNumber,
             countryCode:countryCode
         }
-        if(mobileNumber){
+        if(phoneNumber&&countryCode){
             const mobileExist = await User.findOne({
                 'mobileNumber.phoneNumber':mobileNumber.phoneNumber
             })
@@ -132,6 +140,20 @@ exports.CreateDependentA = async (req, res) => {
       if(req.file){
         img = await UploadFileToAzureBlob(req.file)
      }
+
+     // create user profile
+      const newUser = new User({
+        img:img,
+        firstName:firstName,
+        lastName:lastName,
+        email:email,
+        mobileNumber:mobileNumber,
+        IsDependent:true,
+        MasterUsers:[id],
+        MasterProfiles:[profile._id],
+      
+
+      })
      
       // create new dependent user
         const newDependent = new Dependent({
@@ -148,13 +170,15 @@ exports.CreateDependentA = async (req, res) => {
         const newViewer = new Viewer({
             ViewerProfile:ProfileID,
             CanWriteDoses:true,
-            CanWriteSymptoms:true
+            CanWriteSymptoms:true,
+            DependentProfileNickName:nickName,
+          
             
         })
        // create a new profile for dependent user
          const newProfile = new Profile({
             Owner:{
-                User:id,
+                User:newUser._id,
                 Permissions:{
                     Read:true,
                     Write:true,
@@ -165,11 +189,14 @@ exports.CreateDependentA = async (req, res) => {
                 viewer:newViewer._id,
                 Dependent:newDependent._id
 
-            }]
+            }],
+            MasterUsers:[id],
+            MasterProfiles:[profile._id],
+
          })
          // link profile to viewer
             newViewer.DependentProfile = newProfile._id 
-
+            newUser.profile=newProfile._id
        
 
         // link profile to user
@@ -184,6 +211,7 @@ exports.CreateDependentA = async (req, res) => {
         await newProfile.save()
         await newViewer.save()
         await profile.save()
+        await newUser.save()
     
         const responseData ={
             ProfileID:newProfile._id,
@@ -317,19 +345,29 @@ exports.CreateDependentA = async (req, res) => {
      }
      
         const user = await User.findOne(
-            { "$or": [ { email: email }, { 'mobileNumber.phoneNumber':phoneNumber} ] }
+            {  email: email } 
           );
             // if the invitation is sent before return 
             
           // check if user exists and send invitation to that user
+          if(!user){
+            return errorResMsg(res, 400, req.t("user_not_found"));
+          }
           // case user is active
-          if (user&&!user.temp) {
+          if (user) {
             /**
              * user already exists
              * send notification to that user
              */
             // get user profile
             const userprofile = await Profile.findById(user.profile).populate("Owner.User")
+            .populate({
+             path:"MasterUsers",
+
+            })
+            .populate({
+              path:"MasterProfiles"
+            })
             if(!userprofile){
                 return errorResMsg(res, 400, req.t("profile_not_found"));
             }
@@ -338,10 +376,16 @@ exports.CreateDependentA = async (req, res) => {
             const invitation =await Invitation.find({
                 From:ProfileID,
                 To:userprofile._id,
+                Status:{$in:[0,1]}
             })
 
             if(invitation.length>0){
+              if(invitation.Status==0){
                 return errorResMsg(res, 400, req.t("invitation_sent_before"));
+              }else if(invitation.Status==1){
+                return errorResMsg(res, 400, req.t("relationship_already_exist"));
+              }
+                
             }
             //create dependent user
             const newDependentUser = new Dependent({
@@ -365,36 +409,89 @@ exports.CreateDependentA = async (req, res) => {
                 Status:0,
                 dependent:newDependentUser._id,
                 AccountType:1,
+                externalData:{
+                  DependentProfileNickName:nickName,
+                  DependentProfileImage:img
+                }
 
             })
 
             // save all the data
             await newDependentUser.save()
-            await newInvitation.save()
+            await newInvitation.save();
+            const populatedInvitation = await Invitation.findById(newInvitation._id)
+            .populate({
+              path:"From",
+                select :'Owner.User',
+                populate:{
+                    path:"Owner.User",
+                    select:'firstName lastName email mobileNumber img'
+                }
+              }).populate({
+                path:"To",
+                select :'Owner.User',
+                populate:{
+                    path:"Owner.User",
+                    select:'firstName lastName email mobileNumber img'
+                }
+              }).populate({
+                path:"permissions.CanReadSpacificMeds.Med",
+                select:'name'
+            })
+            const clonedObject = JSON.parse(JSON.stringify(populatedInvitation));
 
             // send notification to the user using email
+            if(!userprofile.MasterUsers||userprofile.MasterUsers.length<1){
+              if(userprofile.Owner.User.lang==="en"){
+                //  email   
+                const invitation = messages.InvitationSentToExistentDependentUser_EN(profile.Owner.User.firstName,firstName);
+                  await SendEmailToUser(email,invitation)
+                 }else{
+                  const invitation = messages.InvitationSentToExistentDependentUser_AR(profile.Owner.User.firstName,firstName);
+                  await SendEmailToUser(email,invitation)
+                 }
+  
+                
+              // send notification to the user using push notification 
+              await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile,"NewInvitationFromCareGiver",{
+                Invitation:clonedObject,
+                ProfileInfoOfSender:{
+                  firstName:profile.Owner.User.firstName,
+                  lastName:profile.Owner.User.lastName,
+                  img:profile.Owner.User.img,
+                  email:profile.Owner.User.email,
+                  ProfileID:profile._id,
+                }
+              })
+            }else{
+              for await(const [index, MasterUser] of userprofile.MasterUsers.entries()){
 
-            if(userprofile.Owner.User.lang==="en"){
-              //  email   
-              const invitation = messages.InvitationSentToExistentDependentUser_EN(profile.Owner.User.firstName,firstName);
-                await SendEmailToUser(email,invitation)
-               }else{
-                const invitation = messages.InvitationSentToExistentDependentUser_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
-                await SendEmailToUser(email,invitation)
-               }
-
-              
-            // send notification to the user using push notification 
-            await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile,"NewInvitationFromCareGiver",{
-              Invitation:newInvitation,
-              ProfileInfoOfSender:{
-                firstName:profile.Owner.User.firstName,
-                lastName:profile.Owner.User.lastName,
-                img:profile.Owner.User.img,
-                email:profile.Owner.User.email,
-                ProfileID:profile._id,
+                if(MasterUser.lang==="en"){
+                  //  email   
+                  const invitation = messages.InvitationSentToMyDependent_EN(profile.Owner.User.firstName,firstName);
+                    await SendEmailToUser(MasterUser.email,invitation)
+                   }else{
+                    const invitation = messages.InvitationSentToMyDependent_AR(profile.Owner.User.firstName,firstName);
+                    await SendEmailToUser(MasterUser.email,invitation)
+                   }
+    
+                  
+                // send notification to the user using push notification 
+                await SendPushNotificationToUserRegardlessLangAndOs(profile,userprofile.MasterProfiles[index],"NewInvitationFromCareGiver",{
+                  Invitation:clonedObject,
+                  ProfileInfoOfSender:{
+                    firstName:profile.Owner.User.firstName,
+                    lastName:profile.Owner.User.lastName,
+                    img:profile.Owner.User.img,
+                    email:profile.Owner.User.email,
+                    ProfileID:profile._id,
+                  }
+                })
               }
-            })
+     
+
+            }
+    
 
             const responseData ={
                 ProfileID:userprofile._id,
@@ -421,104 +518,108 @@ exports.CreateDependentA = async (req, res) => {
             }
 //******************************************************************* */
                   
-            // create new user
-            const newUser = new User({
-                firstName:firstName,
-                lastName:lastName,
-                email:email,
-                mobileNumber:{
-                    countryCode:countryCode,
-                    phoneNumber:phoneNumber
-                },
-                temp:true,
-                ShouldRestPassword:true,
-                verified:true
+      //       // create new user
+      //       const newUser = new User({
+      //           firstName:firstName,
+      //           lastName:lastName,
+      //           email:email,
+      //           mobileNumber:{
+      //               countryCode:countryCode,
+      //               phoneNumber:phoneNumber
+      //           },
+      //           temp:true,
+      //           ShouldRestPassword:true,
+      //           verified:true
 
 
 
-            })
-            // create new profile for the user
-            const newUserProfile = new Profile({
-                Owner:{
-                    User:newUser._id,
-                    Permissions:{
-                        Read:true,
-                        Write:true,
-                    }
-                },
-                temp:true
-            })
-            // create a new dependent user
-            const newDependentUser = new Dependent({
-                firstName:firstName,
-                lastName:lastName,
-                nickName:nickName,
-                email:email,
-                mobileNumber:{
-                    countryCode:countryCode,
-                    phoneNumber:phoneNumber
-                },
-                MasterProfile:ProfileID,
-                DependentProfile:newUserProfile._id,
-                AccountType:1,
-                img
-            })
-            // link profiles
-            newUser.profile=newUserProfile._id
+      //       })
+      //       // create new profile for the user
+      //       const newUserProfile = new Profile({
+      //           Owner:{
+      //               User:newUser._id,
+      //               Permissions:{
+      //                   Read:true,
+      //                   Write:true,
+      //               }
+      //           },
+      //           temp:true
+      //       })
+      //       // create a new dependent user
+      //       const newDependentUser = new Dependent({
+      //           firstName:firstName,
+      //           lastName:lastName,
+      //           nickName:nickName,
+      //           email:email,
+      //           mobileNumber:{
+      //               countryCode:countryCode,
+      //               phoneNumber:phoneNumber
+      //           },
+      //           MasterProfile:ProfileID,
+      //           DependentProfile:newUserProfile._id,
+      //           AccountType:1,
+      //           img
+      //       })
+      //       // link profiles
+      //       newUser.profile=newUserProfile._id
 
-            // add rest password code and its expiration date
+      //       // add rest password code and its expiration date
 
-              //send notifications
-               let RestPasswordCode = await GenerateRandomCode(6);
-               let RestPasswordCode2= await GenerateRandomCode(6)
-               const ResetPasswordXpireDate =  Date.now()  + 8.64e+7 ;
-               RestPasswordCode+=RestPasswordCode2;
-               if(newUser.lang==="en"){
-                const invitation = messages.InvitationSentToDependent_EN(RestPasswordCode,profile.Owner.User.firstName,firstName);
-                await SendEmailToUser(email,invitation)
-               }else{
-                const invitation = messages.InvitationSentToDependent_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
-                await SendEmailToUser(email,invitation)
-               }
+      //         //send notifications
+      //          let RestPasswordCode = await GenerateRandomCode(6);
+      //          let RestPasswordCode2= await GenerateRandomCode(6)
+      //          const ResetPasswordXpireDate =  Date.now()  + 8.64e+7 ;
+      //          RestPasswordCode+=RestPasswordCode2;
+      //          if(newUser.lang==="en"){
+      //           const invitation = messages.InvitationSentToDependent_EN(RestPasswordCode,profile.Owner.User.firstName,firstName);
+      //           await SendEmailToUser(email,invitation)
+      //          }else{
+      //           const invitation = messages.InvitationSentToDependent_AR(RestPasswordCode,profile.Owner.User.firstName,firstName);
+      //           await SendEmailToUser(email,invitation)
+      //          }
           
           
-               newUser.password=RestPasswordCode
-               newUser.ResetPasswordXpireDate=ResetPasswordXpireDate;
+      //          newUser.password=RestPasswordCode
+      //          newUser.verificationExpiryDate=ResetPasswordXpireDate;
 
-               // register the invitation
-                // create new invitation
-            const newInvitation = new Invitation({
-                From:ProfileID,
-                To:newUserProfile._id,
-                Status:0,
-                dependent:newDependentUser._id,
-                AccountType:1,
+      //          // register the invitation
+      //           // create new invitation
+      //       const newInvitation = new Invitation({
+      //           From:ProfileID,
+      //           To:newUserProfile._id,
+      //           Status:0,
+      //           dependent:newDependentUser._id,
+      //           AccountType:1,
+      //           externalData:{
+      //             DependentProfileNickName:nickName,
+      //             DependentProfileImage:img
+      //           }
 
-            })
+      //       })
                  
              
-                // save to db
-            await newUser.save()
-            await newUserProfile.save()
-            await newDependentUser.save()
-            await newInvitation.save()
+      //           // save to db
+      //       await newUser.save()
+      //       await newUserProfile.save()
+      //       await newDependentUser.save()
+      //       await newInvitation.save()
                  
     
-        const responseData ={
-            ProfileID:newUserProfile._id,
-            firstName,
-            lastName,
-            nickName,
-            email,
-            phoneNumber,
-            countryCode,
-            img,
-            Status:0,
-            AccountType:1,
-        }
+      //   const responseData ={
+      //       ProfileID:newUserProfile._id,
+      //       firstName,
+      //       lastName,
+      //       nickName,
+      //       email,
+      //       phoneNumber,
+      //       countryCode,
+      //       img,
+      //       Status:0,
+      //       AccountType:1,
+      //   }
     
-        // return successfully response
-      return successResMsg(res, 200, {message:req.t("invitation_sent"),data:responseData});
+      //   // return successfully response
+      // return successResMsg(res, 200, {message:req.t("invitation_sent"),data:responseData});
       
     } catch (err) {
       // return error response
@@ -573,7 +674,7 @@ exports.CreateDependentA = async (req, res) => {
 
   exports.ChangeInvitationStatus = async (req, res) => {
     /**
-     
+     to accept a caregiver
        */
  
     try {
@@ -582,29 +683,51 @@ exports.CreateDependentA = async (req, res) => {
       const {
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
-        InvitationID
+        InvitationID,
+        permissions,
+        nickName
 
         
        
       }=req.body
         // get the invitation
-      
-        const invitation = await Invitation.findById(InvitationID)
+    
+        const invitation = await Invitation.findById(InvitationID).populate({
+          path:"From",
+          select :'Owner.User',
+          populate:{
+              path:"Owner.User",
+              select:'firstName lastName email mobileNumber img'
+          }
+      }).populate({
+          path:"permissions.CanReadSpacificMeds.Med",
+          select:'name'
+      }).populate({
+        path:"To",
+        select :'Owner.User',
+        populate:{
+            path:"Owner.User",
+            select:'firstName lastName email mobileNumber img'
+        }
+      })
         if(!invitation){
             return errorResMsg(res, 400, req.t("Invitation_not_found"));
         }
         // get the master profile
-        const masterProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.From))
+        const masterProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.From._id))
         if(!masterProfile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         // get the DependentProfile
-        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.To))
-        if(dependentProfile.Owner.User.toString()!=id){
+        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.To._id)).populate("Owner.User")
+        const IsMaster=await IsMasterOwnerToThatProfile(id,dependentProfile)
+        if(dependentProfile.Owner.User._id.toString()!=id&&!IsMaster){
+          
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
-        if(ProfileID.toString()!=invitation.To.toString()){
+        if(ProfileID.toString()!=invitation.To._id.toString()){
+          
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
@@ -626,12 +749,27 @@ exports.CreateDependentA = async (req, res) => {
         if(Status===1){
             invitation.Status=1;
             
-           
+            let newViewer
             // create a new viewer for the master profile
-            const newViewer = new Viewer({
+            if(permissions){
+               newViewer = new Viewer({
                 ViewerProfile:masterProfile._id,
-                DependentProfile:dependentProfile._id
+                DependentProfile:dependentProfile._id,
+                ...permissions,
+                ...invitation.externalData,
+
             })
+            invitation.permissions=permissions
+            }else{
+              newViewer = new Viewer({
+                ViewerProfile:masterProfile._id,
+                DependentProfile:dependentProfile._id,
+                ...invitation.externalData,
+                CareGiverNickName:nickName,
+                Invitation:invitation._id
+            })
+            }
+          
              // add the dependent to the master profile
              masterProfile.Dependents.push({
                 Profile:dependentProfile._id,
@@ -644,10 +782,34 @@ exports.CreateDependentA = async (req, res) => {
                 viewer:newViewer._id
 
             })
+            await dependentProfile.save()
+            await masterProfile.save()
+            await invitation.save()
+            await newViewer.save()
 
+            const PopulatedInvitation = await Invitation.findById(InvitationID).populate({
+              path:"From",
+              select :'Owner.User',
+              populate:{
+                  path:"Owner.User",
+                  select:'firstName lastName email mobileNumber img'
+              }
+          }).populate({
+              path:"permissions.CanReadSpacificMeds.Med",
+              select:'name'
+          }).populate({
+            path:"To",
+            select :'Owner.User',
+            populate:{
+                path:"Owner.User",
+                select:'firstName lastName email mobileNumber img'
+            }
+          })
+           
+            const clonedObject = JSON.parse(JSON.stringify(PopulatedInvitation));
              // send notification to the user using push notification 
              await SendPushNotificationToUserRegardlessLangAndOs(dependentProfile,masterProfile,"DependentAcceptedInvitation",{
-              Invitation:invitation,
+              Invitation:clonedObject,
               ProfileInfoOfSender:{
                 firstName:dependentProfile.Owner.User.firstName,
                 lastName:dependentProfile.Owner.User.lastName,
@@ -658,10 +820,7 @@ exports.CreateDependentA = async (req, res) => {
             })
 
 
-            await dependentProfile.save()
-            await masterProfile.save()
-            await invitation.save()
-            await newViewer.save()
+           
             // return accept confirmation
             return successResMsg(res, 200, {message:req.t("invitation_accepted")});
 
@@ -714,7 +873,7 @@ The filter can be based on the status, sent, and received parameters.
     try {
   
       const {id} =req.id
-      const {
+      let {
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
         sent,
@@ -722,6 +881,11 @@ The filter can be based on the status, sent, and received parameters.
 
        
       }=req.query
+
+      sent= sent=='1'?true:false;
+      received= received=='1'?true:false
+      
+
         // make sure that the api consumer is authorized
         if(!mongoose.isValidObjectId(ProfileID)){
             return errorResMsg(res, 400, req.t("invalid_profile_id"));
@@ -733,8 +897,8 @@ The filter can be based on the status, sent, and received parameters.
         if(profile.Deleted){
           return errorResMsg(res, 400, req.t("Profile_not_found"));
         }
-  
-        if(profile.Owner.User.toString()!=id){
+        const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+        if(profile.Owner.User.toString()!=id&&!IsMaster){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
         // get the Invitations
@@ -744,12 +908,48 @@ The filter can be based on the status, sent, and received parameters.
           invitations = await Invitation.find({
                 $or:[{From:ProfileID},{To:ProfileID}],
                 Status:Status||{ $exists:true}
-            }).populate("dependent")
+            }).populate({
+              path:"permissions.CanReadSpacificMeds.Med",
+              select:'name'
+          }).
+            populate({
+              path:"From",
+              select :'Owner.User',
+              populate:{
+                  path:"Owner.User",
+                  select:'firstName lastName email mobileNumber img'
+              }
+            }).populate({
+              path:"To",
+              select :'Owner.User',
+              populate:{
+                  path:"Owner.User",
+                  select:'firstName lastName email mobileNumber img'
+              }
+            })
         }else if(sent&&!received){
           invitations = await Invitation.find({
                 From:ProfileID,
                 Status:Status||{ $exists:true}
-            }).populate("dependent")
+            })
+            .populate({
+              path:"permissions.CanReadSpacificMeds.Med",
+              select:'name'
+          }).populate({
+              path:"From",
+              select :'Owner.User',
+              populate:{
+                  path:"Owner.User",
+                  select:'firstName lastName email mobileNumber img'
+              }
+            }).populate({
+              path:"To",
+              select :'Owner.User',
+              populate:{
+                  path:"Owner.User",
+                  select:'firstName lastName email mobileNumber img'
+              }
+            })
         }else if(received&&!sent){
             console.log("received will run")
             invitations = await Invitation.find({
@@ -760,17 +960,41 @@ The filter can be based on the status, sent, and received parameters.
                 select :'Owner.User',
                 populate:{
                     path:"Owner.User",
-                    select:'firstName lastName email'
+                    select:'firstName lastName email mobileNumber img'
                 }
             }).populate({
                 path:"permissions.CanReadSpacificMeds.Med",
                 select:'name'
+            }).populate({
+              path:"To",
+              select :'Owner.User',
+              populate:{
+                  path:"Owner.User",
+                  select:'firstName lastName email mobileNumber img'
+              }
             })
         }else{
           invitations = await Invitation.find({
                 $or:[{From:ProfileID},{To:ProfileID}],
                 Status:Status||{ $exists:true}
-            }).populate("dependent")
+            }).populate({
+              path:"permissions.CanReadSpacificMeds.Med",
+              select:'name'
+          }).populate({
+              path:"From",
+                select :'Owner.User',
+                populate:{
+                    path:"Owner.User",
+                    select:'firstName lastName email mobileNumber img'
+                }
+              }).populate({
+                path:"To",
+                select :'Owner.User',
+                populate:{
+                    path:"Owner.User",
+                    select:'firstName lastName email mobileNumber img'
+                }
+              })
         }
         responseData=[
             ...invitations
@@ -836,20 +1060,40 @@ retrieves the dependents of the user from from the viewer collection which depen
           
         }).populate({
             path:"Dependents.viewer",
+            populate: {
+              path: 'DependentProfile',
+              select:'User Deleted IsDependent',
+              populate:{
+                  path:'Owner.User',
+                  select:'firstName lastName nickName img email mobileNumber img'
+              }
+            },
+          
         }).populate({
           path:"Dependents.Profile",
-          select:'Deleted',
-      
-      
-      })
+          select:'Deleted MasterProfiles IsDependent',
+          populate:{
+            path:'Owner.User',
+            select:'IsDependent'
+        }
+        }).populate({
+          path: 'Dependents.viewer',
+            populate:{
+              path:"CanReadSpacificMeds.Med",
+              select:"name"
+              
+            }
+        })
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         if(profile.Deleted){
           return errorResMsg(res, 400, req.t("Profile_not_found"));
         }
+        const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      
   
-        if(profile.Owner.User._id.toString()!=id){
+        if(profile.Owner.User._id.toString()!=id&&!IsMaster){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
        
@@ -857,9 +1101,19 @@ retrieves the dependents of the user from from the viewer collection which depen
         const filteredData=profile.Dependents.filter((item)=>{
           return !item.Profile.Deleted
         })
-
+        const FlaggedResult=filteredData.map(elem=>{
+          const clonedObject = JSON.parse(JSON.stringify(elem));
+          const isFound = elem.Profile.MasterProfiles?elem.Profile.MasterProfiles.includes(ProfileID):false;
+          const IsInterDependent= elem.Profile.Owner.User.IsDependent
+         console.log(elem.Profile)
+          return{
+            ...clonedObject,
+            CanEditProfileInfo:isFound,
+            IsInternalDependent:isFound&&IsInterDependent
+          }
+        })
         responseData=[
-            ...filteredData
+            ...FlaggedResult
         ]
         // return successfully response
         return successResMsg(res, 200, {message:req.t("dependent"),data:responseData});
@@ -935,7 +1189,8 @@ Add a new caregiver to a user's profile
         email,
         phoneNumber,
         countryCode,
-        permissions
+        permissions,
+        nickName
         
        
       }=req.body
@@ -950,7 +1205,10 @@ Add a new caregiver to a user's profile
         }
   
        // check if the user if the user is the owner of that profile
-        if(profile.Owner.User._id.toString() !== id){
+       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      
+  
+        if(profile.Owner.User._id.toString() !== id&&!IsMaster){
             return errorResMsg(res, 400, req.t("Unauthorized"));
         }
 
@@ -962,6 +1220,21 @@ Add a new caregiver to a user's profile
         if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
        }
+       if(IsMaster){
+        const user = await Profile.findOne({
+          "Owner.User":id
+        })
+        if(user){
+          if(user.email=== email){
+            return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
+         }
+  
+         if(user.mobileNumber.phoneNumber=== phoneNumber){
+           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
+        }
+         }
+        }
+  
 
         // check for  email and mobile if it provided
         const mobileNumber={
@@ -1001,16 +1274,21 @@ Add a new caregiver to a user's profile
             const invitation =await Invitation.find({
                 From:ProfileID,
                 To:CareGiverprofile._id,
+                Status:{$in:[0,1]}
             })
-
+            console.log("invitation",invitation)
             if(invitation.length>0){
+              if(invitation.Status==0){
                 return errorResMsg(res, 400, req.t("invitation_sent_before"));
+              }else if(invitation.Status==1){
+                return errorResMsg(res, 400, req.t("relationship_already_exist"));
+              }
             }
             //create dependent user
             const newDependentUser = new Dependent({
                 firstName:user.firstName,
                 lastName:user.lastName,
-                nickName:'',
+                nickName:nickName,
                 email:email,
                 mobileNumber:{
                     countryCode:countryCode,
@@ -1024,7 +1302,7 @@ Add a new caregiver to a user's profile
             })
             let CanReadSpacificMeds;
             if(permissions.CanReadAllMeds){
-              CanReadSpacificMeds=null
+              CanReadSpacificMeds=[]
             }else{
               CanReadSpacificMeds=permissions.CanReadSpacificMeds
             }
@@ -1038,26 +1316,50 @@ Add a new caregiver to a user's profile
                    ... permissions,
                    CanReadSpacificMeds,
                 },
-                AccountType:2
+                AccountType:2,
+                externalData:{
+                  CareGiverNickName:nickName,
+                  CareGiverImage:user.img,
+                }
 
             })
 
             // save all the data
             await newDependentUser.save()
-            await newInvitation.save()
+            await newInvitation.save();
 
+            const populatedInvitation = await Invitation.findById(newInvitation._id)
+            .populate({
+              path:"From",
+                select :'Owner.User',
+                populate:{
+                    path:"Owner.User",
+                    select:'firstName lastName email mobileNumber img'
+                }
+              }).populate({
+                path:"To",
+                select :'Owner.User',
+                populate:{
+                    path:"Owner.User",
+                    select:'firstName lastName email mobileNumber img'
+                }
+              }).populate({
+                path:"permissions.CanReadSpacificMeds.Med",
+                select:'name'
+            })
+              console.log(populatedInvitation)
             // send notification to the user
 
             if(CareGiverprofile.Owner.User.lang==="en"){
                 const invitation = messages.InvitationSentToExistentCareGiverUser_EN(profile.Owner.User.firstName,user.firstName);
                 await SendEmailToUser(email,invitation)
                }else{
-                const invitation = messages.InvitationSentToExistentCareGiverUser_AR(RestPasswordCode,profile.Owner.User.firstName,user.firstName);
+                const invitation = messages.InvitationSentToExistentCareGiverUser_AR(profile.Owner.User.firstName,user.firstName);
                 await SendEmailToUser(email,invitation)
                }
-
+               const clonedObject = JSON.parse(JSON.stringify(populatedInvitation));
                await SendPushNotificationToUserRegardlessLangAndOs(profile,CareGiverprofile,"NewInvitationFromDependent",{
-                Invitation:newInvitation,
+                Invitation:clonedObject,
                 ProfileInfoOfSender:{
                   firstName:profile.Owner.User.firstName,
                   lastName:profile.Owner.User.lastName,
@@ -1142,28 +1444,50 @@ Add a new caregiver to a user's profile
       const {
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
-        InvitationID
+        InvitationID,
+        nickName
 
         
        
       }=req.body
         // get the invitation
-        const invitation = await Invitation.findById(InvitationID)
+       
+        const invitation = await Invitation.findById(InvitationID).populate({
+          path:"From",
+            select :'Owner.User',
+            populate:{
+                path:"Owner.User",
+                select:'firstName lastName email mobileNumber img'
+            }
+          }).populate({
+            path:"To",
+            select :'Owner.User',
+            populate:{
+                path:"Owner.User",
+                select:'firstName lastName email mobileNumber img'
+            }
+          }).populate({
+            path:"permissions.CanReadSpacificMeds.Med",
+            select:'name'
+        })
         if(!invitation){
             return errorResMsg(res, 400, req.t("Invitation_not_found"));
         }
         // get the caregiver profile
-        const CareGiverProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.To))
+        const CareGiverProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.To._id)).populate("Owner.User")
         if(!CareGiverProfile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         // get the DependentProfile
-        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.From))
-        if(CareGiverProfile.Owner.User.toString()!=id){
+        const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.From._id))
+        if(CareGiverProfile.Owner.User._id.toString()!=id){
+          console.log("CareGiverProfile.Owner.User.toString()!=id",CareGiverProfile.Owner.User.toString(),id)
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
-        if(ProfileID.toString()!=invitation.To.toString()){
+        if(ProfileID.toString()!=invitation.To._id.toString()){
+          console.log("ProfileID.toString()!=invitation.To.toString()",ProfileID.toString(),invitation.To.toString())
+
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
@@ -1193,7 +1517,10 @@ Add a new caregiver to a user's profile
                const newViewer = new Viewer({
                 ViewerProfile:CareGiverProfile._id,
                 DependentProfile:dependentProfile._id,
-                ...permissions
+                ...permissions,
+                ...invitation.externalData,
+                DependentProfileNickName:nickName,
+                Invitation:invitation._id
 
             })
 
@@ -1216,9 +1543,10 @@ Add a new caregiver to a user's profile
             await CareGiverProfile.save()
             await invitation.save()
             // return accept confirmation
-
+            console.log("invitation****",invitation)
+            const clonedObject = JSON.parse(JSON.stringify(invitation));
             await SendPushNotificationToUserRegardlessLangAndOs(CareGiverProfile,dependentProfile,"CareGiverAcceptedInvitation",{
-              Invitation:invitation,
+              Invitation:clonedObject,
               ProfileInfoOfSender:{
                 firstName:CareGiverProfile.Owner.User.firstName,
                 lastName:CareGiverProfile.Owner.User.lastName,
@@ -1291,29 +1619,37 @@ retrieves the dependents of the user from the viewer collection which master pro
         }
         const profile = await Profile.findById(ProfileID).populate({
             path: 'Viewers.viewer',
-            
-            populate: {
-                path: 'ViewerProfile',
-                select:'User Deleted',
-                populate:{
-                    path:'Owner.User',
-                    select:'firstName lastName nickName img email mobileNumber'
-                }
+            populate:{
+              path:"CanReadSpacificMeds.Med",
+              select:"name"
+              
             }
             
-          })
+          }).populate({
+            path:'Viewers.viewer',
+            populate:{
+              path: 'ViewerProfile',
+              select: 'User Deleted',
+              populate: {
+                path: 'Owner.User',
+                select: 'firstName lastName nickName img email mobileNumber '
+              }
+            }
+          
+          });
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
+        
         if(profile.Deleted){
           return errorResMsg(res, 400, req.t("Profile_not_found"));
         }
-  
-        if(profile.Owner.User._id.toString()!=id){
+        const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+        if(profile.Owner.User._id.toString()!=id&&!IsMaster){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
        
-        // get user profile dependents
+        // get user profile caregivers
         
         const filteredData=profile.Viewers.filter(elem=>{
           return !elem.viewer.ViewerProfile.Deleted
@@ -1394,7 +1730,8 @@ exports.EditCareGiverPermissions = async (req, res) => {
     const {
       ProfileID,
       ViewerID,
-      Permissions
+      Permissions,
+      nickName
     }=req.body
 
     /**
@@ -1437,8 +1774,8 @@ exports.EditCareGiverPermissions = async (req, res) => {
       if(profile.Deleted){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-
-      if(profile.Owner.User._id.toString()!=id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!=id&&!IsMaster){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
      
@@ -1463,6 +1800,8 @@ exports.EditCareGiverPermissions = async (req, res) => {
       relationship.CanWriteSymptoms=Permissions.CanWriteSymptoms||relationship.CanWriteSymptoms
       relationship.CanReadSpacificMeds=Permissions.CanReadSpacificMeds||relationship.CanReadSpacificMeds
       relationship.notify=Permissions.notify||relationship.notify
+      relationship.CareGiverNickName=nickName||relationship.CareGiverNickName
+      
      
      
       // save changes
@@ -1482,6 +1821,202 @@ exports.EditCareGiverPermissions = async (req, res) => {
 }; 
 
   
+exports.EditDependentInfo = async (req, res) => {
+  /**
+     *  EditCareGiverPermission
+     */
+
+  try {
+
+   const {id} =req.id
+    const {
+      ProfileID,
+      ViewerID,
+      nickName
+    }=req.body
+
+
+      // make sure that the api consumer is authorized
+      if(!mongoose.isValidObjectId(ProfileID)){
+          return errorResMsg(res, 400, req.t("invalid_profile_id"));
+      }
+      const profile = await Profile.findById(ProfileID)
+      if(!profile){
+          return errorResMsg(res, 400, req.t("profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!=id&&!IsMaster){
+          return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+     
+      // get the relationship 
+      const relationship = await Viewer.findOne({
+        ViewerProfile:ProfileID,
+        _id:ViewerID,
+        IsDeleted:false
+      })
+      
+      if(!relationship){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      // update the relationship
+     
+      relationship.DependentProfileNickName=nickName||relationship.DependentProfileNickName
+      
+     
+     
+      // save changes
+      await relationship.save()
+
+     
+     
+
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Permission_Updated_Successfully"),data:relationship});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+}; 
+
+
+exports.EditDependentInfoFull = async (req, res) => {
+  /**
+     *  EditCareGiverPermission
+     */
+
+  try {
+
+   const {id} =req.id
+    const {
+      ProfileID,
+      ViewerID,
+      nickName,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      countryCode,
+
+    }=req.body
+
+
+      // make sure that the api consumer is authorized
+      if(!mongoose.isValidObjectId(ProfileID)){
+          return errorResMsg(res, 400, req.t("invalid_profile_id"));
+      }
+      const profile = await Profile.findById(ProfileID)
+      if(!profile){
+          return errorResMsg(res, 400, req.t("profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!=id&&!IsMaster){
+          return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+     
+      // get the relationship 
+      const relationship = await Viewer.findOne({
+        ViewerProfile:ProfileID,
+        _id:ViewerID,
+        IsDeleted:false
+      })
+      
+      if(!relationship){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      // update the relationship
+     
+      relationship.DependentProfileNickName=nickName||relationship.DependentProfileNickName
+      
+      // save changes
+      await relationship.save()
+
+     
+         if(email){
+           if(profile.Owner.User.email=== email){
+             return errorResMsg(res, 400, req.t("email_exist"));
+          }
+         }
+      
+       if(phoneNumber){
+         if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
+           return errorResMsg(res, 400, req.t("mobile_exist"));
+        }
+       }
+      
+ 
+         // check for  email and mobile if it provided
+         if(email){
+             const emailExist = await User.findOne({
+                 email:email,
+                 
+             })
+             if(emailExist){
+                 return errorResMsg(res, 400, req.t("email_exist"));
+             }
+         }
+         const mobileNumber ={
+             phoneNumber:phoneNumber,
+             countryCode:countryCode
+         }
+         if(phoneNumber&&countryCode){
+             const mobileExist = await User.findOne({
+                 'mobileNumber.phoneNumber':mobileNumber.phoneNumber
+             })
+             if(mobileExist){
+                 return errorResMsg(res, 400, req.t("mobile_exist"));
+             }
+         }
+      
+       // store the image to azure
+       let img;
+       if(req.file){
+         img = await UploadFileToAzureBlob(req.file)
+      }
+    
+       const dependentAUser=await User.findOne({
+        profile:relationship.DependentProfile
+       })
+      
+       dependentAUser.firstName=firstName|| dependentAUser.firstName;
+       dependentAUser.lastName=lastName|| dependentAUser.lastName;
+       dependentAUser.email=email|| dependentAUser.email;
+       dependentAUser.img=img|| dependentAUser.img;
+       dependentAUser.email=email|| dependentAUser.email;
+       dependentAUser.phoneNumber=phoneNumber|| dependentAUser.phoneNumber;
+       dependentAUser.countryCode=countryCode|| dependentAUser.countryCode;
+       await dependentAUser.save()
+     
+         const responseData ={
+             ProfileID:relationship.DependentProfile,
+             firstName:dependentAUser.firstName,
+             lastName:dependentAUser.lastName,
+             nickName:relationship.nickName,
+             email:dependentAUser.email,
+             phoneNumber:dependentAUser.phoneNumber,
+             countryCode:dependentAUser.countryCode,
+             img:dependentAUser.img
+         }
+     
+     
+
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("info_Updated_Successfully"),data:responseData});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+}; 
 
 
  /**
@@ -1534,8 +2069,8 @@ exports.DeleteCareGiverPermissions = async (req, res) => {
       if(profile.Deleted){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-
-      if(profile.Owner.User._id.toString()!=id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!=id&&!IsMaster){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
      
@@ -1560,6 +2095,8 @@ exports.DeleteCareGiverPermissions = async (req, res) => {
       // delete the viewer object from dependent which its viewer === ViewerID from caregiver profile
       const caregiverProfile=await Profile.findById(relationship.ViewerProfile.toString())
       caregiverProfile.Dependents=caregiverProfile.Dependents.filter(obj=>obj.viewer.toString()!=ViewerID)
+
+      await Invitation.findByIdAndDelete(relationship.Invitation)
       // save changes
       await caregiverProfile.save()
       await profile.save()
@@ -1650,6 +2187,135 @@ exports.DeleteDependent = async (req, res) => {
       // delete caregiver form dependent profile
       const DependentProfile=await Profile.findById(relationship.DependentProfile.toString())
       DependentProfile.Viewers=DependentProfile.Viewers.filter(obj=>obj.viewer.toString()!=ViewerID)
+
+       await Invitation.findByIdAndDelete(relationship.Invitation)
+      
+       // transfer ownership to the user 
+       const IsMaster=await IsMasterOwnerToThatProfile(id,DependentProfile)
+       if(IsMaster){
+    
+        //DependentProfile.MasterProfiles=DependentProfile.MasterProfiles.filter(obj=>obj.viewer.toString()!=ViewerID)
+       }
+     
+
+      // save changes
+      await DependentProfile.save()
+      await profile.save()
+      await relationship.save()
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("Dependent_Deleted_Successfully"),data:relationship});
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+}; 
+
+
+exports.DeleteInternalDependent = async (req, res) => {
+  /**
+     *  DeleteDependent a
+     */
+
+  try {
+
+  const {id} =req.id
+    const {
+      ProfileID,
+      ViewerID,
+      
+    }=req.body
+
+   
+
+      // make sure that the api consumer is authorized
+      if(!mongoose.isValidObjectId(ProfileID)){
+          return errorResMsg(res, 400, req.t("invalid_profile_id"));
+      }
+      const profile = await Profile.findById(ProfileID)
+      if(!profile){
+          return errorResMsg(res, 400, req.t("profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
+      if(profile.Owner.User._id.toString()!=id){
+          return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+      
+      // check if the caller is master owner
+    
+
+
+      // get the relationship 
+      const relationship = await Viewer.findOne({
+        ViewerProfile:ProfileID,
+        _id:ViewerID,
+        IsDeleted:false
+      })
+      console.log("relationship",relationship)
+      
+      if(!relationship){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+
+      const DependentProfile=await Profile.findById(relationship.DependentProfile.toString())
+
+        const IsMaster=await IsMasterOwnerToThatProfile(id,DependentProfile)
+        if(!IsMaster){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+
+      // flag the relationship as deleted
+      relationship.IsDeleted=true
+
+
+
+      // delete the dependent from caregiver profile
+     
+      profile.Dependents=profile.Dependents.filter(obj=>obj.viewer.toString()!=ViewerID)
+    
+      DependentProfile.Deleted=true;
+      await Occurrence.deleteMany({
+        ProfileID:DependentProfile._id,
+        PlannedDateTime:{$gte:new Date()}
+      
+      })
+      await UserMedication.updateMany({
+        ProfileID:DependentProfile._id,
+
+      },{
+        $set:{
+          isDeleted:true,
+  
+        }
+      })
+      await SchedulerSchema.updateMany({
+        ProfileID:DependentProfile._id,
+      },{
+        $set:{
+          isDeleted:true,
+        }
+      })
+      await Occurrence.updateMany({
+        ProfileID:DependentProfile._id,
+
+      },{
+        $set:{
+          isSuspended:true,
+        }
+      })
+       
+      // delete user profile
+      await User.findOneAndDelete({
+        profile:DependentProfile._id,
+        IsDependent:true
+      })
+      
+      
+
       // save changes
       await DependentProfile.save()
       await profile.save()
@@ -1715,8 +2381,8 @@ exports.DeleteInvitation = async (req, res) => {
       if(profile.Deleted){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-
-      if(profile.Owner.User._id.toString()!=id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!=id&&!IsMaster){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
      

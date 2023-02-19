@@ -208,7 +208,8 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
             ProfileID,
             DosageID:doseElement._id,
             Scheduler:newScheduler._id,
-            CreatorProfile:viewerProfile._id
+            CreatorProfile:viewerProfile._id,
+            Ringtone:newMed.Ringtone
           }
           const start=new Date(startDate)
           let end;
@@ -279,7 +280,8 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
             ProfileID,
             CreatorProfile:viewerProfile._id,
             DosageID:doseElement._id,
-            Scheduler:newScheduler._id
+            Scheduler:newScheduler._id,
+            Ringtone:newMed.Ringtone
           }
           const start=new Date(startDate)
           

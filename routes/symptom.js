@@ -37,5 +37,10 @@ router.get(
     IsAuth(),
     SymptomController.getSymptoms
 );
+router.get(
+    "/all",
+    IsAuth(),
+    SymptomController.getAllSymptoms
+);
 
 module.exports = router;

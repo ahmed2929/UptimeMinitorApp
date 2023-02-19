@@ -13,10 +13,50 @@ var ProfileSchema = new Schema({
             type:Boolean,
             default:true
         },
-        write:{
+        CanAddMeds:{
             type:Boolean,
             default:true
-        }
+        },
+        CanEditMeds:{
+            type:Boolean,
+            default:true
+        },
+        CanDeleteMeds:{
+            type:Boolean,
+            default:true
+        },
+        CanTakeDose:{
+            type:Boolean,
+            default:true
+        },
+        CanAddSingleDose:{
+            type:Boolean,
+            default:true
+        },
+        CanSuspendDoses:{
+            type:Boolean,
+            default:true
+        },
+        CanAddSymptom:{
+            type:Boolean,
+            default:true
+        },
+        CanEditSymptom:{
+            type:Boolean,
+            default:true
+        },
+        CanDeleteSymptom:{
+            type:Boolean,
+            default:true
+        },
+        CanManageCareCircle:{
+            type:Boolean,
+            default:true
+        },
+        CanEditProfile:{
+            type:Boolean,
+            default:true
+        },
     }
   },
     Dependents:[{
@@ -93,7 +133,15 @@ var ProfileSchema = new Schema({
     DateOfBirth:{
         type:Date,
         
-    }
+    },
+    MasterUsers:[{
+        type:Schema.Types.ObjectId,
+        ref:"User",
+    }],
+    MasterProfiles:[{
+        type:Schema.Types.ObjectId,
+        ref:"Profile",
+    }]
 
 
  

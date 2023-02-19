@@ -10,7 +10,10 @@
 
 const {UploadFileToAzureBlob} =require("../../../utils/HelperFunctions")
 const Viewer =require("../../../DB/Schema/Viewers")
-const {SendPushNotificationToUserRegardlessLangAndOs} =require("../../../utils/HelperFunctions")
+const {SendPushNotificationToUserRegardlessLangAndOs,
+  BindNickNameWithDependentSymptom,
+  GetSymptomForProfileID,
+  GetSymptomForProfileIDList} =require("../../../utils/HelperFunctions")
 
 const {
   successResMsg,
@@ -120,9 +123,9 @@ exports.CreateSymptom = async (req, res) => {
         
       }
       //case the owner dont has write permission
-      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-        return errorResMsg(res, 401, req.t("Unauthorized"));
-      }
+      // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      //   return errorResMsg(res, 401, req.t("Unauthorized"));
+      // }
   
   
       let img
@@ -444,9 +447,9 @@ exports.EditSymptom = async (req, res) => {
       
     }
     //case the owner does not has write permission
-    if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-      return errorResMsg(res, 401, req.t("Unauthorized"));
-    }
+    // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+    //   return errorResMsg(res, 401, req.t("Unauthorized"));
+    // }
 
 
     let img
@@ -590,9 +593,9 @@ exports.DeleteSymptom = async (req, res) => {
       
     }
     //case the owner does not has write permission
-    if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-      return errorResMsg(res, 401, req.t("Unauthorized"));
-    }
+    // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+    //   return errorResMsg(res, 401, req.t("Unauthorized"));
+    // }
 
 
     // get symptom
@@ -616,3 +619,118 @@ exports.DeleteSymptom = async (req, res) => {
   }
 };
 
+exports.getAllSymptoms=async (req, res) => {
+  /**
+   * get my doses and my dependents doses
+   * 
+   * 
+   */
+  /** 
+   * return doses with a spacic date
+   * if no date is provided the default is today
+   * returns not suspended dosages
+   * 
+   */
+  try {
+
+    const {id} =req.id
+    let {
+    date,
+    ProfileID,
+    EndDate
+    }=req.query
+
+             /*
+    
+    check permission 
+    
+    */
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(profile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    // get the viewer permissions
+    const viewerProfile =await Profile.findOne({
+    "Owner.User":id
+    })
+    
+    if(!viewerProfile){
+       return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(viewerProfile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    
+    if(profile.Owner.User.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+   
+    
+    // get Occurrences which equal today
+    if(!date){
+      date=new Date()
+    }
+    const queryDate =new Date(+date)
+    let nextDay
+    if(!EndDate){
+      nextDay=new Date(+date)
+      nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
+      }else{
+      nextDay=EndDate
+    }
+
+    const MyDependents =await Viewer.find({
+      ViewerProfile:viewerProfile._id,
+      IsDeleted:false
+    })
+    const NickNameHashTable={}
+    MyDependents.forEach(element => {
+      NickNameHashTable[`${element.DependentProfile}`]=element.DependentProfileNickName
+    });
+    const dependentsProfiles =MyDependents.filter(elem=>{
+      return elem.CanReadSymptoms;
+    })
+    const dependentsProfilesIDs =dependentsProfiles.map(elem=>{
+
+      return elem.DependentProfile
+    })
+
+   
+   
+    // get caller doses
+    const MySymptoms =await GetSymptomForProfileID(ProfileID,queryDate,nextDay)
+    // get Dependents Doses that has a general read perm
+    console.log(dependentsProfilesIDs)
+    //const DependentsSymptoms =await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay) 
+    const DependentsSymptoms=await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay)
+
+    // bind nickname with dependent
+
+    const BindNickNameWithDependentList =await BindNickNameWithDependentSymptom(DependentsSymptoms,NickNameHashTable) 
+
+  
+   
+
+      const finalResult={
+        CallerSymptoms:MySymptoms,
+        DependentsSymptoms:BindNickNameWithDependentList
+      }
+
+
+
+  return successResMsg(res, 200, {message:req.t("Success"),data:finalResult});
+
+   
+    
+  
+    
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};

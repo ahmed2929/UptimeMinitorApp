@@ -1,8 +1,8 @@
 exports.NewInvitationFromCareGiver_EN_GCM=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": `new invitation from ${InvitationFrom}`,
-            "body": `${InvitationFrom} sent you invitation to be a dependent`
+            "title": `Care Circle Invitation`,
+            "body": `You received a Care Circle invitation. Open Voithy app to view its details`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -14,8 +14,8 @@ exports.NewInvitationFromCareGiver_EN_GCM=(InvitationFrom,InvitationID,Notificat
 exports.NewInvitationFromCareGiver_AR_GCM=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": ` بارسال دعوة ${InvitationFrom} قام`,
-            "body": ` بارسال دعوة لتكون مريض لديه ${InvitationFrom} قام`
+            "title": `لديك دعوة جديدة`,
+                "body": `قم بفتح تطبيق فويثي`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -29,8 +29,8 @@ exports.NewInvitationFromCareGiver_AR_GCM=(InvitationFrom,InvitationID,Notificat
 exports.DependentAcceptedInvitation_EN_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": `${DependentName}, accepted your invitation`,
-            "body": `${DependentName}, accepted your invitation`
+            "title": `Your Invitation has been accepted `,
+            "body": `Open Voithy to view the details`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -42,8 +42,8 @@ exports.DependentAcceptedInvitation_EN_GCM=(DependentName,InvitationID,Notificat
 exports.DependentAcceptedInvitation_AR_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": `${DependentName}, قبل دعوتك`,
-            "body": `${DependentName}, قبل دعوتك`
+            "title": ` قبل دعوتك`,
+            "body": ` قبل دعوتك`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -56,8 +56,8 @@ exports.DependentAcceptedInvitation_AR_GCM=(DependentName,InvitationID,Notificat
 exports.NewInvitationFromDependent_EN_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": `${DependentName}, sent you invitation`,
-            "body": `${DependentName}, sent you invitation to be his caregiver`
+            "title": `Care Circle Invitation`,
+            "body": `You received a Care Circle invitation. Open Voithy app to view its details`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -69,8 +69,8 @@ exports.NewInvitationFromDependent_EN_GCM=(DependentName,InvitationID,Notificati
 exports.NewInvitationFromDependent_AR_GCM=(DependentName,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": `${DependentName}, بارسال دعوة`,
-            "body": `${DependentName}, بارسال دعوة لك أن تكون مرافق له`
+            "title": ` بارسال دعوة`,
+            "body": ` بارسال دعوة لك أن تكون مرافق له`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -83,8 +83,8 @@ exports.NewInvitationFromDependent_AR_GCM=(DependentName,InvitationID,Notificati
 exports.CareGiverAcceptedInvitation_EN_GCM=(CareGiver,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": `${CareGiver}, accepted your invitation`,
-            "body": `${CareGiver}, accepted your invitation`
+            "title": `Your Invitation has been accepted `,
+            "body": `Open Voithy to view the details.`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -97,8 +97,8 @@ exports.CareGiverAcceptedInvitation_EN_GCM=(CareGiver,InvitationID,NotificationA
 exports.CareGiverAcceptedInvitation_AR_GCM=(CareGiver,InvitationID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
-            "title": `${CareGiver}, قبل دعوتك`,
-            "body": `${CareGiver}, قبل دعوتك`
+            "title": ` قبل دعوتك`,
+            "body": ` قبل دعوتك`
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -173,8 +173,8 @@ exports.NewInvitationFromCareGiver_EN_APNS=(InvitationFrom,InvitationID,Notifica
     return {
         "aps":{
             "alert":{
-                "title": `new invitation from ${InvitationFrom}`,
-                "body": `${InvitationFrom} sent you invitation to be a dependent`
+                "title": `Care Circle Invitation.`,
+                "body": `You received a Care Circle invitation. Open Voithy app to view its details`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
@@ -190,8 +190,8 @@ exports.NewInvitationFromCareGiver_AR_APNS=(InvitationFrom,InvitationID,Notifica
     return {
         "aps":{
             "alert":{
-                "title": `بارسال دعوة ${InvitationFrom} قام`,
-                "body": `بارسال دعوة لتكون مريض لديه ${InvitationFrom} قام`
+                "title": `لديك دعوة جديدة`,
+                "body": `قم بفتح تطبيق فويثي`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
@@ -206,8 +206,8 @@ exports.DependentAcceptedInvitation_EN_APNS=(DependentName,InvitationID,Notifica
     return {
         "aps":{
             "alert":{
-                "title": `${DependentName}, accepted your invitation`,
-                "body": `${DependentName}, accepted your invitation`
+                "title": `Your Invitation has been accepted `,
+                "body": `Open Voithy to view the details`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
@@ -222,8 +222,8 @@ exports.DependentAcceptedInvitation_AR_APNS=(DependentName,InvitationID,Notifica
     return {
         "aps":{
             "alert":{
-                "title": `${DependentName}, قبل دعوتك`,
-                "body": `${DependentName}, قبل دعوتك`
+                "title": ` قبل دعوتك`,
+                "body": ` قبل دعوتك`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
@@ -237,8 +237,8 @@ exports.NewInvitationFromDependent_EN_APNS=(DependentName,InvitationID,Notificat
     return {
         "aps":{
             "alert":{
-                "title": `${DependentName}, sent you invitation`,
-                "body": `${DependentName}, sent you invitation to be his caregiver`
+                "title": `Care Circle Invitation`,
+                "body": `You received a Care Circle invitation. Open Voithy app to view its details`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
@@ -252,8 +252,8 @@ exports.NewInvitationFromDependent_AR_APNS=(DependentName,InvitationID,Notificat
     return {
         "aps":{
             "alert":{
-                "title": `${DependentName}, بارسال دعوة`,
-                "body": `${DependentName}, بارسال دعوة لك أن تكون مرافق له`
+                "title": ` بارسال دعوة`,
+                "body": ` بارسال دعوة لك أن تكون مرافق له`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
@@ -268,8 +268,8 @@ exports.CareGiverAcceptedInvitation_EN_APNS=(CareGiver,InvitationID,Notification
     return {
         "aps":{
             "alert":{
-                "title": `${CareGiver}, accepted your invitation`,
-                "body": `${CareGiver}, accepted your invitation`
+                "title": `Your Invitation has been accepted`,
+                "body": `Open Voithy to view the details.`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,
@@ -284,8 +284,8 @@ exports.CareGiverAcceptedInvitation_AR_APNS=(CareGiver,InvitationID,Notification
     return {
         "aps":{
             "alert":{
-                "title": `${CareGiver}, قبل دعوتك`,
-                "body": `${CareGiver}, قبل دعوتك`
+                "title": ` قبل دعوتك`,
+                "body": ` قبل دعوتك`
             },
             "data":{
                 "InvitationID": `${InvitationID}`,

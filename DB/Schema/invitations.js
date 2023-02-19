@@ -85,9 +85,21 @@ var InvitationsSchema = new Schema({
         },
     },
     AccountType:{
-        type:Number, // 2 if the recevier will be a caregiver 1 for dependent
+        /**
+         * 1: the receiver will be a dependent
+         * 2: if the receiver will be a caregiver,
+         * 3: receiver will be MasterToDependent and the old master will be removed,
+         * 4: will be MasterToDependent and the old master will remain
+         * 
+         */
+        type:Number,  
         default:1
-    }
+    },
+    externalData:{
+        type:Object,
+        default:{}
+    },
+
 
  
  

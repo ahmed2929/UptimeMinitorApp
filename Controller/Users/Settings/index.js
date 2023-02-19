@@ -22,7 +22,7 @@ const {
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 
-const {GenerateToken,GenerateRandomCode,GenerateRefreshToken} =require("../../../utils/HelperFunctions")
+const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile} =require("../../../utils/HelperFunctions")
 
 
 
@@ -42,8 +42,9 @@ exports.EditProfile = async (req, res) => {
       if(profile.Deleted){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-    
-      if(profile.Owner.User.toString()!==id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+
+      if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       
@@ -311,13 +312,15 @@ exports.EditProfile = async (req, res) => {
       if(profile.Deleted){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
-
-      if(profile.Owner.User.toString()!==id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
      
         // delete user
-        await User.findByIdAndDelete(id)
+        await User.findByOneAndDelete({
+          profile:ProfileID
+        })
         // delete profile
         profile.Deleted=true
         profile.NotificationInfo=null

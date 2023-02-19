@@ -193,7 +193,8 @@ exports.CreateNewMed = async (req, res) => {
         type,
         ProfileID,
         Refillable,
-        RefileLevel
+        RefileLevel,
+        Ringtone
       }=req.body
       
 
@@ -227,9 +228,9 @@ exports.CreateNewMed = async (req, res) => {
          
        }
        //case the owner does not has write permission
-       if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-         return errorResMsg(res, 401, req.t("Unauthorized"));
-       }
+      //  if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      //    return errorResMsg(res, 401, req.t("Unauthorized"));
+      //  }
    
      
       let img
@@ -258,7 +259,8 @@ exports.CreateNewMed = async (req, res) => {
         Refile:{
           Refillable,
           RefileLevel
-        }
+        },
+        Ringtone
         
       })
     
@@ -275,6 +277,7 @@ exports.CreateNewMed = async (req, res) => {
         ProfileID,
         CreatorProfile:viewerProfile._id,
         SchedulerType:JSON.parse(Scheduler).ScheduleType,
+        
       }
       // create Scheduler 
       let jsonScheduler=JSON.parse(Scheduler)
@@ -409,7 +412,8 @@ exports.CreateNewMed = async (req, res) => {
         type,
         ProfileID,
         Refillable,
-        RefileLevel
+        RefileLevel,
+        Ringtone
       }=req.body
   
   
@@ -440,9 +444,9 @@ exports.CreateNewMed = async (req, res) => {
         
       }
       //case the owner dont has write permission
-      if(profile.Owner.User.toString()===id&&!profile.Owner.Permissions.write){
-        return errorResMsg(res, 401, req.t("Unauthorized"));
-      }
+      // if(profile.Owner.User.toString()===id&&!profile.Owner.Permissions.write){
+      //   return errorResMsg(res, 401, req.t("Unauthorized"));
+      // }
   
   
   
@@ -480,7 +484,8 @@ exports.CreateNewMed = async (req, res) => {
           Refile:{
             Refillable:Refillable||oldMed.Refile.Refillable,
             RefileLevel:RefileLevel||oldMed.Refile.RefileLevel
-          }
+          },
+          Ringtone:Ringtone||oldMed.Ringtone
         },{new:true})
         newMed=editedMed
         // generate MedInfo snapshot
@@ -955,9 +960,9 @@ exports.CreateNewMed = async (req, res) => {
         
       }
       //case the owner dont has write permission
-      if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
-        return errorResMsg(res, 401, req.t("Unauthorized"));
-      }
+      // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
+      //   return errorResMsg(res, 401, req.t("Unauthorized"));
+      // }
   
   
   

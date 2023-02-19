@@ -78,6 +78,23 @@ router.delete(
     IsAuth(),
     CircleController.DeleteInvitation
 )
+router.put(
+    "/edit/dependent/profile",
+    IsAuth(),
+    CircleController.EditDependentInfo
+)
+router.put(
+    "/edit/dependent/full/profile",
+    IsAuth(),
+    CircleController.EditDependentInfoFull
+)
+router.delete(
+    "/delete/dependent/A",
+    IsAuth(),
+    CircleController.DeleteInternalDependent
+)
+
+
 
 
 

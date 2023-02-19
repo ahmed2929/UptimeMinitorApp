@@ -41,7 +41,7 @@ var ViewerSchema = new Schema({
     CanReadSpacificMeds:[{
         Med:{
             type:Schema.Types.ObjectId,
-             ref:"Medication",
+             ref:"UserMedication",
         },
         CanRead:{
             type:Boolean,
@@ -80,6 +80,18 @@ var ViewerSchema = new Schema({
     IsDeleted:{
         type:Boolean,
         default:false
+    },
+    DependentProfileNickName:{
+        type:String,
+        default:null
+    },
+    CareGiverNickName:{
+        type:String,
+        default:null
+    },
+    Invitation:{
+        type:Schema.Types.ObjectId,
+        ref:"Invitation",
     }
  
 

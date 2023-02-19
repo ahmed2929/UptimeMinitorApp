@@ -1,0 +1,74 @@
+const generalDoses = await Occurrence.aggregate([
+  {
+    $match: {
+      ProfileID: { $in: dependentsProfilesIDs },
+      PlannedDateTime: { $gte: queryDate, $lt: nextDay },
+      isSuspended: false,
+    },
+  },
+  {
+    $lookup: {
+      from: "profiles",
+      localField: "ProfileID",
+      foreignField: "_id",
+      as: "profile",
+    },
+  },
+  {
+    $unwind: "$profile",
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "profile.Owner.User",
+      foreignField: "_id",
+      as: "user",
+    },
+  },
+  {
+    $unwind: "$user",
+  },
+  {
+    $group: {
+      _id: "$ProfileID",
+      doses: {
+        $push: {
+          PlannedDateTime: "$PlannedDateTime",
+          PlannedDose: "$PlannedDose",
+          Status: "$Status",
+          Medication: "$Medication",
+          Scheduler: "$Scheduler",
+          MedInfo: "$MedInfo",
+          _id: "$_id",
+        },
+      },
+      owner: {
+        $first: "$user",
+      },
+      profile: {
+        $first: "$profile",
+      },
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      ProfileID: "$_id",
+      doses: 1,
+      owner: {
+        firstName: "$owner.firstName",
+        lastName: "$owner.lastName",
+        email: "$owner.email",
+      },
+      dependantName: "$profile.dependantName",
+    },
+  },
+]);
+
+
+
+***********
+db.profiles.updateOne(
+  { _id: ObjectId("63eb74824abb2bd47b7cbddf") },
+  { $set: { Dependents: [], Viewers: [] } }
+)
