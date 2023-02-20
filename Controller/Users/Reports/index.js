@@ -119,9 +119,9 @@ exports.getReport=async (req, res) => {
       }
       // check if the user is the owner and has write permission or can add meds
         //case the owner dont has write permission
-        if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
-          return errorResMsg(res, 401, req.t("Unauthorized"));
-        }
+        // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        //   return errorResMsg(res, 401, req.t("Unauthorized"));
+        // }
         let hasGeneralReadPermissions;
         let hasSpacificReadPermissions;
         if(profile.Owner.User.toString()===id){
@@ -440,8 +440,8 @@ exports.getReport=async (req, res) => {
       const {id} =req.id
       const {ProfileID,StartDate,EndDate,MedID}=req.query
   
-  
-               /*
+      
+      /*
       
       check permission 
       
@@ -477,9 +477,9 @@ exports.getReport=async (req, res) => {
       }
       // check if the user is the owner and has write permission or can add meds
         //case the owner dont has write permission
-        if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
-          return errorResMsg(res, 401, req.t("Unauthorized"));
-        }
+        // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        //   return errorResMsg(res, 401, req.t("Unauthorized"));
+        // }
         let hasGeneralReadPermissions;
         let hasSpacificReadPermissions;
         if(profile.Owner.User.toString()===id){
@@ -533,12 +533,11 @@ exports.getReport=async (req, res) => {
          Medication:mongoose.Types.ObjectId(MedID),
          isSuspended:false
     }).populate(
-    {
-       path:"Medication",
-       select:"name img unit strength type"
-    }
-    ).select("Medication PlannedDateTime PlannedDose Status ProfileID")
-    
+      {
+         path:"Medication",
+         select:"name img unit strength type"
+      }
+      ).select("-MedInfo")
    
   
   
@@ -547,7 +546,7 @@ exports.getReport=async (req, res) => {
       
   
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+     
     }else{
       return errorResMsg(res, 401, req.t("Unauthorized"));
     }

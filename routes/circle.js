@@ -85,6 +85,7 @@ router.put(
 )
 router.put(
     "/edit/dependent/full/profile",
+    upload.single("img"),
     IsAuth(),
     CircleController.EditDependentInfoFull
 )

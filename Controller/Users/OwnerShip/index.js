@@ -20,7 +20,7 @@ const mongoose = require('mongoose');
 const Invitation =require("../../../DB/Schema/invitations")
 const NotificationMessages=require("../../../Messages/Notifications/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
-const {SendPushNotificationToUserRegardlessLangAndOs} =require("../../../utils/HelperFunctions")
+const {SendPushNotificationToUserRegardlessLangAndOs,CheckProfilePermissions} =require("../../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
@@ -46,6 +46,11 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
       if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       const searchForEmail =await User.findOne({
         email:newEmail
@@ -105,6 +110,11 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
       if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       const searchForEmail =await TempEmails.findOne({
         email:ChangedEmail
       })
@@ -158,6 +168,11 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
       if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       let searchForEmail =await TempEmails.findOne({
         email:newEmail
@@ -219,6 +234,11 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
       if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       if(!newPassword){
         return errorResMsg(res, 400, req.t("Invalid_Password"));
       }
@@ -275,6 +295,11 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
       if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       const CareGiverProfile=await Profile.findOne({
         _id:CareGiverProfileID,
@@ -415,7 +440,11 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
-      
+        if(dependentProfile.Owner.User._id.toString() === id){
+          if(!CheckProfilePermissions(dependentProfile,'CanManageCareCircle')){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+          }
+        }
         // change the invitation status............................................................
         if(invitation.Status!=0){
             return errorResMsg(res, 400, req.t("invitation_status_changed_before"));

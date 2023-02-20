@@ -17,7 +17,7 @@ const Viewer =require("../../../DB/Schema/Viewers")
 const messages = require("../../../Messages/Email/index")
 const NotificationMessages=require("../../../Messages/Notifications/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
-const {SendPushNotificationToUserRegardlessLangAndOs,IsMasterOwnerToThatProfile} =require("../../../utils/HelperFunctions")
+const {SendPushNotificationToUserRegardlessLangAndOs,IsMasterOwnerToThatProfile,ReturnProfileFullPermissions,CheckProfilePermissions,ReturnDependentPermissionsProfileLevelTypeA,ReturnDependentPermissionsProfileLevelTypeB} =require("../../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
@@ -110,6 +110,13 @@ exports.CreateDependentA = async (req, res) => {
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
        }
       }
+      // if the caller is the profile owner then check his Permissions
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+    
      
 
         // check for  email and mobile if it provided
@@ -175,6 +182,7 @@ exports.CreateDependentA = async (req, res) => {
           
             
         })
+        const DependentTypeADefaultPermissions=ReturnDependentPermissionsProfileLevelTypeA()
        // create a new profile for dependent user
          const newProfile = new Profile({
             Owner:{
@@ -192,6 +200,7 @@ exports.CreateDependentA = async (req, res) => {
             }],
             MasterUsers:[id],
             MasterProfiles:[profile._id],
+            Permissions:DependentTypeADefaultPermissions
 
          })
          // link profile to viewer
@@ -337,6 +346,12 @@ exports.CreateDependentA = async (req, res) => {
             return errorResMsg(res, 400, req.t("email_or_mobile_required"));
         }
 
+        if(profile.Owner.User._id.toString() === id){
+          if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+          }
+        }
+      
           
       // store the image to azure
       let img;
@@ -730,6 +745,11 @@ exports.CreateDependentA = async (req, res) => {
           
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
+        }
+        if(dependentProfile.Owner.User._id.toString() === id){
+          if(!CheckProfilePermissions(dependentProfile,'CanManageCareCircle')){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+          }
         }
       
         // change the invitation status............................................................
@@ -1235,6 +1255,12 @@ Add a new caregiver to a user's profile
          }
         }
   
+        if(profile.Owner.User._id.toString() === id){
+          if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+          }
+        }
+      
 
         // check for  email and mobile if it provided
         const mobileNumber={
@@ -1490,7 +1516,17 @@ Add a new caregiver to a user's profile
 
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
-        }
+          
+          }
+
+          if(CareGiverProfile.Owner.User._id.toString() === id){
+            if(!CheckProfilePermissions(CareGiverProfile,'CanManageCareCircle')){
+              return errorResMsg(res, 400, req.t("Unauthorized"));
+            }
+          }
+        
+
+
         if(invitation.Status!=0){
             return errorResMsg(res, 400, req.t("invitation_status_changed_before"));
         }
@@ -1730,7 +1766,7 @@ exports.EditCareGiverPermissions = async (req, res) => {
     const {
       ProfileID,
       ViewerID,
-      Permissions,
+      permissions,
       nickName
     }=req.body
 
@@ -1778,6 +1814,12 @@ exports.EditCareGiverPermissions = async (req, res) => {
       if(profile.Owner.User._id.toString()!=id&&!IsMaster){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+    
      
       // get the relationship 
       const relationship = await Viewer.findOne({
@@ -1790,19 +1832,20 @@ exports.EditCareGiverPermissions = async (req, res) => {
         return errorResMsg(res, 400, req.t("relationship_not_found"));
       }
       // update the relationship
-      relationship.CanWriteMeds=Permissions.CanWriteMeds||relationship.CanWriteMeds
-      relationship.CanReadDoses=Permissions.CanReadDoses||relationship.CanReadDoses
-      relationship.CanWriteDoses=Permissions.CanWriteDoses||relationship.CanWriteDoses
-      relationship.CanReadRefile=Permissions.CanReadRefile||relationship.CanReadRefile
-      relationship.CanReadAllMeds=Permissions.CanReadAllMeds||relationship.CanReadAllMeds
-      relationship.CanReadSymptoms=Permissions.CanReadSymptoms||relationship.CanReadSymptoms
-      relationship.CanAddMeds=Permissions.CanAddMeds||relationship.CanAddMeds
-      relationship.CanWriteSymptoms=Permissions.CanWriteSymptoms||relationship.CanWriteSymptoms
-      relationship.CanReadSpacificMeds=Permissions.CanReadSpacificMeds||relationship.CanReadSpacificMeds
-      relationship.notify=Permissions.notify||relationship.notify
+      console.log(permissions)
+      relationship.CanWriteMeds=permissions.CanWriteMeds?permissions.CanWriteMeds:relationship.CanWriteMeds
+      relationship.CanReadDoses=permissions.CanReadDoses?permissions.CanReadDoses:relationship.CanReadDoses
+      relationship.CanWriteDoses=permissions.CanWriteDoses?permissions.CanWriteDoses:relationship.CanWriteDoses
+      relationship.CanReadRefile=permissions.CanReadRefile?permissions.CanReadRefile:relationship.CanReadRefile
+      relationship.CanReadAllMeds=permissions.CanReadAllMeds?permissions.CanReadAllMeds:relationship.CanReadAllMeds
+      relationship.CanReadSymptoms=permissions.CanReadSymptoms?permissions.CanReadSymptoms:relationship.CanReadSymptoms
+      relationship.CanAddMeds=permissions.CanAddMeds?permissions.CanAddMeds:relationship.CanAddMeds
+      relationship.CanWriteSymptoms=permissions.CanWriteSymptoms?permissions.CanWriteSymptoms:relationship.CanWriteSymptoms
+      relationship.CanReadSpacificMeds=permissions.CanReadSpacificMeds?permissions.CanReadSpacificMeds:relationship.CanReadSpacificMeds
+      relationship.notify=permissions.notify?permissions.notify:relationship.notify
       relationship.CareGiverNickName=nickName||relationship.CareGiverNickName
       
-     
+     console.log("******",relationship)
      
       // save changes
       await relationship.save()
@@ -1850,6 +1893,12 @@ exports.EditDependentInfo = async (req, res) => {
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
       if(profile.Owner.User._id.toString()!=id&&!IsMaster){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+      }
+
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
      
       // get the relationship 
@@ -1905,7 +1954,7 @@ exports.EditDependentInfoFull = async (req, res) => {
 
     }=req.body
 
-
+    console.log("****",req.body)
       // make sure that the api consumer is authorized
       if(!mongoose.isValidObjectId(ProfileID)){
           return errorResMsg(res, 400, req.t("invalid_profile_id"));
@@ -1922,6 +1971,11 @@ exports.EditDependentInfoFull = async (req, res) => {
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
      
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       // get the relationship 
       const relationship = await Viewer.findOne({
         ViewerProfile:ProfileID,
@@ -2073,7 +2127,11 @@ exports.DeleteCareGiverPermissions = async (req, res) => {
       if(profile.Owner.User._id.toString()!=id&&!IsMaster){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
-     
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       // get the relationship 
       const relationship = await Viewer.findOne({
         DependentProfile:ProfileID,
@@ -2093,10 +2151,30 @@ exports.DeleteCareGiverPermissions = async (req, res) => {
       profile.Viewers=profile.Viewers.filter(obj=>obj.viewer.toString()!=ViewerID)
     
       // delete the viewer object from dependent which its viewer === ViewerID from caregiver profile
-      const caregiverProfile=await Profile.findById(relationship.ViewerProfile.toString())
+      const caregiverProfile=await Profile.findById(relationship.ViewerProfile.toString()).populate("Owner.User")
       caregiverProfile.Dependents=caregiverProfile.Dependents.filter(obj=>obj.viewer.toString()!=ViewerID)
 
       await Invitation.findByIdAndDelete(relationship.Invitation)
+
+      const TheCareGiverWasMaster=await IsMasterOwnerToThatProfile(caregiverProfile.Owner.User._id.toString(),profile)
+      if(TheCareGiverWasMaster){
+       
+       profile.MasterProfiles=profile.MasterProfiles.filter(obj=>obj.toString()!=caregiverProfile._id.toString())
+       profile.MasterUsers=profile.MasterUsers.filter(obj=>obj.toString()!=caregiverProfile.Owner.User._id.toString())
+       const DependentUser=await User.findOne({
+         profile:profile._id
+       })
+       DependentUser.MasterProfiles=DependentUser.MasterProfiles.filter(obj=>obj.toString()!=caregiverProfile._id.toString())
+       DependentUser.MasterUsers=DependentUser.MasterUsers.filter(obj=>obj.toString()!=caregiverProfile.Owner.User._id.toString())
+       await DependentUser.save()
+       // give profile owner full control
+       const FullPermissions=ReturnProfileFullPermissions();
+       profile.Permissions=FullPermissions
+     
+     
+     }
+
+
       // save changes
       await caregiverProfile.save()
       await profile.save()
@@ -2166,7 +2244,11 @@ exports.DeleteDependent = async (req, res) => {
       if(profile.Owner.User._id.toString()!=id){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
-     
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       // get the relationship 
       const relationship = await Viewer.findOne({
         ViewerProfile:ProfileID,
@@ -2193,9 +2275,21 @@ exports.DeleteDependent = async (req, res) => {
        // transfer ownership to the user 
        const IsMaster=await IsMasterOwnerToThatProfile(id,DependentProfile)
        if(IsMaster){
-    
-        //DependentProfile.MasterProfiles=DependentProfile.MasterProfiles.filter(obj=>obj.viewer.toString()!=ViewerID)
-       }
+        
+        DependentProfile.MasterProfiles=DependentProfile.MasterProfiles.filter(obj=>obj.toString()!=profile._id.toString())
+        DependentProfile.MasterUsers=DependentProfile.MasterUsers.filter(obj=>obj.toString()!=id)
+        const DependentUser=await User.findOne({
+          profile:DependentProfile._id
+        })
+        DependentUser.MasterProfiles=DependentUser.MasterProfiles.filter(obj=>obj.toString()!=profile._id.toString())
+        DependentUser.MasterUsers=DependentUser.MasterUsers.filter(obj=>obj.toString()!=id)
+        await DependentUser.save()
+        // give profile owner full control
+        const FullPermissions=ReturnProfileFullPermissions();
+        DependentProfile.Permissions=FullPermissions
+        await DependentProfile.save()
+      
+      }
      
 
       // save changes
@@ -2245,6 +2339,13 @@ exports.DeleteInternalDependent = async (req, res) => {
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
       
+
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
       // check if the caller is master owner
     
 
@@ -2385,7 +2486,11 @@ exports.DeleteInvitation = async (req, res) => {
       if(profile.Owner.User._id.toString()!=id&&!IsMaster){
           return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
       }
-     
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanManageCareCircle')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       // get the invitation
       const invitation = await Invitation.findOneAndDelete({
         _id:InvitationID,

@@ -7,58 +7,62 @@ var ProfileSchema = new Schema({
     User:{
         type:Schema.Types.ObjectId,
         ref:"User",
-    },
-    Permissions:{
-        read:{
-            type:Boolean,
-            default:true
-        },
-        CanAddMeds:{
-            type:Boolean,
-            default:true
-        },
-        CanEditMeds:{
-            type:Boolean,
-            default:true
-        },
-        CanDeleteMeds:{
-            type:Boolean,
-            default:true
-        },
-        CanTakeDose:{
-            type:Boolean,
-            default:true
-        },
-        CanAddSingleDose:{
-            type:Boolean,
-            default:true
-        },
-        CanSuspendDoses:{
-            type:Boolean,
-            default:true
-        },
-        CanAddSymptom:{
-            type:Boolean,
-            default:true
-        },
-        CanEditSymptom:{
-            type:Boolean,
-            default:true
-        },
-        CanDeleteSymptom:{
-            type:Boolean,
-            default:true
-        },
-        CanManageCareCircle:{
-            type:Boolean,
-            default:true
-        },
-        CanEditProfile:{
-            type:Boolean,
-            default:true
-        },
     }
   },
+  Permissions:{
+    CanRead:{
+        type:Boolean,
+        default:true
+    },
+    CanAddMeds:{
+        type:Boolean,
+        default:true
+    },
+    CanEditMeds:{
+        type:Boolean,
+        default:true
+    },
+    CanDeleteMeds:{
+        type:Boolean,
+        default:true
+    },
+    CanTakeDose:{
+        type:Boolean,
+        default:true
+    },
+    CanEditSingleDose:{
+        type:Boolean,
+        default:true
+    },
+    CanAddSingleDose:{
+        type:Boolean,
+        default:true
+    },
+    CanSuspendDoses:{
+        type:Boolean,
+        default:true
+    },
+    CanAddSymptom:{
+        type:Boolean,
+        default:true
+    },
+    CanEditSymptom:{
+        type:Boolean,
+        default:true
+    },
+    CanDeleteSymptom:{
+        type:Boolean,
+        default:true
+    },
+    CanManageCareCircle:{
+        type:Boolean,
+        default:true
+    },
+    CanEditProfile:{
+        type:Boolean,
+        default:true
+    },
+    },
     Dependents:[{
     
             Profile:{
@@ -78,7 +82,7 @@ var ProfileSchema = new Schema({
                 ref:"Viewer",
             }
      
-}],
+    }],
     Viewers:[{
         viewer:{
             type:mongoose.Schema.Types.ObjectId,

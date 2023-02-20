@@ -1370,6 +1370,107 @@ const GetSymptomForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
     }
 
 }
+
+const ReturnProfileFullPermissions=()=>{
+  try {
+ 
+    
+  return {
+  CanRead:true,
+  CanAddMeds:true,
+  CanEditMeds:true,
+  CanDeleteMeds:true,
+  CanTakeDose:true,
+  CanEditSingleDose:true,
+  CanAddSingleDose:true,
+  CanSuspendDoses:true,
+  CanAddSymptom:true,
+  CanEditSymptom:true,
+  CanDeleteSymptom:true,
+  CanManageCareCircle:true,
+  CanEditProfile:true
+    
+  
+  }
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+const ReturnDependentPermissionsProfileLevelTypeB=()=>{
+  try {
+ 
+    
+    return {
+      CanRead:true,
+      CanAddMeds:false,
+      CanEditMeds:false,
+      CanDeleteMeds:false,
+      CanTakeDose:true,
+      CanEditSingleDose:true,
+      CanAddSingleDose:true,
+      CanSuspendDoses:true,
+      CanAddSymptom:true,
+      CanEditSymptom:true,
+      CanDeleteSymptom:true,
+      CanManageCareCircle:false,
+      CanEditProfile:false
+        
+      
+      }
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+
+const ReturnDependentPermissionsProfileLevelTypeA=()=>{
+  try {
+ 
+    
+    return {
+      CanRead:true,
+      CanAddMeds:false,
+      CanEditMeds:false,
+      CanDeleteMeds:false,
+      CanTakeDose:false,
+      CanEditSingleDose:false,
+      CanAddSingleDose:false,
+      CanSuspendDoses:false,
+      CanAddSymptom:false,
+      CanEditSymptom:false,
+      CanDeleteSymptom:false,
+      CanManageCareCircle:false,
+      CanEditProfile:false
+        
+      
+      }
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+
+const CheckProfilePermissions=(profile,permission)=>{
+  try {
+    
+    return profile.Permissions[permission]
+    
+ 
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+
 module.exports={
     GenerateToken,
     GenerateRandomCode,
@@ -1391,5 +1492,9 @@ module.exports={
     BindNickNameWithDependent,
     GetSymptomForProfileID,
     GetSymptomForProfileIDList,
-    BindNickNameWithDependentSymptom
+    BindNickNameWithDependentSymptom,
+    ReturnProfileFullPermissions,
+    CheckProfilePermissions,
+    ReturnDependentPermissionsProfileLevelTypeB,
+    ReturnDependentPermissionsProfileLevelTypeA
 }

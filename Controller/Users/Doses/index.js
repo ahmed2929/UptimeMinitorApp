@@ -19,7 +19,8 @@ const {
    GetDosesForProfileID,
   GetDosesForListOfProfiles,
   GetDosesForListOfMedications,
-  BindNickNameWithDependent
+  BindNickNameWithDependent,
+  CheckProfilePermissions
 } =require("../../../utils/HelperFunctions")
 
 
@@ -151,6 +152,13 @@ exports.EditSingleDose=async (req, res) => {
         }
         
       }
+
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditSingleDose')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
       //case the owner dont has write permission
       // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
       //   return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -287,6 +295,12 @@ exports.EditSingleDose=async (req, res) => {
           return errorResMsg(res, 401, req.t("Unauthorized"));
         }
         
+      }
+
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanSuspendDoses')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       //case the owner dont has write permission
       // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
@@ -437,6 +451,11 @@ exports.EditSingleDose=async (req, res) => {
         }
         
       }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanTakeDose')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       //case the owner dont has write permission
       // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
       //   return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -586,7 +605,7 @@ exports.EditSingleDose=async (req, res) => {
       }
       // check if the user is the owner and has write permission or can add meds
         //case the owner dont has write permission
-        if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        if(profile.Owner.toString()===id&&!profile.Permissions.read){
           return errorResMsg(res, 401, req.t("Unauthorized"));
         }
         let hasGeneralReadPermissions;
@@ -933,6 +952,11 @@ exports.EditSingleDose=async (req, res) => {
         return errorResMsg(res, 401, req.t("Unauthorized"));
       }
       
+    }
+    if(profile.Owner.User._id.toString() === id){
+      if(!CheckProfilePermissions(profile,'CanAddSingleDose')){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
     }
     //case the owner dont has write permission
     // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){

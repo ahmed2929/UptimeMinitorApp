@@ -22,7 +22,7 @@ const {
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 
-const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile} =require("../../../utils/HelperFunctions")
+const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile,CheckProfilePermissions} =require("../../../utils/HelperFunctions")
 
 
 
@@ -47,7 +47,11 @@ exports.EditProfile = async (req, res) => {
       if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
-      
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
       const searchForPhone =await User.findOne({
         "mobileNumber.countryCode":countryCode,
         "mobileNumber.phoneNumber":phoneNumber,
@@ -105,8 +109,14 @@ exports.EditProfile = async (req, res) => {
       }
     
       
-      if(profile.Owner.User.toString()!==id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       if(!OldPassword||!newPassword){
         return errorResMsg(res, 400, req.t("Invalid_Password"));
@@ -147,8 +157,14 @@ exports.EditProfile = async (req, res) => {
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
     
-      if(profile.Owner.User.toString()!==id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       const searchForEmail =await User.findOne({
         email:newEmail
@@ -204,8 +220,14 @@ exports.EditProfile = async (req, res) => {
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
       
-      if(profile.Owner.User.toString()!==id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       const searchForEmail =await TempEmails.findOne({
         email:ChangedEmail
@@ -255,8 +277,14 @@ exports.EditProfile = async (req, res) => {
       }
     
       
-      if(profile.Owner.User.toString()!==id){
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
       }
       let searchForEmail =await TempEmails.findOne({
         email:newEmail
@@ -316,7 +344,11 @@ exports.EditProfile = async (req, res) => {
       if(profile.Owner.User.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
-     
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
         // delete user
         await User.findByOneAndDelete({
           profile:ProfileID

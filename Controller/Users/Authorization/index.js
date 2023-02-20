@@ -226,6 +226,7 @@ exports.logIn = async (req, res) => {
         verified:user.verified,
         profile:user.profile,
         img:user.img,
+        Permissions:userProfile.Permissions,
 
         
       },
