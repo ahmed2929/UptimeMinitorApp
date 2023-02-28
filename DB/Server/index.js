@@ -14,6 +14,7 @@ const ConnetToDB =async()=>{
         
       const DBConnection= await mongoose.connect(ConnectString,DBConectionOptions)
       console.log("DB connected")
+     
       return DBConnection
     } catch (error) {
         console.log(error)
