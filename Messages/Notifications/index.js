@@ -112,7 +112,7 @@ exports.RefileAlert_EN_GCM=(patientName,MedName,MedID,NotificationActionType,Not
     return {
         "notification":{
             "title": `Refilel Alert`,
-            "body": `${patientName} need to Refilel ${MedName}`
+            "body": `Open Voithy app to view its details`
         },
         "data":{
             "MedID": `${MedID}`,
@@ -126,7 +126,7 @@ exports.RefileAlert_AR_GCM=(patientName,MedName,MedID,NotificationActionType,Not
     return {
         "notification":{
             "title": `تنبيه إعادة التعبئة`,
-            "body": `${patientName} يحتاج إلى إعادة تعبئة ${MedName}`
+            "body": `قم بفتح التطبيق `
         },
         "data":{
             "MedID": `${MedID}`,
@@ -141,7 +141,7 @@ exports.NewSymptom_EN_GCM=(patientName,NewSymptomID,NotificationActionType,Notif
         "notification":{
            
                 "title": `patient has new symptom`,
-                "body": `${patientName} has new symptom `
+                "body": `patient has new symptom `
             },
             "data":{
                 "SymptomID": `${NewSymptomID}`,
@@ -156,7 +156,8 @@ exports.NewSymptom_AR_GCM=(patientName,NewSymptomID,NotificationActionType,Notif
     return {
         "notification":{
             "title": `المريض لديه عرض جديد`,
-                "body": `${patientName} لديه عرض جديد`
+            "body": `المريض لديه عرض جديد`,
+           
             },
             "data":{
                 "SymptomID": `${NewSymptomID}`,
@@ -166,7 +167,36 @@ exports.NewSymptom_AR_GCM=(patientName,NewSymptomID,NotificationActionType,Notif
         }
     }
 }
-
+exports.NewSymptomAddedToMe_EN_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "notification":{
+           
+            "title": `A new Symptom has been added`,
+            "body": `CareGiver has added new symptom to you `
+        },
+        "data":{
+            "SymptomID": `${NewSymptomID}`,
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
+        
+    }
+    }
+}
+exports.NewSymptom_AR_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "notification":{
+           
+            "title": `  تم اضافة عرض جديد `,
+            "body": `تم اضافة عرض جديد `
+        },
+        "data":{
+            "SymptomID": `${NewSymptomID}`,
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
+        
+    }
+    }
+}
 /////////////////////////////////////////IOS/////////////////////////////////////////
 
 exports.NewInvitationFromCareGiver_EN_APNS=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
@@ -300,7 +330,7 @@ exports.RefileAlert_EN_APNS=(patientName,MedName,MedID,NotificationActionType,No
         "aps":{
             "alert":{
                 "title": `Refilel Alert`,
-                "body": `${patientName} need to Refilel ${MedName}`
+                "body": `Open Voithy app to view its details`
             },
             "data":{
                 "MedID": `${MedID}`,
@@ -315,7 +345,7 @@ exports.RefileAlert_AR_APNS=(patientName,MedName,MedID,NotificationActionType,No
         "aps":{
             "alert":{
                 "title": `تنبيه إعادة التعبئة`,
-                "body": `${patientName} يحتاج إلى إعادة تعبئة ${MedName}`
+                "body": `تنبيه إعادة التعبئة`,
             },
             "data":{
                 "MedID": `${MedID}`,
@@ -331,7 +361,7 @@ exports.NewSymptom_EN_APNS=(patientName,NewSymptomID,NotificationActionType,Noti
         "aps":{
             "alert":{
                 "title": `patient has new symptom`,
-                "body": `${patientName} has new symptom `
+                "body": `patient has new symptom `
             },
             "data":{
                 "SymptomID": `${NewSymptomID}`,
@@ -346,7 +376,39 @@ exports.NewSymptom_AR_APNS=(patientName,NewSymptomID,NotificationActionType,Noti
         "aps":{
             "alert":{
                 "title": `المريض لديه عرض جديد`,
-                "body": `${patientName} لديه عرض جديد`
+                "body": ` لديه عرض جديد`
+            },
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            }
+        }
+    }
+}
+
+
+exports.NewSymptomAddedToMe_EN_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "aps":{
+            "alert":{
+                "title": `A new Symptom has been added`,
+                "body": `CareGiver has added new symptom to you `
+            },
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            }
+        }
+    }
+}
+exports.NewSymptom_AR_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "aps":{
+            "alert":{
+                "title": `  تم اضافة عرض جديد `,
+                "body": `تم اضافة عرض جديد `
             },
             "data":{
                 "SymptomID": `${NewSymptomID}`,

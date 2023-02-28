@@ -11,6 +11,7 @@ const MedRecommendation = require("../../../DB/Schema/MedRecommendation");
 const NotificationSchema = require("../../../DB/Schema/Notifications");
 const Profile = require("../../../DB/Schema/Profile");
 const {UploadFileToAzureBlob}=require("../../../utils/HelperFunctions")
+const axios = require('axios');
 const {
   successResMsg,
   errorResMsg
@@ -121,7 +122,7 @@ exports.Notification = async (req, res) => {
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
     
-    if(profile.Owner.User.toString()!==id){
+    if(profile.Owner.User._id.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }
 
@@ -206,7 +207,7 @@ exports.MakeNotificationSeen = async (req, res) => {
     if(profile.Deleted){
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
-    if(profile.Owner.User.toString()!==id){
+    if(profile.Owner.User._id.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }
     // update notification seen status
@@ -233,6 +234,43 @@ exports.MakeNotificationSeen = async (req, res) => {
 };
 
 
+// make api to return Static data to the caller 
+exports.GetStaticData = async (req, res) => {
+   
+  try {
 
+   
+    const {ResourceID}=req.query
+    const BaseResourceURL=process.env.Storage_Resource_Base_URL
+    let url=`${BaseResourceURL}/${ResourceID}`
+    //get the resource from azure blob storage
+    console.log("url :",url)
+
+   
+    const { data, headers } = await axios({
+      url:url ,
+      method: 'GET',
+      responseType: 'stream',
+    });
+
+    // Set the response headers based on the content type of the resource
+    res.set('Content-Type', headers['content-type']);
+    res.set('Content-Length', headers['content-length']);
+
+    // return the data as response
+    data.pipe(res);
+
+
+    
+
+    
+       
+   
+  } catch (err) {
+    // return error response
+    console.log("error is ",err)
+    return errorResMsg(res, 500, err);
+  }
+}
 
 

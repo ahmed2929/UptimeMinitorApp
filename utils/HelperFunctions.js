@@ -166,7 +166,7 @@ const getUserEmailFromId=async(id)=>{
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
         const uploadBlobResponse = await blockBlobClient.upload(file.buffer, file.buffer.length);
         console.log(uploadBlobResponse)
-        const url = `https://medimages.blob.core.windows.net/${containerName}/${blobName}`;
+        const url = `${blobName}`;
         
 
         return url;
@@ -568,7 +568,50 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                         await sendNotification(userprofile._id,Android_payload,"Android",8,payloadData)
                     } 
                 break;
-                case "NewInvitationToBeMasterUser":
+                case "NewSymptomAddToMe":
+                  //i case of only IOS
+                     if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                         //save notification in db
+                         const notification = new Notification({
+                             ProfileID:userprofile._id,
+                             data:payloadData,
+                             action:10
+                             
+                         })
+                         await notification.save()
+                         payload=NotificationMessages.NewSymptomAddedToMe_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                         await sendNotification(userprofile._id,payload,"IOS",10,payloadData)
+ 
+                     }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                         //save notification in db
+                         const notification = new Notification({
+                             ProfileID:userprofile._id,
+                             data:payloadData,
+                             action:10
+                             
+                         })
+                         await notification.save()
+                         payload=NotificationMessages.NewSymptomAddedToMe_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                         await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+ 
+                     }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                      //save notification in db
+                      const notification = new Notification({
+                         ProfileID:userprofile._id,
+                         data:payloadData,
+                         action:10
+                         
+                     })
+                     await notification.save()   
+                     const IOS_payload=NotificationMessages.NewSymptomAddedToMe_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+ 
+                     const Android_payload=NotificationMessages.NewSymptomAddedToMe_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                     //case of both
+                         await sendNotification(userprofile._id,IOS_payload,"IOS",10,payloadData)
+                         await sendNotification(userprofile._id,Android_payload,"Android",10,payloadData)
+                     } 
+                 break;    
+            case "NewInvitationToBeMasterUser":
                     //i case of only IOS
                        if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
@@ -875,8 +918,50 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        await sendNotification(userprofile._id,Android_payload,"Android",8,payloadData)
                    } 
                break;
-           
+            case "NewSymptomAddToMe":
+                //i case of only IOS
+                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:10
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewSymptomAddedToMe_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
 
+                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:10
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewSymptomAddedToMe_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+
+                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                    //save notification in db
+                    const notification = new Notification({
+                       ProfileID:userprofile._id,
+                       data:payloadData,
+                       action:10
+                       
+                   })
+                   await notification.save()   
+                   const IOS_payload=NotificationMessages.NewSymptomAddedToMe_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+
+                   const Android_payload=NotificationMessages.NewSymptomAddedToMe_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                   //case of both
+                       await sendNotification(userprofile._id,IOS_payload,"IOS",10,payloadData)
+                       await sendNotification(userprofile._id,Android_payload,"Android",10,payloadData)
+                   } 
+               break;
+           
             default:
                 break;
 
@@ -925,7 +1010,7 @@ const CheckRelationShipBetweenCareGiverAndDependent=async(ProfileID,id)=>{
         DependentProfile:ProfileID,
         IsDeleted:false
        })
-       if(!viewer&&profile.Owner.User.toString()!==id){
+       if(!viewer&&profile.Owner.User._id.toString()!==id){
         return false;
       }
       
@@ -1377,7 +1462,7 @@ const ReturnProfileFullPermissions=()=>{
     
   return {
   CanRead:true,
-  CanAddMeds:true,
+  CanAddNewMeds:true,
   CanEditMeds:true,
   CanDeleteMeds:true,
   CanTakeDose:true,
@@ -1405,7 +1490,7 @@ const ReturnDependentPermissionsProfileLevelTypeB=()=>{
     
     return {
       CanRead:true,
-      CanAddMeds:false,
+      CanAddNewMeds:false,
       CanEditMeds:false,
       CanDeleteMeds:false,
       CanTakeDose:true,
@@ -1434,7 +1519,7 @@ const ReturnDependentPermissionsProfileLevelTypeA=()=>{
     
     return {
       CanRead:true,
-      CanAddMeds:false,
+      CanAddNewMeds:false,
       CanEditMeds:false,
       CanDeleteMeds:false,
       CanTakeDose:false,

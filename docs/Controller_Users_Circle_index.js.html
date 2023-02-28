@@ -136,7 +136,7 @@ exports.CreateDependentA = async (req, res) => {
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
         // check if the user if the user is the owner of that profile
-        if(profile.Owner.User.toString() !== id){
+        if(profile.Owner.User._id.toString() !== id){
             return errorResMsg(res, 400, req.t("Unauthorized"));
         }
 
@@ -182,8 +182,8 @@ exports.CreateDependentA = async (req, res) => {
         // create new viewer for the dependent user
         const newViewer = new Viewer({
             ViewerProfile:ProfileID,
-            CanWriteDoses:true,
-            CanWriteSymptoms:true
+            CanEditDoses:true,
+            CanEditSymptoms:true
             
         })
        // create a new profile for dependent user
@@ -553,14 +553,14 @@ exports.CreateDependentA = async (req, res) => {
        * the invitation is sent from a caregiver
        * the user will be dependent on the caregiver
        * the caregiver will be able to monitor user account with the following permissions
-       * "CanWriteMeds": false,
+       * "CanEditAllMeds": false,
         "CanReadDoses": false,
-        "CanWriteDoses": false,
+        "CanEditDoses": false,
         "CanReadRefile": false,
         "CanReadAllMeds": false,
         "CanReadSymptoms": true,
-        "CanAddMeds": true,
-        "CanWriteSymptoms": false,
+        "CanAddNewMeds": true,
+        "CanEditSymptoms": false,
        *
         *-1 change invitation status if it did not change before
         *-2 create a new viewer permission 
@@ -608,7 +608,7 @@ exports.CreateDependentA = async (req, res) => {
         }
         // get the DependentProfile
         const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(Invitation.To))
-        if(dependentProfile.Owner.User.toString()!=id){
+        if(dependentProfile.Owner.User._id.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
@@ -724,7 +724,7 @@ The filter can be based on the status, sent, and received parameters.
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
-        if(profile.Owner.User.toString()!=id){
+        if(profile.Owner.User._id.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
         // get the Invitations
@@ -864,14 +864,14 @@ Add a new caregiver to a user's profile
 @param {string} req.body.phoneNumber - phoneNumber
 @param {string} req.body.countryCode - countryCode
 @param {Object} req.body.permissions - permissions object  "permissions": {
-    "CanWriteMeds": false,
+    "CanEditAllMeds": false,
     "CanReadDoses": false,
-    "CanWriteDoses": false,
+    "CanEditDoses": false,
     "CanReadRefile": false,
     "CanReadAllMeds": false,
     "CanReadSymptoms": true,
-    "CanAddMeds": true,
-    "CanWriteSymptoms": false,
+    "CanAddNewMeds": true,
+    "CanEditSymptoms": false,
     "CanReadSpacificMeds": [
       {
         "Med": "63b69329424603fd6128b72c",
@@ -880,7 +880,7 @@ Add a new caregiver to a user's profile
         "CanReadDoses": true,
         "CanReadRefile": true,
         "CanWriteRefile": false,
-        "CanWriteDoses": false
+        "CanEditDoses": false
       }
     ],
     "notify": true
@@ -1110,7 +1110,7 @@ Add a new caregiver to a user's profile
         }
         // get the DependentProfile
         const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(Invitation.From))
-        if(CareGiverProfile.Owner.User.toString()!=id){
+        if(CareGiverProfile.Owner.User._id.toString()!=id){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }

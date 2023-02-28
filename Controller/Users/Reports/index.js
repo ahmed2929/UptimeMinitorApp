@@ -114,7 +114,7 @@ exports.getReport=async (req, res) => {
 
       })
   
-      if(!viewer&&profile.Owner.User.toString()!==id){
+      if(!viewer&&profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       // check if the user is the owner and has write permission or can add meds
@@ -124,7 +124,7 @@ exports.getReport=async (req, res) => {
         // }
         let hasGeneralReadPermissions;
         let hasSpacificReadPermissions;
-        if(profile.Owner.User.toString()===id){
+        if(profile.Owner.User._id.toString()===id){
           hasGeneralReadPermissions=true
         }else{
            hasGeneralReadPermissions=viewer.CanReadDoses;
@@ -447,7 +447,7 @@ exports.getReport=async (req, res) => {
       
       */
   
-      const profile =await Profile.findById(ProfileID)
+      const profile =await Profile.findById(ProfileID).populate("Owner.User")
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
@@ -472,7 +472,7 @@ exports.getReport=async (req, res) => {
        IsDeleted:false
       })
   
-      if(!viewer&&profile.Owner.User.toString()!==id){
+      if(!viewer&&profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       // check if the user is the owner and has write permission or can add meds
@@ -482,7 +482,7 @@ exports.getReport=async (req, res) => {
         // }
         let hasGeneralReadPermissions;
         let hasSpacificReadPermissions;
-        if(profile.Owner.User.toString()===id){
+        if(profile.Owner.User._id.toString()===id){
           hasGeneralReadPermissions=true
         }else{
            hasGeneralReadPermissions=viewer.CanReadDoses;
@@ -512,10 +512,20 @@ exports.getReport=async (req, res) => {
        ).select("-MedInfo")
        
       
-   
+       const editedData=doses.map(dose=>{
+        return {
+          ...dose._doc,
+          exportProfileData:{
+            firstName:profile.Owner.User.firstName,
+            lastName:profile.Owner.User.lastName,
+            img:profile.Owner.User.img,
+            email:profile.Owner.User.email,
+          }
+        }
+      })
     
        // return successful response
-       return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+       return successResMsg(res, 200, {message:req.t("Success"),data:editedData});
   
     }else if(hasSpacificReadPermissions.length>0){
   
@@ -539,10 +549,20 @@ exports.getReport=async (req, res) => {
       }
       ).select("-MedInfo")
    
-  
+      const editedData=doses.map(dose=>{
+        return {
+          ...dose._doc,
+          exportProfileData:{
+            firstName:profile.Owner.User.firstName,
+            lastName:profile.Owner.User.lastName,
+            img:profile.Owner.User.img,
+            email:profile.Owner.User.email,
+          }
+        }
+      })
   
     // return successful response
-    return successResMsg(res, 200, {message:req.t("Success"),data:doses});
+    return successResMsg(res, 200, {message:req.t("Success"),data:editedData});
       
   
       // return successful response

@@ -163,19 +163,19 @@ exports.EditSingleDose=async (req, res) => {
        DependentProfile:ProfileID
       })
   
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
   
       // check if the user is the owner and has write permission or can add meds
   
-      if(profile.Owner.User.toString()!=id){
+      if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToAllMeds=viewer.CanWriteDoses;
+        const hasWritePermissonToAllMeds=viewer.CanEditDoses;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===oldOccurrence.Medication.toString()){
-            return med.CanWriteDoses
+            return med.CanEditDoses
           }
         }) 
         if(!(hasWritePermissonToThatDose||hasWritePermissonToAllMeds)){
@@ -296,14 +296,14 @@ exports.EditSingleDose=async (req, res) => {
        DependentProfile:ProfileID
       })
   
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       // check if the user is the owner and has write permission or can add meds
   
-      if(profile.Owner.User.toString()!=id){
+      if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToThatMed=viewer.CanWriteMeds;
+        const hasWritePermissonToThatMed=viewer.CanEditAllMeds;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===Scheduler.medication.toString()){
@@ -437,19 +437,19 @@ exports.EditSingleDose=async (req, res) => {
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID
       })
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
   
       // check if the user is the owner and has write permission or can add meds
   
-      if(profile.Owner.User.toString()!=id){
+      if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToThatMed=viewer.CanWriteDoses;
+        const hasWritePermissonToThatMed=viewer.CanEditDoses;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===dose.Medication.toString()){
-            return med.CanWriteDoses
+            return med.CanEditDoses
           }
         }) 
         if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){
@@ -570,7 +570,7 @@ exports.EditSingleDose=async (req, res) => {
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID
       })
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       // check if the user is the owner and has write permission or can add meds
@@ -580,7 +580,7 @@ exports.EditSingleDose=async (req, res) => {
         }
         let hasGeneralReadPermissions;
         let hasSpacificReadPermissions;
-        if(profile.Owner.User.toString()===id){
+        if(profile.Owner.User._id.toString()===id){
           hasGeneralReadPermissions=true
         }else{
           hasGeneralReadPermissions=viewer.CanReadDoses;
@@ -727,7 +727,7 @@ exports.EditSingleDose=async (req, res) => {
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID
       })
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       // check if the user is the owner and has write permission or can add meds
@@ -737,7 +737,7 @@ exports.EditSingleDose=async (req, res) => {
         }
         let hasGeneralReadPermissions;
         let hasSpacificReadPermissions;
-        if(profile.Owner.User.toString()===id){
+        if(profile.Owner.User._id.toString()===id){
           hasGeneralReadPermissions=true
         }else{
           hasGeneralReadPermissions=viewer.CanReadDoses;

@@ -31,7 +31,10 @@ router.post(
     IsAuth(),
     generalController.MakeNotificationSeen
 );
-
+router.get(
+    "/static",
+    generalController.GetStaticData
+);
 
 
 

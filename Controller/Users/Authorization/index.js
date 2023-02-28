@@ -16,7 +16,7 @@ const {
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 
-const {GenerateToken,GenerateRandomCode,GenerateRefreshToken} =require("../../../utils/HelperFunctions")
+const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile} =require("../../../utils/HelperFunctions")
 
 
 
@@ -654,7 +654,7 @@ exports.GenerateAccessToken = async (req, res) => {
           } = req.body;
           const {id} =req.id
 
-          const profile =await Profile.findById(ProfileID)
+          const profile =await Profile.findById(ProfileID).populate("Owner.User")
     
           if(!profile){
             return errorResMsg(res, 400, req.t("Profile_not_found"));
@@ -664,7 +664,7 @@ exports.GenerateAccessToken = async (req, res) => {
             return errorResMsg(res, 400, req.t("Profile_not_found"));
           }
     
-          if(profile.Owner.User.toString()!==id){
+          if(profile.Owner.User._id.toString()!==id){
             return errorResMsg(res, 400, req.t("Unauthorized"));
           }
           //delete device token from NotificationInfo.DevicesTokens if DeviceToken === DeviceToken
@@ -689,3 +689,56 @@ exports.GenerateAccessToken = async (req, res) => {
           return errorResMsg(res, 500, err);
         }
       };
+
+
+
+      exports.getUserProfileInfo = async (req, res) => {
+ 
+        try {
+          const {
+            ProfileID
+          } = req.query;
+          const {id} =req.id
+          
+          const userProfile=await Profile.findById(ProfileID).populate("Owner.User")
+          const IsMaster=await IsMasterOwnerToThatProfile(id,userProfile)
+          if(userProfile.Owner.User._id.toString()!==id&&!IsMaster){
+            return errorResMsg(res, 400, req.t("Unauthorized"));
+          }
+
+
+          const user=await User.findOne({
+            profile:ProfileID,
+          })
+         
+          // create data to be returned
+          const data = {
+            user:{
+              firstName:user.firstName,
+              lastName:user.lastName,
+              email:user.email,
+              lang:user.lang,
+              verified:user.verified,
+              profile:user.profile,
+              img:user.img,
+              phoneNumber:user.mobileNumber.phoneNumber?user.mobileNumber.phoneNumber:null,
+              countryCode:user.mobileNumber.countryCode?user.mobileNumber.countryCode:null,
+              gender:userProfile.gender,
+              DateOfBirth:userProfile.DateOfBirth,
+              Permissions:userProfile.Permissions,
+
+      
+              
+            },
+            ShouldRestPassword:user.ShouldRestPassword
+          };
+          // return successfully response
+          return successResMsg(res, 200, data);
+        } catch (err) {
+          // return error response
+          console.log(err)
+          return errorResMsg(res, 500, err);
+        }
+      };
+
+      

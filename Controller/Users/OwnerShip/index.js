@@ -44,7 +44,7 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -107,7 +107,7 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
       }
       
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -166,7 +166,7 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
     
       
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -231,7 +231,7 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
       }
     
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -293,7 +293,7 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -432,7 +432,7 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
         // get the DependentProfile
         const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.To._id))
         const IsMaster=await IsMasterOwnerToThatProfile(id,dependentProfile)
-        if(dependentProfile.Owner.User.toString()!=id&&!IsMaster){
+        if(dependentProfile.Owner.User._id.toString()!=id&&!IsMaster){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }

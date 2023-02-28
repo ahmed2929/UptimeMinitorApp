@@ -775,6 +775,7 @@ exports.CreateDependentA = async (req, res) => {
                newViewer = new Viewer({
                 ViewerProfile:masterProfile._id,
                 DependentProfile:dependentProfile._id,
+                CareGiverNickName:nickName,
                 ...permissions,
                 ...invitation.externalData,
 
@@ -910,7 +911,7 @@ The filter can be based on the status, sent, and received parameters.
         if(!mongoose.isValidObjectId(ProfileID)){
             return errorResMsg(res, 400, req.t("invalid_profile_id"));
         }
-        const profile = await Profile.findById(ProfileID)
+        const profile = await Profile.findById(ProfileID).populate("Owner.User")
         if(!profile){
             return errorResMsg(res, 400, req.t("profile_not_found"));
         }
@@ -918,7 +919,7 @@ The filter can be based on the status, sent, and received parameters.
           return errorResMsg(res, 400, req.t("Profile_not_found"));
         }
         const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-        if(profile.Owner.User.toString()!=id&&!IsMaster){
+        if(profile.Owner.User._id.toString()!=id&&!IsMaster){
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
         // get the Invitations
@@ -1243,13 +1244,13 @@ Add a new caregiver to a user's profile
        if(IsMaster){
         const user = await Profile.findOne({
           "Owner.User":id
-        })
+        }).populate("Owner.User")
         if(user){
-          if(user.email=== email){
+          if(user.Owner.User.email=== email){
             return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
          }
   
-         if(user.mobileNumber.phoneNumber=== phoneNumber){
+         if(user.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
            return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_caregiver"));
         }
          }
@@ -1507,7 +1508,7 @@ Add a new caregiver to a user's profile
         // get the DependentProfile
         const dependentProfile = await Profile.findById(mongoose.Types.ObjectId(invitation.From._id))
         if(CareGiverProfile.Owner.User._id.toString()!=id){
-          console.log("CareGiverProfile.Owner.User.toString()!=id",CareGiverProfile.Owner.User.toString(),id)
+          console.log("CareGiverProfile.Owner.User._id.toString()!=id",CareGiverProfile.Owner.User._id.toString(),id)
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_change_this_invitation"));
 
         }
@@ -1694,7 +1695,7 @@ retrieves the dependents of the user from the viewer collection which master pro
         responseData=[
             ...filteredData
         ]
-        // return sucess response
+        // return success response
         return successResMsg(res, 200, {message:req.t("caregivers"),data:responseData});
       
     } catch (err) {
@@ -1833,16 +1834,16 @@ exports.EditCareGiverPermissions = async (req, res) => {
       }
       // update the relationship
       console.log(permissions)
-      relationship.CanWriteMeds=permissions.CanWriteMeds?permissions.CanWriteMeds:relationship.CanWriteMeds
-      relationship.CanReadDoses=permissions.CanReadDoses?permissions.CanReadDoses:relationship.CanReadDoses
-      relationship.CanWriteDoses=permissions.CanWriteDoses?permissions.CanWriteDoses:relationship.CanWriteDoses
-      relationship.CanReadRefile=permissions.CanReadRefile?permissions.CanReadRefile:relationship.CanReadRefile
-      relationship.CanReadAllMeds=permissions.CanReadAllMeds?permissions.CanReadAllMeds:relationship.CanReadAllMeds
-      relationship.CanReadSymptoms=permissions.CanReadSymptoms?permissions.CanReadSymptoms:relationship.CanReadSymptoms
-      relationship.CanAddMeds=permissions.CanAddMeds?permissions.CanAddMeds:relationship.CanAddMeds
-      relationship.CanWriteSymptoms=permissions.CanWriteSymptoms?permissions.CanWriteSymptoms:relationship.CanWriteSymptoms
-      relationship.CanReadSpacificMeds=permissions.CanReadSpacificMeds?permissions.CanReadSpacificMeds:relationship.CanReadSpacificMeds
-      relationship.notify=permissions.notify?permissions.notify:relationship.notify
+      relationship.CanWriteMeds=permissions.CanWriteMeds
+      relationship.CanReadDoses=permissions.CanReadDoses
+      relationship.CanWriteDoses=permissions.CanWriteDoses
+      relationship.CanReadRefile=permissions.CanReadRefile
+      relationship.CanReadAllMeds=permissions.CanReadAllMeds
+      relationship.CanReadSymptoms=permissions.CanReadSymptoms
+      relationship.CanAddMeds=permissions.CanAddMeds
+      relationship.CanWriteSymptoms=permissions.CanWriteSymptoms
+      relationship.CanReadSpacificMeds=permissions.CanReadSpacificMeds
+      relationship.notify=permissions.notify
       relationship.CareGiverNickName=nickName||relationship.CareGiverNickName
       
      console.log("******",relationship)
@@ -2308,7 +2309,7 @@ exports.DeleteDependent = async (req, res) => {
 
 
 exports.DeleteInternalDependent = async (req, res) => {
-  /**
+    /**
      *  DeleteDependent a
      */
 

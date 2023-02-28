@@ -20,7 +20,12 @@ const Symptom =require("../routes/symptom")
 const Reports =require("../routes/reports")
 const Settings =require("../routes/settings")
 const OwnerShip =require("../routes/OwnerShip")
-// set localiztion config
+const Share =require("../routes/share")
+const {checkApiKeyAndSecret} =require("../utils/Authorization")
+//setup app insights
+let appInsights = require("applicationinsights");
+appInsights.setup(process.env.AzureAppInsights).start();
+// set localization config
 i18next.use(Backend).use(i18nextMiddleware.LanguageDetector)
 .init({
     fallbackLng: 'en',
@@ -36,11 +41,16 @@ i18next.use(Backend).use(i18nextMiddleware.LanguageDetector)
 module.exports=(app)=>{ 
    // general middlewares
     app.use(bodyParser.json());
-   //HTTP headers
-    app.use(helmet());
-
-    //Enable cors
+      //Enable cors
+     
     app.use(cors());
+   //HTTP headers
+   app.use(helmet());
+
+  //  app.use((req, res, next) => {
+  //   res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  //   next();
+  // });
 
 //Against brute attack
 const rateLimiter = rateLimit({
@@ -49,7 +59,7 @@ const rateLimiter = rateLimit({
   message: "Too many request from this IP, please try again in an hour!",
 });
 
-//rate liniter
+//rate limit
 app.use("/api", rateLimiter);
 
 app.use(
@@ -92,17 +102,20 @@ app.use((req,res,next)=>{
 
   next();
 })
-app.get("/", (req, res) => {
+
+
+  app.use("/api/v1/admin",Admin);
+
+  // protect routes with checkApiKeyAndSecret
+  //app.use(checkApiKeyAndSecret)
+  app.get("/", (req, res) => {
     res.status(200).json({
       status: "Success",
       message: `Welcome to voithy read the docs`,
     });
   });
-
-  
   app.use("/api/v1/auth", Authorization);
   app.use("/api/v1/general",General);
-  app.use("/api/v1/admin",Admin);
   app.use("/api/v1/circle",Circle);
   app.use("/api/v1/dose",Doses);
   app.use("/api/v1/medication",Medication);
@@ -110,13 +123,15 @@ app.get("/", (req, res) => {
   app.use("/api/v1/report",Reports)
   app.use("/api/v1/settings",Settings)
   app.use("/api/v1/ownership",OwnerShip)
-
+  app.use("/api/v1/share",Share)
   
 
 
 
-  //Handling unhandle routes
+  //Handling 404 routes
     app.all("*", (req, res, next) => {
+      console.log("path not found")
+      console.log(req.originalUrl)
     return res.status(404).json({
       status: "Error 404",
       message: `path not found. Can't find ${req.originalUrl} on this server`,
@@ -125,8 +140,10 @@ app.get("/", (req, res) => {
    
 
 
-//error handle meddlewere
+//error handling
 app.use((error,req,res,next)=>{
+  console.log("internal server error")
+  console.log("error:",error)
    const status    = error.statusCode || 500 ;
    const message   = error.message           ;
    const data      = error.data              ;

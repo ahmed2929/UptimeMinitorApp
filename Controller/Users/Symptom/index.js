@@ -83,7 +83,7 @@ exports.CreateSymptom = async (req, res) => {
       and has a addMed permission
       
       */
-      const profile =await Profile.findById(ProfileID)
+      const profile =await Profile.findById(ProfileID).populate("Owner.User")
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
@@ -94,7 +94,7 @@ exports.CreateSymptom = async (req, res) => {
       // get the viewer permissions
       const viewerProfile =await Profile.findOne({
       "Owner.User":id
-      })
+      }).populate("Owner.User")
       
       if(!viewerProfile){
          return errorResMsg(res, 400, req.t("Profile_not_found"));
@@ -107,14 +107,14 @@ exports.CreateSymptom = async (req, res) => {
        DependentProfile:ProfileID,
        IsDeleted:false
       })
-      if(!viewer&&profile.Owner.User.toString()!==id){
+      if(!viewer&&profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
        
      
       // check if the user is the owner and has write permission or can add meds
   
-      if(profile.Owner.User.toString()!==id){
+      if(profile.Owner.User._id.toString()!==id){
         // check if the user has add med permission
         const hasAddMedPermissonToMeds=viewer.CanWriteSymptoms;
   
@@ -175,6 +175,10 @@ exports.CreateSymptom = async (req, res) => {
     })
     .populate("ViewerProfile")
     for await (const viewer of careCircle) {
+      //skip the viewer if his ViewerProfile is the same as viewerProfile
+      if(viewer.ViewerProfile._id.toString()===viewerProfile._id.toString()){
+        continue
+      }
       await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"NewSymptom",{
         SymptomId:newSymton._id,
         ProfileInfoOfSender:{
@@ -183,6 +187,19 @@ exports.CreateSymptom = async (req, res) => {
           img:profile.Owner.User.img,
           email:profile.Owner.User.email,
           ProfileID:profile._id,
+        }
+      })
+    }
+    // notify profile dependent if the profile.Owner.User._id is not as id
+    if(profile.Owner.User._id.toString() !== id){
+      await SendPushNotificationToUserRegardlessLangAndOs(viewerProfile,profile,"NewSymptomAddToMe",{
+        SymptomId:newSymton._id,
+        ProfileInfoOfSender:{
+          firstName:viewerProfile.Owner.User.firstName,
+          lastName:viewerProfile.Owner.User.lastName,
+          img:viewerProfile.Owner.User.img,
+          email:viewerProfile.Owner.User.email,
+          ProfileID:viewerProfile._id,
         }
       })
     }
@@ -244,7 +261,7 @@ exports.CreateSymptom = async (req, res) => {
       
       */
   
-      const profile =await Profile.findById(ProfileID)
+      const profile =await Profile.findById(ProfileID).populate("Owner.User")
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
@@ -269,7 +286,7 @@ exports.CreateSymptom = async (req, res) => {
        IsDeleted:false
       })
   
-      if(!viewer&&profile.Owner.User.toString()!==id){
+      if(!viewer&&profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
   
@@ -279,7 +296,7 @@ exports.CreateSymptom = async (req, res) => {
         // }
     
       let hasGeneralReadPermissions;
-      if(profile.Owner.User.toString()===id){
+      if(profile.Owner.User._id.toString()===id){
         hasGeneralReadPermissions=true
       }else{
         hasGeneralReadPermissions=viewer.CanReadSymptoms;
@@ -307,9 +324,26 @@ exports.CreateSymptom = async (req, res) => {
         }
       })
      
+      // add this object exportProfileData={
+      //   firstName,
+      //   lastName,
+        
+      // } to every object in symptoms array
+
+      const editedData=symptoms.map(symptom=>{
+        return {
+          ...symptom._doc,
+          exportProfileData:{
+            firstName:profile.Owner.User.firstName,
+            lastName:profile.Owner.User.lastName,
+            img:profile.Owner.User.img,
+            email:profile.Owner.User.email,
+          }
+        }
+      })
       
       // return successfully response
-      return successResMsg(res, 200, {message:req.t("Success"),data:symptoms});
+      return successResMsg(res, 200, {message:req.t("Success"),data:editedData});
   
     
     }else{
@@ -331,9 +365,19 @@ exports.CreateSymptom = async (req, res) => {
           }
         })
        
-        
+        const editedData=symptoms.map(symptom=>{
+          return {
+            ...symptom._doc,
+            exportProfileData:{
+              firstName:profile.Owner.User.firstName,
+              lastName:profile.Owner.User.lastName,
+              img:profile.Owner.User.img,
+              email:profile.Owner.User.email,
+            }
+          }
+        })
         // return successfully response
-        return successResMsg(res, 200, {message:req.t("Success"),data:symptoms});
+        return successResMsg(res, 200, {message:req.t("Success"),data:editedData});
     
       
       }else{
@@ -439,13 +483,13 @@ exports.EditSymptom = async (req, res) => {
      DependentProfile:ProfileID,
      IsDeleted:false
     })
-    if(!viewer&&profile.Owner.User.toString()!==id){
+    if(!viewer&&profile.Owner.User._id.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }
      
     // check if the user is the owner and has write permission or can add meds
 
-    if(profile.Owner.User.toString()!==id){
+    if(profile.Owner.User._id.toString()!==id){
       // check if the user has add med permission
       const CanEditSymptom=viewer.CanWriteSymptoms;
 
@@ -590,13 +634,13 @@ exports.DeleteSymptom = async (req, res) => {
      IsDeleted:false
 
     })
-    if(!viewer&&profile.Owner.User.toString()!==id){
+    if(!viewer&&profile.Owner.User._id.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }
      
     // check if the user is the owner and has write permission or can add symptom
 
-    if(profile.Owner.User.toString()!==id){
+    if(profile.Owner.User._id.toString()!==id){
       // check if the user has add med permission
       const CanDeleteSymptom=viewer.CanWriteSymptoms;
 
@@ -683,7 +727,7 @@ exports.getAllSymptoms=async (req, res) => {
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
     
-    if(profile.Owner.User.toString()!==id){
+    if(profile.Owner.User._id.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }
    

@@ -172,6 +172,11 @@ router.put(
     userController.ResetPassword
 );
 
+router.get(
+    "/get/profile/info",
+    IsAuth(),
+    userController.getUserProfileInfo
+);
 
 
 

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const Access = require("../DB/Schema/apiAccess");
 
 exports.authorization = () => {
   return (req, res, next) => {
@@ -51,4 +52,36 @@ exports.authorizeRefreshToken = () => {
     }
   };
 };
+
+exports.checkApiKeyAndSecret=(req, res, next)=>{
+  const apiKey = req.get('X-API-KEY');
+  const apiSecret = req.get('X-API-SECRET');
+
+  if (!apiKey || !apiSecret) {
+    return res.status(401).json({
+      error: req.t("API key and secret required"),
+      status: "error",
+    });
+  }
+
+  Access.findOne({ apiKey: apiKey, apiSecret: apiSecret })
+    .then(client => {
+      if (!client) {
+        return res.status(401).json({
+          error: req.t("Invalid API key or secret"),
+          status: "error",
+        });
+      } else {
+        req.client = client;
+        next();
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(500).json({
+        error: req.t("Error checking API key and secret"),
+        status: "error",
+      });
+    });
+}
 

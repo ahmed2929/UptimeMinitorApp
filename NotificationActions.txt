@@ -2,9 +2,14 @@
 1:New Invitation from dependent
 2:Dependent Accepted Invitation
 3:CareGiver Accepted Invitation
-4: 30 minutes passed and dependent did not take action 
-5: 1 hour passed and dependent did not take action
-6: refile alert
-7: dose time has come
-8: new symptom
+4: 30 minutes passed and no action (user)
+5: 1 hour passed and  no action (user)
+6: med refile alert (user)
+7: dose time has come (user)
+8: new symptom (my dependent added a new symptom)
 9:new invitation to be master owner
+10:caregiver added new symptom to me 
+11:dependent did not take med (30 m)
+12:dependent did not take med (1 h)
+13:med refile alert for my dependent
+14:my internal dependent dose time has come

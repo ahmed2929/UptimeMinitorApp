@@ -35,7 +35,7 @@ exports.EditProfile = async (req, res) => {
      
   
   
-      const profile =await Profile.findById(ProfileID)
+      const profile =await Profile.findById(ProfileID).populate('Owner.User')
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
@@ -43,8 +43,8 @@ exports.EditProfile = async (req, res) => {
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      console.log(profile.Owner.User,id)
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -69,9 +69,12 @@ exports.EditProfile = async (req, res) => {
          img = await UploadFileToAzureBlob(req.file)
       }
       // update profile info
-      profile.gender=gender||profile.gender
-      profile.DateOfBirth=DateOfBirth||profile.DateOfBirth
-     
+      
+      profile.gender=Number(gender)>=0?Number(gender):profile.gender
+      console.log(Number(gender)>=0?Number(gender):profile.gender)
+      console.log(Number(gender))
+      profile.DateOfBirth=DateOfBirth?new Date(+DateOfBirth):null||profile.DateOfBirth
+      console.log(gender)
       await profile.save()
       const user=await User.findById(id)
 
@@ -110,7 +113,7 @@ exports.EditProfile = async (req, res) => {
     
       
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -158,7 +161,7 @@ exports.EditProfile = async (req, res) => {
       }
     
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -221,7 +224,7 @@ exports.EditProfile = async (req, res) => {
       }
       
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -278,7 +281,7 @@ exports.EditProfile = async (req, res) => {
     
       
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){
@@ -341,7 +344,7 @@ exports.EditProfile = async (req, res) => {
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
-      if(profile.Owner.User.toString()!==id&&!IsMaster){
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       if(profile.Owner.User._id.toString() === id){

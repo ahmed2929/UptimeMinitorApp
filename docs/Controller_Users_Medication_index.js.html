@@ -264,16 +264,16 @@ exports.CreateNewMed = async (req, res) => {
         ViewerProfile:viewerProfile._id,
         DependentProfile:ProfileID
        })
-       if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+       if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
   
         
        // check if the user is the owner and has write permission or can add meds
    
-       if(profile.Owner.User.toString()!==id){
+       if(profile.Owner.User._id.toString()!==id){
          // check if the user has add med permission
-         const hasAddMedPermissonToMeds=viewer.CanAddMeds;
+         const hasAddMedPermissonToMeds=viewer.CanAddNewMeds;
    
          if(!hasAddMedPermissonToMeds){
            return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -714,15 +714,15 @@ exports.CreateNewMed = async (req, res) => {
        DependentProfile:ProfileID
       })
   
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
   
       // check if the user is the owner and has write permission or can add meds
   
-      if(profile.Owner.User.toString()!==id){
+      if(profile.Owner.User._id.toString()!==id){
         // check if the user has add med permission
-        const hasWritePermissonToAllMeds=viewer.CanWriteMeds;
+        const hasWritePermissonToAllMeds=viewer.CanEditAllMeds;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatMed=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===MedId.toString()){
@@ -735,7 +735,7 @@ exports.CreateNewMed = async (req, res) => {
         
       }
       //case the owner dont has write permission
-      if(profile.Owner.User.toString()===id&amp;&amp;!profile.Owner.Permissions.write){
+      if(profile.Owner.User._id.toString()===id&amp;&amp;!profile.Owner.Permissions.write){
         return errorResMsg(res, 401, req.t("Unauthorized"));
       }
   
@@ -1078,7 +1078,7 @@ exports.CreateNewMed = async (req, res) => {
        DependentProfile:ProfileID
       })
   
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       // check if the user is the owner and has write permission or can add meds
@@ -1088,7 +1088,7 @@ exports.CreateNewMed = async (req, res) => {
         }
         let hasGeneralReadPermissions;
         let hasSpacificReadPermissions;
-        if(profile.Owner.User.toString()===id){
+        if(profile.Owner.User._id.toString()===id){
           hasGeneralReadPermissions=true
         }else{
            hasGeneralReadPermissions=viewer.CanReadAllMeds;
@@ -1237,14 +1237,14 @@ exports.CreateNewMed = async (req, res) => {
        DependentProfile:ProfileID
       })
   
-      if(!viewer&amp;&amp;profile.Owner.User.toString()!==id){
+      if(!viewer&amp;&amp;profile.Owner.User._id.toString()!==id){
         return errorResMsg(res, 400, req.t("Unauthorized"));
       }
       // check if the user is the owner and has write permission or can add meds
   
-      if(profile.Owner.User.toString()!=id){
+      if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToThatMed=viewer.CanWriteMeds;
+        const hasWritePermissonToThatMed=viewer.CanEditAllMeds;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===MedId){
