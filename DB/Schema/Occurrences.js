@@ -74,7 +74,6 @@ var OccurrencesSchema = new Schema({
   },
   Ringtone:{
     type:String,
-    default:"default"
   }
 
  

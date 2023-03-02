@@ -4,6 +4,8 @@ const fs  =require("fs");
 const xlsx =require("xlsx")
 const Access = require("../../DB/Schema/apiAccess");
 const crypto = require('crypto');
+const FeedBack =require("../../DB/Schema/Feedback")
+
 
 const {
   successResMsg,
@@ -172,6 +174,45 @@ exports.GenerateApiKeysAndSecrets = async (req, res) => {
 
     // return successful response
     return successResMsg(res, 200, Response);
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+exports.GetFeedBacks = async (req, res) => {
+ 
+  try {
+
+   // const {id} =req.id
+    const page=req.query.page||1
+    const itemPerPage = 10 ;
+    let totalItems;
+   
+
+
+        totalItems = await FeedBack.find().countDocuments();
+    
+          const feedbacks = await FeedBack.find()
+            .sort({createdAt: -1})
+            .skip((page - 1) * itemPerPage)
+            .limit(itemPerPage)
+            .populate({
+              path: "User",
+              select: "firstName lastName email"
+
+            })
+           
+         
+           const results= {
+                total:totalItems,
+                feedbacks
+              }
+    
+    // return successful response
+       
+    return successResMsg(res, 200, {data:results});
   } catch (err) {
     // return error response
     console.log(err)

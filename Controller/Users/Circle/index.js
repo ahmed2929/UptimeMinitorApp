@@ -17,7 +17,7 @@ const Viewer =require("../../../DB/Schema/Viewers")
 const messages = require("../../../Messages/Email/index")
 const NotificationMessages=require("../../../Messages/Notifications/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
-const {SendPushNotificationToUserRegardlessLangAndOs,IsMasterOwnerToThatProfile,ReturnProfileFullPermissions,CheckProfilePermissions,ReturnDependentPermissionsProfileLevelTypeA,ReturnDependentPermissionsProfileLevelTypeB} =require("../../../utils/HelperFunctions")
+const {SendPushNotificationToUserRegardlessLangAndOs,IsMasterOwnerToThatProfile,ReturnProfileFullPermissions,CheckProfilePermissions,ReturnDependentPermissionsProfileLevelTypeA,ReturnDependentPermissionsProfileLevelTypeB,isValidEmail} =require("../../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
@@ -106,6 +106,9 @@ exports.CreateDependentA = async (req, res) => {
         }
      
       if(phoneNumber){
+        if(isNaN(phoneNumber)){
+          return errorResMsg(res, 400, req.t("phone_number_is_not_valid"));
+        }
         if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
        }
@@ -121,6 +124,9 @@ exports.CreateDependentA = async (req, res) => {
 
         // check for  email and mobile if it provided
         if(email){
+          if(!isValidEmail(email)){
+            return errorResMsg(res, 400, req.t("email_is_not_valid"));
+          }
             const emailExist = await User.findOne({
                 email:email,
                 
@@ -336,7 +342,18 @@ exports.CreateDependentA = async (req, res) => {
        if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
         return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
      }
+     if(email){
+      if(!isValidEmail(email)){
+       return errorResMsg(res, 400, req.t("email_is_not_valid"));
+     
+    }}
 
+    if(phoneNumber){
+     if(isNaN(phoneNumber)){
+       return errorResMsg(res, 400, req.t("phone_number_is_not_valid"));
+     
+    }
+  }
         // check for  email and mobile if it provided
         const mobileNumber={
             phoneNumber:phoneNumber,
@@ -393,15 +410,13 @@ exports.CreateDependentA = async (req, res) => {
                 To:userprofile._id,
                 Status:{$in:[0,1]}
             })
-
-            if(invitation.length>0){
-              if(invitation.Status==0){
-                return errorResMsg(res, 400, req.t("invitation_sent_before"));
-              }else if(invitation.Status==1){
-                return errorResMsg(res, 400, req.t("relationship_already_exist"));
-              }
-                
+            console.log("invitation",invitation)
+            if(invitation.length > 0) {
+             
+              return  errorResMsg(res, 400, req.t("invitation_sent_before"));
+              
             }
+            
             //create dependent user
             const newDependentUser = new Dependent({
                 firstName:firstName,
@@ -1261,7 +1276,18 @@ Add a new caregiver to a user's profile
             return errorResMsg(res, 400, req.t("Unauthorized"));
           }
         }
-      
+        if(email){
+          if(!isValidEmail(email)){
+           return errorResMsg(res, 400, req.t("email_is_not_valid"));
+         
+        }}
+    
+        if(phoneNumber){
+         if(isNaN(phoneNumber)){
+           return errorResMsg(res, 400, req.t("phone_number_is_not_valid"));
+         
+        }
+      }
 
         // check for  email and mobile if it provided
         const mobileNumber={
@@ -1305,11 +1331,8 @@ Add a new caregiver to a user's profile
             })
             console.log("invitation",invitation)
             if(invitation.length>0){
-              if(invitation.Status==0){
                 return errorResMsg(res, 400, req.t("invitation_sent_before"));
-              }else if(invitation.Status==1){
-                return errorResMsg(res, 400, req.t("relationship_already_exist"));
-              }
+              
             }
             //create dependent user
             const newDependentUser = new Dependent({
@@ -1993,6 +2016,20 @@ exports.EditDependentInfoFull = async (req, res) => {
       
       // save changes
       await relationship.save()
+
+
+      if(email){
+        if(!isValidEmail(email)){
+         return errorResMsg(res, 400, req.t("email_is_not_valid"));
+       
+      }}
+  
+      if(phoneNumber){
+       if(isNaN(phoneNumber)){
+         return errorResMsg(res, 400, req.t("phone_number_is_not_valid"));
+       
+      }
+    }
 
      
          if(email){

@@ -15,8 +15,6 @@ router.put(
 
 router.post(
     "/suspend",
-    validation.SuspendDoseFromDateToDate(),
-    validation.validate,
     IsAuth(),
     DosesController.SuspendDoses
 );

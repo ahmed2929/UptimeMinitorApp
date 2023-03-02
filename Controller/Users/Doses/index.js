@@ -902,7 +902,8 @@ exports.EditSingleDose=async (req, res) => {
      MedID,
      PlannedDateTime,
      PlannedDose,
-    ProfileID
+      ProfileID,
+      Status
     }=req.body
 
     // check for permission
@@ -977,6 +978,7 @@ exports.EditSingleDose=async (req, res) => {
     PlannedDateTime,
     PlannedDose,
     ProfileID,
+    Status,
     MedInfo:{
       strength:med.strength,
       name:med.name,

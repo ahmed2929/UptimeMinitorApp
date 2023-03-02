@@ -130,7 +130,7 @@ const getUserEmailFromId=async(id)=>{
             sender: "DoNotReply@voithy.com",
             content: {
               subject: "voithy",
-                html: message,
+                html: message
             },
             recipients: {
               to: [
@@ -1556,6 +1556,10 @@ const CheckProfilePermissions=(profile,permission)=>{
 
 }
 
+const isValidEmail=(email)=> {
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  return emailRegex.test(email);
+}
 module.exports={
     GenerateToken,
     GenerateRandomCode,
@@ -1581,5 +1585,6 @@ module.exports={
     ReturnProfileFullPermissions,
     CheckProfilePermissions,
     ReturnDependentPermissionsProfileLevelTypeB,
-    ReturnDependentPermissionsProfileLevelTypeA
+    ReturnDependentPermissionsProfileLevelTypeA,
+    isValidEmail
 }

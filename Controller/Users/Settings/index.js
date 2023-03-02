@@ -17,12 +17,14 @@ const TempEmails = require("../../../DB/Schema/TempEmails")
 const Occurrence = require("../../../DB/Schema/Occurrences");
 const SchedulerSchema = require("../../../DB/Schema/Scheduler");
 const UserMedication = require("../../../DB/Schema/UserMedication");
+const Invitation =require("../../../DB/Schema/invitations")
+const FeedBack =require("../../../DB/Schema/Feedback")
 const {
   successResMsg,
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 
-const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile,CheckProfilePermissions} =require("../../../utils/HelperFunctions")
+const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile,CheckProfilePermissions,isValidEmail} =require("../../../utils/HelperFunctions")
 
 
 
@@ -52,6 +54,14 @@ exports.EditProfile = async (req, res) => {
           return errorResMsg(res, 400, req.t("Unauthorized"));
         }
       }
+
+  
+      if(phoneNumber){
+       if(isNaN(phoneNumber)){
+         return errorResMsg(res, 400, req.t("phone_number_is_not_valid"));
+       
+      }
+    }
       const searchForPhone =await User.findOne({
         "mobileNumber.countryCode":countryCode,
         "mobileNumber.phoneNumber":phoneNumber,
@@ -169,6 +179,15 @@ exports.EditProfile = async (req, res) => {
           return errorResMsg(res, 400, req.t("Unauthorized"));
         }
       }
+
+      if(newEmail){
+        if(!isValidEmail(newEmail)){
+         return errorResMsg(res, 400, req.t("email_is_not_valid"));
+       
+      }}
+  
+ 
+
       const searchForEmail =await User.findOne({
         email:newEmail
       })
@@ -232,6 +251,12 @@ exports.EditProfile = async (req, res) => {
           return errorResMsg(res, 400, req.t("Unauthorized"));
         }
       }
+      if(ChangedEmail){
+        if(!isValidEmail(ChangedEmail)){
+         return errorResMsg(res, 400, req.t("email_is_not_valid"));
+       
+      }}
+  
       const searchForEmail =await TempEmails.findOne({
         email:ChangedEmail
       })
@@ -289,6 +314,13 @@ exports.EditProfile = async (req, res) => {
           return errorResMsg(res, 400, req.t("Unauthorized"));
         }
       }
+
+      if(newEmail){
+        if(!isValidEmail(newEmail)){
+         return errorResMsg(res, 400, req.t("email_is_not_valid"));
+       
+      }}
+  
       let searchForEmail =await TempEmails.findOne({
         email:newEmail
       })
@@ -353,7 +385,7 @@ exports.EditProfile = async (req, res) => {
         }
       }
         // delete user
-        await User.findByOneAndDelete({
+        await User.findOneAndDelete({
           profile:ProfileID
         })
         // delete profile
@@ -389,7 +421,8 @@ exports.EditProfile = async (req, res) => {
             isSuspended:true,
           }
         })
-         
+     await Invitation.deleteMany({ From: ProfileID })
+      await Invitation.deleteMany({ To: ProfileID })
       return successResMsg(res, 200, {message:req.t("Profile_Deleted")});
     } catch (err) {
       // return error response
@@ -398,3 +431,107 @@ exports.EditProfile = async (req, res) => {
     }
   };
   
+  exports.CreateFeedBack = async (req, res) => {
+ 
+    try {
+  
+      const {id} =req.id
+      const {
+        Type,
+        Description,
+      }=req.body
+ 
+      // get the viewer permissions
+
+      const userInfo=await User.findById(id)
+      if(!userInfo){
+        return errorResMsg(res, 400, req.t("User_not_found"));
+      }
+      let img
+      // store the image to azure
+      if(req.files.img&&req.files.img[0]){
+         img = await UploadFileToAzureBlob(req.files.img[0])
+      }
+      // store voice record to azure
+      let voice
+      if(req.files.voice&&req.files.voice[0]){
+        voice = await UploadFileToAzureBlob(req.files.voice[0])
+      }
+     
+  
+      // create new feedback
+      const newFeedBack = new FeedBack({
+        img,
+        User:id,
+        Type,
+        Description,
+        VoiceRecord:voice,
+       
+  
+      })
+      
+      await newFeedBack.save()
+    const responseData={
+      ...newFeedBack._doc,
+    }
+    const emailData={
+      firstName:userInfo.firstName,
+      lastName:userInfo.lastName,
+      email:userInfo.email,
+      CountryCode:userInfo.mobileNumber.countryCode?userInfo.mobileNumber.countryCode:'',
+      phoneNumber:userInfo.mobileNumber.phoneNumber?userInfo.mobileNumber.phoneNumber:'',
+      type:Type,
+      Description:Description?Description:'',
+      img:img?img:false,
+      voice:voice?voice:false,
+    }
+    const feedbackEmail = messages.NewFeedBack_EN(emailData);
+    await SendEmailToUser('info@voithy.com',feedbackEmail)
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("FeedBack_Created"),data:responseData});
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+  exports.GetUserFeedBacks = async (req, res) => {
+ 
+    try {
+  
+     const {id} =req.id
+      const page=req.query.page||1
+      const itemPerPage = 10 ;
+      let totalItems;
+     
+  
+  
+          totalItems = await FeedBack.find().countDocuments();
+      
+            const feedbacks = await FeedBack.find({User:id})
+              .sort({createdAt: -1})
+              .skip((page - 1) * itemPerPage)
+              .limit(itemPerPage)
+              .populate({
+                path: "User",
+                select: "firstName lastName email"
+  
+              })
+             
+           
+             const results= {
+                  total:totalItems,
+                  feedbacks
+                }
+      
+      // return successful response
+         
+      return successResMsg(res, 200, {data:results});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };

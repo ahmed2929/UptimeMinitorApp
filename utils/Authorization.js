@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Access = require("../DB/Schema/apiAccess");
-
+const mongoose=require("mongoose")
 exports.authorization = () => {
   return (req, res, next) => {
     try {
@@ -64,8 +64,17 @@ exports.checkApiKeyAndSecret=(req, res, next)=>{
     });
   }
 
-  Access.findOne({ apiKey: apiKey, apiSecret: apiSecret })
+  // check if api key is valid mongo id
+  if (!mongoose.Types.ObjectId.isValid(apiKey)) {
+    return res.status(401).json({
+      error: req.t("Invalid API key"),
+      status: "error",
+    });
+  }
+
+  Access.findOne({ _id: apiKey, Secret: apiSecret ,IsActive:true})
     .then(client => {
+      console.log("client",client)
       if (!client) {
         return res.status(401).json({
           error: req.t("Invalid API key or secret"),

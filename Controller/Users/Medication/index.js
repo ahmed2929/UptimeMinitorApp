@@ -330,12 +330,16 @@ exports.CreateNewMed = async (req, res) => {
      
       
     
+    
   
-  
-  
+      const editedMed={
+        //deep clone newMed object
+        ...JSON.parse(JSON.stringify(newMed)),
+        Scheduler:JSON.parse(JSON.stringify(newScheduler))
+      }
   
      const responseData={
-        med:newMed,
+        med:editedMed,
         scheduler:newScheduler
 
 
@@ -990,12 +994,13 @@ exports.CreateNewMed = async (req, res) => {
   
       // delete all future occurrences
       await Occurrence.deleteMany({Medication:MedId,PlannedDateTime:{$gt:new Date()}})
-  
+      // update the old ocuurences to be suspended
+      await Occurrence.updateMany({Medication:MedId,PlannedDateTime:{$lte:new Date()}},{isSuspended:true})
       // update medication deleted flag
       console.log(Scheduler)
       Medication.isDeleted=true;
       Scheduler.isDeleted=true;
-  
+      
       await Medication.save()
       await Scheduler.save()
   

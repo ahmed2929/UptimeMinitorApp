@@ -73,7 +73,7 @@ exports.signUp = async (req, res) => {
         ...req.body,
         verificationCode,
         verificationExpiryDate,
-        temp:false
+        temp:true
     }
 
     const newUser = await User.create(UserInfo);
@@ -467,7 +467,9 @@ exports.VerifyAccount = async (req, res) => {
   try {
     const {
       verifyCode,
-      email
+      email,
+      DeviceToken,
+      DeviceOs
     } = req.body;
   
     if(!email){
@@ -499,8 +501,57 @@ exports.VerifyAccount = async (req, res) => {
     user.verified=true;
     user.verificationCode="";
     user.verificationExpiryDate=""
+    user.temp=false
     await user.save();
-    return successResMsg(res, 200, {message:req.t("account_has_been_activated")});
+    const token = GenerateToken(user._id)
+    const refreshToken = GenerateRefreshToken(user._id);
+    const userProfile=await Profile.findById(user.profile)
+
+    if(DeviceToken&&DeviceToken.length>0&&DeviceOs&&DeviceOs.length>0){
+     
+      // and new DeviceToken and DeviceOs into the userProfile.NotificationInfo if the DeviceToken and os does not exist in the array
+    let NotificationRegister;
+      if(!userProfile.NotificationInfo.DevicesTokens.some((item)=>item.DeviceToken===DeviceToken&&item.DeviceOs===DeviceOs)){
+        // assign the new device to the user profile 
+        if(DeviceOs==="IOS"){
+          userProfile.NotificationInfo.IOS=true
+          NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
+        }else if(DeviceOs==="Android"){
+          userProfile.NotificationInfo.Android=true
+          NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
+        }else{
+          return errorResMsg(res, 401, req.t("Invalid_os_type"));
+        }
+        userProfile.NotificationInfo.DevicesTokens.push({
+          DeviceToken,
+          DeviceOs,
+          NotificationRegister
+        })
+        await userProfile.save()
+      
+      }
+      
+    }
+
+    const data = {
+      token,
+      refreshToken,
+      user:{
+        firstName:user.firstName,
+        lastName:user.lastName,
+        email:user.email,
+        lang:user.lang,
+        verified:user.verified,
+        profile:user.profile,
+        img:user.img,
+        Permissions:userProfile.Permissions,
+
+        
+      },
+      NotificationInfo:userProfile.NotificationInfo.DevicesTokens,
+      ShouldRestPassword:user.ShouldRestPassword
+    };
+    return successResMsg(res, 200, {message:req.t("account_has_been_activated"),data:data});
   } catch (err) {
     console.log(err)
     return errorResMsg(res, 500, err);

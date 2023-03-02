@@ -90,7 +90,7 @@ exports.getReport=async (req, res) => {
       
       */
   
-      const profile =await Profile.findById(ProfileID)
+      const profile =await Profile.findById(ProfileID).populate("Owner.User")
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
@@ -247,7 +247,13 @@ exports.getReport=async (req, res) => {
           MedsData:responseData,
           TotalNumberOFMeds,
           Statics:result,
-          Adherence:Adherence.toFixed(2)
+          Adherence:Adherence.toFixed(2),
+          exportProfileData:{
+            firstName:profile.Owner.User.firstName,
+            lastName:profile.Owner.User.lastName,
+            img:profile.Owner.User.img,
+            email:profile.Owner.User.email,
+          }
   
         
   
@@ -375,7 +381,13 @@ exports.getReport=async (req, res) => {
         MedsData:responseData,
         TotalNumberOFMeds,
         Statics:result,
-        Adherence:Adherence.toFixed(2)
+        Adherence:Adherence.toFixed(2),
+        exportProfileData:{
+          firstName:profile.Owner.User.firstName,
+          lastName:profile.Owner.User.lastName,
+          img:profile.Owner.User.img,
+          email:profile.Owner.User.email,
+        }
 
       
 

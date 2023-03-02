@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0px;
+            font-family: Helvetica, "Helvetica Neue", Roboto, Noto, Arial, sans-serif;
+        }
+
+        #RootWrapperWelocmeToVoithy {
+            min-height: 100vh;
+            background-color: rgb(250, 250, 250);
+            position: relative;
+        }
+
+        #Bg {
+            width: 650px;
+            height: 311px;
+            background: linear-gradient(-180deg, rgb(162, 201, 217), rgba(252, 252, 252, 0));
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+
+        #WelocmeToVoithy {
+            color: black;
+            text-overflow: ellipsis;
+            font-size: 32px;
+            font-family: Roboto, sans-serif;
+            font-weight: initial;
+            text-align: center;
+            position: absolute;
+            left: 189px;
+            top: 255px;
+        }
+
+        #Body {
+            color: black;
+            text-overflow: ellipsis;
+            font-size: 20px;
+            font-family: Roboto, sans-serif;
+            font-weight: initial;
+            text-align: center;
+            width: 334px;
+            position: absolute;
+            left: 157px;
+            top: 313px;
+        }
+
+        #VoithyLogo {
+            width: 209px;
+            height: 37px;
+            position: absolute;
+            left: 220px;
+            top: 82px;
+        }
+
+        #Group142 {
+            width: 209px;
+            height: 37px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+
+        #Vector {
+            width: 30px;
+            height: 31px;
+            position: absolute;
+            left: 45px;
+            top: 2px;
+            right: 135px;
+            bottom: 3px;
+        }
+
+        #Vector_0001 {
+            width: 32px;
+            height: 32px;
+            position: absolute;
+            left: 76px;
+            top: 2px;
+            right: 102px;
+            bottom: 3px;
+        }
+
+        #Vector_0002 {
+            width: 5px;
+            height: 31px;
+            position: absolute;
+            left: 112px;
+            top: 2px;
+            right: 91px;
+            bottom: 3px;
+        }
+
+        #Vector_0003 {
+            width: 25px;
+            height: 31px;
+            position: absolute;
+            left: 122px;
+            top: 2px;
+            right: 62px;
+            bottom: 3px;
+        }
+
+        #Vector_0004 {
+            width: 25px;
+            height: 31px;
+            position: absolute;
+            left: 152px;
+            top: 2px;
+            right: 32px;
+            bottom: 3px;
+        }
+
+        #Vector_0005 {
+            width: 28px;
+            height: 31px;
+            position: absolute;
+            left: 181px;
+            top: 2px;
+            right: 0px;
+            bottom: 3px;
+        }
+
+        #Vector_0006 {
+            width: 8px;
+            height: 29px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 201px;
+            bottom: 8px;
+        }
+
+        #Vector_0007 {
+            width: 29px;
+            height: 8px;
+            position: absolute;
+            left: 0px;
+            top: 29px;
+            right: 180px;
+            bottom: 0px;
+        }
+
+        #Vector_0008 {
+            width: 9px;
+            height: 29px;
+            position: absolute;
+            left: 29px;
+            top: 8px;
+            right: 171px;
+            bottom: 0px;
+        }
+
+        #Vector_0009 {
+            width: 29px;
+            height: 8px;
+            position: absolute;
+            left: 8px;
+            top: 0px;
+            right: 171px;
+            bottom: 29px;
+        }
+
+        #Rectangle2825 {
+            width: 650px;
+            height: 297px;
+            background-color: rgb(236, 236, 236);
+            position: absolute;
+            left: 0px;
+            top: 523px;
+        }
+
+        #Group33853 {
+            width: 240px;
+            height: 172px;
+            position: absolute;
+            left: 205px;
+            top: 562px;
+        }
+
+        #Group33852 {
+            width: 240px;
+            height: 33px;
+            position: absolute;
+            left: 0px;
+            top: 39px;
+        }
+
+        #AndroidAppIconBlack {
+            width: 110px;
+            height: 33px;
+            position: absolute;
+            left: 130px;
+            top: 0px;
+        }
+
+        #AndroidAppIconBlack_0001 {
+            object-fit: cover;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+        }
+
+        #AppleAppIconBlack {
+            width: 110px;
+            height: 33px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+
+        #DownloadTheApp {
+            color: rgb(25, 25, 25);
+            text-overflow: ellipsis;
+            font-size: 16px;
+            font-family: Roboto, sans-serif;
+            font-weight: initial;
+            text-align: center;
+            position: absolute;
+            left: 56px;
+            top: 0px;
+        }
+
+        #Facebook {
+            object-fit: cover;
+            position: absolute;
+            left: 190px;
+            top: 151px;
+            right: 29px;
+            bottom: 0px;
+        }
+
+        #Twitter {
+            object-fit: cover;
+            position: absolute;
+            left: 150px;
+            top: 151px;
+            right: 69px;
+            bottom: 0px;
+        }
+
+        #Instagram {
+            object-fit: cover;
+            position: absolute;
+            left: 110px;
+            top: 151px;
+            right: 110px;
+            bottom: 0px;
+        }
+
+        #Youtube {
+            object-fit: cover;
+            position: absolute;
+            left: 69px;
+            top: 151px;
+            right: 150px;
+            bottom: 0px;
+        }
+
+        #Link {
+            object-fit: cover;
+            position: absolute;
+            left: 29px;
+            top: 151px;
+            right: 190px;
+            bottom: 0px;
+
+        }
+
+        #FollowUs {
+            color: rgb(25, 25, 25);
+            text-overflow: ellipsis;
+            font-size: 16px;
+            font-family: Roboto, sans-serif;
+            font-weight: initial;
+            text-align: center;
+            position: absolute;
+            left: 86px;
+            top: 112px;
+        }
+
+        #Paragraph3 {
+            color: black;
+            text-overflow: ellipsis;
+            font-size: 12px;
+            font-family: Roboto, sans-serif;
+            font-weight: initial;
+            text-align: center;
+            position: absolute;
+            left: 258px;
+            top: 788px;
+        }
+
+        #Line244 {
+            width: 316px;
+            height: 0px;
+            border-top: solid 1px rgb(208, 208, 208);
+            position: absolute;
+            left: 167px;
+            top: 773px;
+        }
+
+        #Group33856 {
+            width: 40px;
+            height: 30px;
+            position: absolute;
+            left: 305px;
+            top: 205px;
+        }
+
+        #Frame {
+            width: 40px;
+            height: 30px;
+            overflow: hidden;
+            position: absolute;
+            left: 40px;
+            top: 0px;
+            transform: rotate(-180deg);
+            transform-origin: top left;
+        }
+
+        #Rectangle2826 {
+            background-color: white;
+            border-radius: 4px;
+            position: absolute;
+            left: 39px;
+            top: 1px;
+            right: -37px;
+            bottom: 1px;
+            transform: rotate(-180deg);
+            transform-origin: top left;
+        }
+
+        #Vector_0010 {
+            width: 40px;
+            height: 30px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+        }
+
+        #Vector_0011 {
+            width: 30px;
+            height: 12px;
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            right: 5px;
+            bottom: 14px;
+        }
+
+        #Group33857 {
+            width: 45px;
+            height: 45px;
+            position: absolute;
+            left: 322px;
+            top: 183px;
+        }
+
+        #Ellipse317 {
+            width: 45px;
+            height: 45px;
+            background: radial-gradient(rgba(77, 168, 87, 0.4), rgba(77, 168, 87, 0));
+            border-radius: 45px / 45px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+
+        #Group33855 {
+            width: 21px;
+            height: 21px;
+            position: absolute;
+            left: 12px;
+            top: 12px;
+        }
+
+        #Rectangle2 {
+            width: 21px;
+            height: 21px;
+            background-color: rgb(77, 168, 87);
+            border-radius: 18px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+
+        #BxCheckCircle {
+            width: 13px;
+            height: 13px;
+            overflow: hidden;
+            position: absolute;
+            left: 4px;
+            top: 4px;
+        }
+
+        #BxCheckCircle_0001 {
+            overflow: hidden;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+        }
+
+        #Vector_0012 {
+            width: 11px;
+            height: 11px;
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            right: 1px;
+            bottom: 1px;
+        }
+
+        #Vector_0013 {
+            width: 6px;
+            height: 4px;
+            position: absolute;
+            left: 3px;
+            top: 5px;
+            right: 4px;
+            bottom: 4px;
+        }
+
+        #_3456 {
+            color: rgb(41, 87, 136);
+            text-overflow: ellipsis;
+            font-size: 48px;
+            font-family: Roboto, sans-serif;
+            font-weight: initial;
+            letter-spacing: 10px;
+            text-align: center;
+            position: absolute;
+            left: 263px;
+            top: 403px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="RootWrapperWelocmeToVoithy">
+        <div id="Bg">
+
+        </div>
+        <span id="WelocmeToVoithy">
+            Welocme to Voithy
+        </span>
+        <span id="Body">
+            Please use this One Time Pass code to verify your account
+        </span>
+        <div id="VoithyLogo">
+            <div id="Group142">
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector">
+                    <path fill="rgb(41, 87, 136)"
+                        d="M29.5827 0L16.9618 31.3367L12.6108 31.3367L0 0L5.76783 0L14.7713 22.5672L23.8149 0L29.5827 0Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0001">
+                    <path fill="rgb(41, 87, 136)"
+                        d="M26.0908 16.0459C26.0908 9.88278 22.0287 5.35194 15.8015 5.35194C9.57426 5.35194 5.36317 9.88278 5.36317 16.0459C5.36317 22.2091 9.56433 26.7399 15.8015 26.7399C22.0387 26.7399 26.0908 22.2091 26.0908 16.0459ZM0 16.0459C0 6.74681 6.47554 0 15.8015 0C25.1275 0 31.5037 6.74681 31.5037 16.0459C31.5037 25.345 25.1275 32.0918 15.8015 32.0918C6.47554 32.0918 0 25.345 0 16.0459Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0002">
+                    <path fill="rgb(41, 87, 136)" d="M5.37868 0L0 0L0 31.3367L5.37868 31.3367L5.37868 0Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0003">
+                    <path fill="rgb(41, 87, 136)"
+                        d="M24.9724 4.91925L15.218 4.91925L15.218 31.3367L9.75438 31.3367L9.75438 4.91925L0 4.91925L0 0L24.9724 0L24.9724 4.91925Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0004">
+                    <path fill="rgb(41, 87, 136)"
+                        d="M25.3566 0L25.3566 31.3367L19.9849 31.3367L19.9849 18.2715L5.37174 18.2715L5.37174 31.3367L0 31.3367L0 0L5.37174 0L5.37174 13.0652L19.9849 13.0652L19.9849 0L25.3566 0Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0005">
+                    <path fill="rgb(41, 87, 136)"
+                        d="M16.7653 17.836L16.7653 31.3367L11.3309 31.3367L11.3309 17.9845L0 0L6.25812 0L14.023 12.2932L21.7979 0L28.046 0L16.7653 17.836Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0006">
+                    <path fill="rgb(232, 64, 52)"
+                        d="M8.45221 16.8921L8.45221 0C3.4045 1.6902 0 6.44451 0 11.8018L0 28.6939C5.04771 27.0037 8.45221 22.2494 8.45221 16.8921">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0007">
+                    <path fill="rgb(232, 64, 52)"
+                        d="M16.9607 0L0 0C1.69905 4.96436 6.47826 8.30612 11.8536 8.30612L28.8143 8.30612C27.1153 3.34177 22.3361 0 16.9607 0Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0008">
+                    <path fill="rgb(232, 64, 52)"
+                        d="M8.8364 0C3.55925 1.6902 0 6.44451 0 11.8018L0 28.6939C5.27715 26.9938 8.8364 22.2494 8.8364 16.8921L8.8364 0Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0009">
+                    <path fill="rgb(232, 64, 52)"
+                        d="M12.0117 8.30612L29.1985 8.30612C27.4768 3.35142 22.644 0 17.1969 0L0 0C1.72171 4.96436 6.56464 8.30612 12.0117 8.30612Z">
+
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <div id="Rectangle2825">
+
+        </div>
+        <div id="Group33853">
+            <div id="Group33852">
+                <div id="AndroidAppIconBlack">
+                    <svg width="110" height="33" viewBox="0 0 110 33" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <rect width="110" height="33" fill="url(#pattern0)"/>
+                        <defs>
+                        <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+                        <use xlink:href="#image0_805_395" transform="scale(0.00555556 0.0185185)"/>
+                        </pattern>
+                        <image id="image0_805_395" width="180" height="54" xlink:href="data:image/png;base64,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"/>
+                        </defs>
+                        </svg>                        
+                </div>
+                <div id="AppleAppIconBlack">
+                    <svg width="110" height="33" viewBox="0 0 110 33" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <rect width="110" height="33" fill="url(#pattern0)"/>
+                        <defs>
+                        <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+                        <use xlink:href="#image0_805_968" transform="scale(0.00555556 0.0185185)"/>
+                        </pattern>
+                        <image id="image0_805_968" width="180" height="54" xlink:href="data:image/png;base64,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"/>
+                        </defs>
+                        </svg>                        
+                </div>
+            </div>
+            <span id="DownloadTheApp">
+                Download the app
+            </span>
+            
+          
+           
+        </div>
+        <span id="Paragraph3">
+            © 2022 All right reserved
+        </span>
+        <div id="Line244">
+
+        </div>
+        <div id="Group33856">
+            <div id="Frame">
+                <div id="Rectangle2826">
+
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0010">
+                    <path fill="rgb(41, 87, 136)"
+                        d="M35.7031 0L4.29688 0C1.92734 0 0 1.89769 0 4.23077L0 25.7692C0 28.1023 1.92734 30 4.29688 30L35.7031 30C38.0727 30 40 28.1023 40 25.7692L40 4.23077C40 1.89769 38.0727 0 35.7031 0ZM37.6562 25.7692C37.6562 26.83 36.7805 27.6923 35.7031 27.6923L4.29688 27.6923C3.21953 27.6923 2.34375 26.83 2.34375 25.7692L2.34375 4.23077C2.34375 3.17 3.21953 2.30769 4.29688 2.30769L35.7031 2.30769C36.7805 2.30769 37.6562 3.17 37.6562 4.23077L37.6562 25.7692Z">
+
+                    </path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0011">
+                    <path fill="rgb(41, 87, 136)"
+                        d="M28.5776 0.24329L17.3932 8.80867C16.1221 9.78175 14.3471 9.78175 13.0768 8.80867L1.89162 0.24329C1.38068 -0.148249 0.644748 -0.0574792 0.247091 0.445598C-0.150565 0.948675 -0.0583775 1.67329 0.45256 2.06483L11.6369 10.6302C12.6963 11.441 13.9651 11.8464 15.2346 11.8464C16.5041 11.8464 17.7729 11.441 18.8322 10.6302L30.0166 2.06483C30.5276 1.67329 30.6197 0.948675 30.2221 0.445598C29.8244 -0.0574792 29.0885 -0.148249 28.5776 0.24329L28.5776 0.24329Z">
+
+                    </path>
+                </svg>
+            </div>
+        </div>
+        <div id="Group33857">
+            <div id="Ellipse317">
+
+            </div>
+            <div id="Group33855">
+                <div id="Rectangle2">
+
+                </div>
+                <div id="BxCheckCircle">
+                    <div id="BxCheckCircle_0001">
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0012">
+                            <path fill="white"
+                                d="M5.47625 0C2.45664 0 0 2.45664 0 5.47625C0 8.49585 2.45664 10.9525 5.47625 10.9525C8.49585 10.9525 10.9525 8.49585 10.9525 5.47625C10.9525 2.45664 8.49585 0 5.47625 0ZM5.47625 9.85724C3.06067 9.85724 1.09525 7.89182 1.09525 5.47625C1.09525 3.06067 3.06067 1.09525 5.47625 1.09525C7.89182 1.09525 9.85724 3.06067 9.85724 5.47625C9.85724 7.89182 7.89182 9.85724 5.47625 9.85724Z">
+
+                            </path>
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" id="Vector_0013">
+                            <path fill="white"
+                                d="M2.03223 2.89913L0.773246 1.64233L0 2.41776L2.03333 4.44671L5.7057 0.774341L4.93136 0L2.03223 2.89913Z">
+
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span id="_3456">
+            3456
+        </span>
+    </div>
+</body>
+
+</html>

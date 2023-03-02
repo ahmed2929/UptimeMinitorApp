@@ -106,7 +106,7 @@ exports.SuspendDoseFromDateToDate = () => {
           const StartDateValue=new Date(+value).getTime()
           if (StartDateValue <= now) {
             console.log("invalid_start_date")
-
+            
             return false
           }
           return true;
@@ -493,11 +493,11 @@ exports.validate = (req, res, next) => {
             return next()
         }
         const extractedErrors = []
-        errors.array().map(err => extractedErrors.push({
-            [err.param]: req.t(err.msg)
-        }))
+        errors.array().map(err => extractedErrors.push(
+            req.t(err.msg)
+        ))
         return res.status(422).json({
-            errors: extractedErrors,
+            error: extractedErrors[0],
         })
   
     } catch {

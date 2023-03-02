@@ -26,6 +26,10 @@ router.post(
 );
 
 
+router.get(
+    "/get/feedbacks",
+    adminController.GetFeedBacks
+);
 
 
 

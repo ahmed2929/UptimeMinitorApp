@@ -22,6 +22,7 @@ const Settings =require("../routes/settings")
 const OwnerShip =require("../routes/OwnerShip")
 const Share =require("../routes/share")
 const {checkApiKeyAndSecret} =require("../utils/Authorization")
+
 //setup app insights
 let appInsights = require("applicationinsights");
 appInsights.setup(process.env.AzureAppInsights).start();
@@ -40,6 +41,12 @@ i18next.use(Backend).use(i18nextMiddleware.LanguageDetector)
 
 module.exports=(app)=>{ 
    // general middlewares
+
+   //serve static data
+  // app.use(express.static(path.join(__dirname, '../public')));
+
+
+
     app.use(bodyParser.json());
       //Enable cors
      
@@ -107,7 +114,7 @@ app.use((req,res,next)=>{
   app.use("/api/v1/admin",Admin);
 
   // protect routes with checkApiKeyAndSecret
-  app.use(checkApiKeyAndSecret)
+ app.use(checkApiKeyAndSecret)
   
   app.get("/", (req, res) => {
     res.status(200).json({

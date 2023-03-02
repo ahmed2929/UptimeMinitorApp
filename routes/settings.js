@@ -43,6 +43,18 @@ router.delete(
     IsAuth(),
     SettingsController.DeleteAccount
 ),
+router.post(
+    "/create/feedback",
+    upload.fields([{name:"img",maxCount:1},{name:"voice",maxCount:1}]),
+    IsAuth(),
+    SettingsController.CreateFeedBack
+)
+
+router.get(
+    "/get/user/feedback",
+    IsAuth(),
+    SettingsController.GetUserFeedBacks
+)
 
 
 
