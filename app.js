@@ -11,5 +11,6 @@ app=SetMiddleWares(app)
 // Start the server
 app.listen(port,()=>{
     console.log(`server is runnig on port ${port}`)
+    
 })
 

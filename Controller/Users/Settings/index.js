@@ -33,7 +33,7 @@ exports.EditProfile = async (req, res) => {
     try {
   
       const {id} =req.id
-      const {ProfileID,firstName,lastName,countryCode,phoneNumber,gender,DateOfBirth}=req.body
+      const {ProfileID,firstName,lastName,countryCode,phoneNumber,gender,DateOfBirth,KeepOldImg}=req.body
      
   
   
@@ -72,8 +72,8 @@ exports.EditProfile = async (req, res) => {
         }
       }
 
-
-      let img
+     
+      let img=null
       // store the image to azure
       if(req.file){
          img = await UploadFileToAzureBlob(req.file)
@@ -92,7 +92,7 @@ exports.EditProfile = async (req, res) => {
       user.mobileNumber.phoneNumber=phoneNumber||user.mobileNumber.phoneNumber
       user.firstName=firstName||user.firstName
       user.lastName=lastName||user.lastName
-      user.img=img||user.img
+      user.img=KeepOldImg==='true'?user.img:img
       await user.save()
       
          

@@ -13,3 +13,5 @@
 12:dependent did not take med (1 h)
 13:med refile alert for my dependent
 14:my internal dependent dose time has come
+15:dependent add a new BloodGlucoseMeasurement 
+16:care giver added a new BloodGlucoseMeasurement to me

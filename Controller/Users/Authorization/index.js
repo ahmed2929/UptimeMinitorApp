@@ -114,7 +114,8 @@ exports.signUp = async (req, res) => {
       const verificationMessage = messages.verifyAccount_EN(verificationCode);
       await SendEmailToUser(newUser.email,verificationMessage)
     }else{
-      const verificationMessage = messages.verifyAccount_AR(verificationExpiryDate);
+      const verificationMessage = messages.verifyAccount_AR(verificationCode);
+      
       await SendEmailToUser(newUser.email,verificationMessage)
     }
 

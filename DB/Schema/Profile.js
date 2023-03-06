@@ -62,6 +62,14 @@ var ProfileSchema = new Schema({
         type:Boolean,
         default:true
     },
+    CanManageMeasurement:{
+        type:Boolean,
+        default:true
+    },
+    CanReadMeasurement:{
+        type:Boolean,
+        default:true
+    },
     },
     Dependents:[{
     

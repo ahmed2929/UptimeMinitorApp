@@ -409,7 +409,6 @@ exports.CreateNewMed = async (req, res) => {
   
       const {id} =req.id
       let {
-        img,
         MedId,
         name,
         strength,
@@ -424,7 +423,8 @@ exports.CreateNewMed = async (req, res) => {
         ProfileID,
         Refillable,
         RefileLevel,
-        Ringtone
+        Ringtone,
+        KeepOldImg
       }=req.body
   
   
@@ -466,19 +466,19 @@ exports.CreateNewMed = async (req, res) => {
       // }
   
   
-  
-  
+      if(!MedId){
+        return errorResMsg(res, 400, req.t("Medication_id_required"));
+      }
+      const oldMed=await UserMedication.findById(MedId);
+      if(!oldMed){
+        return errorResMsg(res, 404, req.t("Medication_not_found"));
+      }
+      let img=null;
       if(req.file){
          // store the image
       img = await UploadFileToAzureBlob(req.file)
         }
-        if(!MedId){
-          return errorResMsg(res, 400, req.t("Medication_id_required"));
-        }
-        const oldMed=await UserMedication.findById(MedId);
-        if(!oldMed){
-          return errorResMsg(res, 404, req.t("Medication_not_found"));
-        }
+     
   
         // check if the caller is thas the permssion to edit
         // for now the creator who has the right to edit
@@ -487,7 +487,7 @@ exports.CreateNewMed = async (req, res) => {
   
         // edit medication
        const editedMed= await UserMedication.findByIdAndUpdate(MedId,{
-          img:img||oldMed.img,
+          img:KeepOldImg==='true'?oldMed.img:img,
           name:name||oldMed.name,
           strength:strength||oldMed.strength,
           description:description||oldMed.description,
@@ -636,11 +636,12 @@ exports.CreateNewMed = async (req, res) => {
        }
      
       
-
+      const responseData=await UserMedication.findById(editedMed._id)
+      .populate("Scheduler")
 
      
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Scheduler_Updated")});
+      return successResMsg(res, 200, {message:req.t("Scheduler_Updated"),data:responseData});
       
     } catch (err) {
       // return error response

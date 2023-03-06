@@ -32,7 +32,14 @@ exports.ChangeUserDefaultLang = async (req, res) => {
     const {id} =req.id
     // get user with email
     const user = await User.findById(id);
+    if (!user) {
+      return errorResMsg(res, 404, req.t("user_not_found"));
+    }
+    // get user profile
+    const profile = await Profile.findById(user.profile);
     user.lang=lang;
+    profile.lang=lang;
+    await profile.save()
     await user.save()
 
     // return successful response

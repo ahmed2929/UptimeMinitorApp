@@ -22,7 +22,7 @@ const Settings =require("../routes/settings")
 const OwnerShip =require("../routes/OwnerShip")
 const Share =require("../routes/share")
 const {checkApiKeyAndSecret} =require("../utils/Authorization")
-
+const Measurement =require("../routes/MeasurementManagement")
 //setup app insights
 let appInsights = require("applicationinsights");
 appInsights.setup(process.env.AzureAppInsights).start();
@@ -60,14 +60,14 @@ module.exports=(app)=>{
   // });
 
 //Against brute attack
-const rateLimiter = rateLimit({
-  max: 200,
-  windowMs: 60 * 60 * 1000,
-  message: "Too many request from this IP, please try again in an hour!",
-});
+// const rateLimiter = rateLimit({
+//   max: 200,
+//   windowMs: 60 * 60 * 1000,
+//   message: "Too many request from this IP, please try again in an hour!",
+// });
 
 //rate limit
-app.use("/api", rateLimiter);
+//app.use("/api", rateLimiter);
 
 app.use(
   express.json({
@@ -114,7 +114,7 @@ app.use((req,res,next)=>{
   app.use("/api/v1/admin",Admin);
 
   // protect routes with checkApiKeyAndSecret
- app.use(checkApiKeyAndSecret)
+ //app.use(checkApiKeyAndSecret)
   
   app.get("/", (req, res) => {
     res.status(200).json({
@@ -132,6 +132,7 @@ app.use((req,res,next)=>{
   app.use("/api/v1/settings",Settings)
   app.use("/api/v1/ownership",OwnerShip)
   app.use("/api/v1/share",Share)
+  app.use("/api/v1/measurement",Measurement)
   
 
 

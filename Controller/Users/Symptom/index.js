@@ -166,11 +166,22 @@ exports.CreateSymptom = async (req, res) => {
     const responseData={
       ...newSymton._doc,
     }
+    // populated symptom data
+    const populateSymptom=await Symptom.findById(newSymton._id).populate({
+      path:"CreatorProfile EditedBy",
+      select:"firstName lastName img",
+      populate:{
+        path:"Owner.User",
+        select:"firstName lastName img"
+      }
+    })
+    //deep clone populated symptom
+    const populatedSymptomClone=JSON.parse(JSON.stringify(populateSymptom))
     //send notification to his care circle
     const careCircle =await Viewer.find({
       DependentProfile:ProfileID,
       IsDeleted:false,
-      CanViewSymptoms:true,
+      CanReadSymptoms:true,
       notify:true
     })
     .populate("ViewerProfile")
@@ -181,6 +192,7 @@ exports.CreateSymptom = async (req, res) => {
       }
       await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"NewSymptom",{
         SymptomId:newSymton._id,
+        Symptom:populatedSymptomClone,
         ProfileInfoOfSender:{
           firstName:profile.Owner.User.firstName,
           lastName:profile.Owner.User.lastName,
@@ -194,6 +206,7 @@ exports.CreateSymptom = async (req, res) => {
     if(profile.Owner.User._id.toString() !== id){
       await SendPushNotificationToUserRegardlessLangAndOs(viewerProfile,profile,"NewSymptomAddToMe",{
         SymptomId:newSymton._id,
+        Symptom:populatedSymptomClone,
         ProfileInfoOfSender:{
           firstName:viewerProfile.Owner.User.firstName,
           lastName:viewerProfile.Owner.User.lastName,
@@ -443,7 +456,9 @@ exports.EditSymptom = async (req, res) => {
       Description,
       Severity,
       StartedIn,
-      SymptomID
+      SymptomID,
+      KeepOldImg,
+      KeepOldVoice
     }=req.body
     /*
     
@@ -509,13 +524,13 @@ exports.EditSymptom = async (req, res) => {
     // }
 
 
-    let img
+    let img=null
     // store the image to azure
     if(req.files.img&&req.files.img[0]){
        img = await UploadFileToAzureBlob(req.files.img[0])
     }
     // store voice record to azure
-    let voice
+    let voice=null
     if(req.files.voice&&req.files.voice[0]){
       voice = await UploadFileToAzureBlob(req.files.voice[0])
     }
@@ -532,13 +547,13 @@ exports.EditSymptom = async (req, res) => {
     }
     // update the symptom
 console.log("will update")
-    symptom.img=img||symptom.img
+    symptom.img=KeepOldImg==='true'?symptom.img:img
     symptom.EditedBy=viewerProfile._id
     symptom.Type=Type||symptom.Type
     symptom.Description=Description||symptom.Description
     symptom.Severity=Severity||symptom.Severity
     symptom.StartedIn=StartedIn||symptom.StartedIn
-    symptom.VoiceRecord=voice||symptom.VoiceRecord
+    symptom.VoiceRecord=KeepOldVoice==='true'?symptom.VoiceRecord:voice
     
     // save the symptom
    await symptom.save()

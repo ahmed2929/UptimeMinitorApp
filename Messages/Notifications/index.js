@@ -2,7 +2,9 @@ exports.NewInvitationFromCareGiver_EN_GCM=(InvitationFrom,InvitationID,Notificat
     return {
         "notification":{
             "title": `You received a new request from a Caregiver`,
-            "body": `Please open Voithy to view the details`
+            "body": `Please open Voithy to view the details`,
+            "sound": "default",
+
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -15,7 +17,8 @@ exports.NewInvitationFromCareGiver_AR_GCM=(InvitationFrom,InvitationID,Notificat
     return {
         "notification":{
             "title": `لقد تلقيت طلبًا جديدًا من مقدم الرعاية`,
-                "body": `الرجاء فتح فويثي لعرض التفاصيل`
+                "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+                "sound": "default",
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -30,7 +33,8 @@ exports.DependentAcceptedInvitation_EN_GCM=(DependentName,InvitationID,Notificat
     return {
         "notification":{
             "title": `Your invitation has been accepted`,
-            "body": `Please open Voithy to view the details`
+            "body": `Please open Voithy to view the details`,
+            "sound": "default",
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -43,7 +47,8 @@ exports.DependentAcceptedInvitation_AR_GCM=(DependentName,InvitationID,Notificat
     return {
         "notification":{
             "title": ` تم قبول دعوتك`,
-            "body": `الرجاء فتح فويثي لعرض التفاصيل`
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+            "sound": "default",
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -57,7 +62,8 @@ exports.NewInvitationFromDependent_EN_GCM=(DependentName,InvitationID,Notificati
     return {
         "notification":{
             "title": `You received a new request from a Dependent`,
-            "body": `Please open Voithy to view the details`
+            "body": `Please open Voithy to view the details`,
+            "sound": "default",
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -70,7 +76,8 @@ exports.NewInvitationFromDependent_AR_GCM=(DependentName,InvitationID,Notificati
     return {
         "notification":{
             "title": `لقد تلقيت طلبًا جديدًا من تابع`,
-            "body": `الرجاء فتح فويثي لعرض التفاصيل`
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+            "sound": "default",
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -84,7 +91,8 @@ exports.CareGiverAcceptedInvitation_EN_GCM=(CareGiver,InvitationID,NotificationA
     return {
         "notification":{
             "title": `Your invitation has been accepted `,
-            "body": `Please open Voithy to view the details`
+            "body": `Please open Voithy to view the details`,
+            "sound": "default",
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -98,7 +106,8 @@ exports.CareGiverAcceptedInvitation_AR_GCM=(CareGiver,InvitationID,NotificationA
     return {
         "notification":{
             "title": ` تم قبول دعوتك`,
-            "body": `الرجاء فتح فويثي لعرض التفاصيل`
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+            "sound": "default",
         },
         "data":{
             "InvitationID": `${InvitationID}`,
@@ -112,7 +121,8 @@ exports.RefileAlert_EN_GCM=(patientName,MedName,MedID,NotificationActionType,Not
     return {
         "notification":{
             "title": `Refilel Alert`,
-            "body": `Please open Voithy to view the details`
+            "body": `Please open Voithy to view the details`,
+            "sound": "default",
         },
         "data":{
             "MedID": `${MedID}`,
@@ -126,7 +136,8 @@ exports.RefileAlert_AR_GCM=(patientName,MedName,MedID,NotificationActionType,Not
     return {
         "notification":{
             "title": `تنبيه إعادة التعبئة`,
-            "body": `الرجاء فتح فويثي لعرض التفاصيل`
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+            "sound": "default",
         },
         "data":{
             "MedID": `${MedID}`,
@@ -141,7 +152,8 @@ exports.NewSymptom_EN_GCM=(patientName,NewSymptomID,NotificationActionType,Notif
         "notification":{
            
                 "title": `A dependent added a new symptom`,
-                "body": `Please open Voithy to view the details`
+                "body": `Please open Voithy to view the details`,
+                "sound": "default",
             },
             "data":{
                 "SymptomID": `${NewSymptomID}`,
@@ -156,7 +168,8 @@ exports.NewSymptom_AR_GCM=(patientName,NewSymptomID,NotificationActionType,Notif
     return {
         "notification":{
             "title": `أضاف أحد التابعين أعراضًا جديدة `,
-            "body": `الرجاء فتح فويثي لعرض التفاصيل`
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+            "sound": "default",
            
             },
             "data":{
@@ -172,7 +185,8 @@ exports.NewSymptomAddedToMe_EN_GCM=(patientName,NewSymptomID,NotificationActionT
         "notification":{
            
             "title": `Your caregiver added a new symptom to you`,
-            "body": `Please open Voithy to view the details`
+            "body": `Please open Voithy to view the details`,
+            "sound": "default",
         },
         "data":{
             "SymptomID": `${NewSymptomID}`,
@@ -187,7 +201,8 @@ exports.NewSymptom_AR_GCM=(patientName,NewSymptomID,NotificationActionType,Notif
         "notification":{
            
             "title": `  تم اضافة عرض جديد `,
-            "body": `الرجاء فتح فويثي لعرض التفاصيل`
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+            "sound": "default",
         },
         "data":{
             "SymptomID": `${NewSymptomID}`,
@@ -197,6 +212,39 @@ exports.NewSymptom_AR_GCM=(patientName,NewSymptomID,NotificationActionType,Notif
     }
     }
 }
+
+exports.NewMeasurementAddedByMyDependnet_EN_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "notification":{
+            "title": `A dependent added a new Measurement`,
+            "body": `Please open Voithy to view the details`,
+            "sound": "default",
+        },
+        "data":{
+            "SymptomID": `${NewSymptomID}`,
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
+        
+    }
+    }
+}
+exports.NewMeasurementAddedByMyDependnet_AR_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "notification":{
+           
+            "title": ` تم اضافة قياس جديد `,
+                "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+                "sound": "default",
+        },
+        "data":{
+            "SymptomID": `${NewSymptomID}`,
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
+        
+    }
+    }
+}
+
 /////////////////////////////////////////IOS/////////////////////////////////////////
 
 exports.NewInvitationFromCareGiver_EN_APNS=(InvitationFrom,InvitationID,NotificationActionType,NotificationID)=>{
@@ -206,6 +254,7 @@ exports.NewInvitationFromCareGiver_EN_APNS=(InvitationFrom,InvitationID,Notifica
                 "title": `You received a new request from a Caregiver`,
                 "body": `Please open Voithy to view the details`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -223,6 +272,7 @@ exports.NewInvitationFromCareGiver_AR_APNS=(InvitationFrom,InvitationID,Notifica
                 "title": `لقد تلقيت طلبًا جديدًا من مقدم الرعاية`,
                 "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -239,6 +289,7 @@ exports.DependentAcceptedInvitation_EN_APNS=(DependentName,InvitationID,Notifica
                 "title": `Your invitation has been accepted`,
                 "body": `Please open Voithy to view the details`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -255,6 +306,7 @@ exports.DependentAcceptedInvitation_AR_APNS=(DependentName,InvitationID,Notifica
                 "title": ` تم قبول دعوتك`,
                 "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -270,6 +322,7 @@ exports.NewInvitationFromDependent_EN_APNS=(DependentName,InvitationID,Notificat
                 "title": `You received a new request from a Dependent`,
             "body": `Please open Voithy to view the details`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -285,6 +338,7 @@ exports.NewInvitationFromDependent_AR_APNS=(DependentName,InvitationID,Notificat
                 "title": `لقد تلقيت طلبًا جديدًا من تابع`,
                 "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -301,6 +355,7 @@ exports.CareGiverAcceptedInvitation_EN_APNS=(CareGiver,InvitationID,Notification
                 "title": `Your invitation has been accepted `,
                 "body": `Please open Voithy to view the details`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -314,9 +369,10 @@ exports.CareGiverAcceptedInvitation_AR_APNS=(CareGiver,InvitationID,Notification
     return {
         "aps":{
             "alert":{
-                "title": ` تم قبول دعوتك`,
+            "title": ` تم قبول دعوتك`,
             "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
+            "sound": "default",
             "data":{
                 "InvitationID": `${InvitationID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -332,6 +388,7 @@ exports.RefileAlert_EN_APNS=(patientName,MedName,MedID,NotificationActionType,No
                 "title": `Refilel Alert`,
                 "body": `Please open Voithy to view the details`
             },
+            "sound": "default",
             "data":{
                 "MedID": `${MedID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -347,6 +404,7 @@ exports.RefileAlert_AR_APNS=(patientName,MedName,MedID,NotificationActionType,No
                 "title": `تنبيه إعادة التعبئة`,
                 "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
+            "sound": "default",
             "data":{
                 "MedID": `${MedID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -363,6 +421,7 @@ exports.NewSymptom_EN_APNS=(patientName,NewSymptomID,NotificationActionType,Noti
                 "title": `A dependent added a new symptom`,
                 "body": `Please open Voithy to view the details`
             },
+            "sound": "default",
             "data":{
                 "SymptomID": `${NewSymptomID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -378,6 +437,7 @@ exports.NewSymptom_AR_APNS=(patientName,NewSymptomID,NotificationActionType,Noti
                 "title": `أضاف أحد التابعين أعراضًا جديدة `,
                 "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
+            "sound": "default",
             "data":{
                 "SymptomID": `${NewSymptomID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -396,6 +456,7 @@ exports.NewSymptomAddedToMe_EN_APNS=(patientName,NewSymptomID,NotificationAction
             "title": `Your caregiver added a new symptom to you`,
             "body": `Please open Voithy to view the details`
             },
+            "sound": "default",
             "data":{
                 "SymptomID": `${NewSymptomID}`,
                 "NotificationActionType":`${NotificationActionType}`,
@@ -411,6 +472,42 @@ exports.NewSymptom_AR_APNS=(patientName,NewSymptomID,NotificationActionType,Noti
                 "title": `  تم اضافة عرض جديد `,
                 "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
+            "sound": "default",
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            }
+        }
+    }
+}
+
+exports.NewMeasurementAddedByMyDependnet_AR_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "aps":{
+            "alert":{
+                "title": ` تم اضافة قياس جديد `,
+                "body": `الرجاء فتح فويثي لعرض التفاصيل`
+            },
+            "sound": "default",
+            "data":{
+                "SymptomID": `${NewSymptomID}`,
+                "NotificationActionType":`${NotificationActionType}`,
+                "NotificationID":`${NotificationID}`
+            }
+        }
+    }
+}
+
+exports.NewMeasurementAddedByMyDependnet_EN_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "aps":{
+            "alert":{
+                 
+            "title": `A dependent added a new Measurement`,
+            "body": `Please open Voithy to view the details`
+            },
+            "sound": "default",
             "data":{
                 "SymptomID": `${NewSymptomID}`,
                 "NotificationActionType":`${NotificationActionType}`,
