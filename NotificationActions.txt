@@ -15,3 +15,9 @@
 14:my internal dependent dose time has come
 15:dependent add a new BloodGlucoseMeasurement 
 16:care giver added a new BloodGlucoseMeasurement to me
+17:dependent add a new BloodPressureMeasurement 
+18:care giver added a new BloodPressureMeasurement to me
+19:BloodGlucoseMeasurement Reminder to me
+20:BloodGlucoseMeasurement Reminder to my dependent
+21:BloodPressureMeasurement Reminder to me
+22:BloodPressureMeasurement Reminder to my dependent

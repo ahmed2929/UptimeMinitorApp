@@ -64,7 +64,7 @@ exports.InvitationSentToExistentCareGiverUser_EN = (InvitationFrom,userName) => 
     </tr>
     <tr>
       <td class="footer">
-        For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+        For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
       </td>
     </tr>
   </table>
@@ -142,8 +142,7 @@ exports.InvitationSentToExistentCareGiverUser_AR = (InvitationFrom,userName) => 
   </tr>
   <tr>
     <td class="footer">
-      For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
-    </td>
+    لمزيد من المعلومات اتصل بنا على <a href="mailto:info@voithy.com"> info@voithy.com </a>.    </td>
   </tr>
 </table>
 </body>
@@ -223,7 +222,7 @@ exports.InvitationSentToExistentDependentUser_EN = (InvitationFrom,userName) => 
   </tr>
   <tr>
     <td class="footer">
-      For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+      For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
     </td>
   </tr>
 </table>
@@ -344,7 +343,7 @@ exports.InvitationSentToMyDependent_EN = (InvitationFrom,userName) => {
     </tr>
     <tr>
       <td class="footer">
-        For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+        For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
       </td>
     </tr>
   </table>
@@ -420,8 +419,7 @@ exports.InvitationSentToMyDependent_AR= (InvitationFrom,userName) => {
   </tr>
   <tr>
     <td class="footer">
-      For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
-    </td>
+    لمزيد من المعلومات اتصل بنا على <a href="mailto:info@voithy.com"> info@voithy.com </a>.    </td>
   </tr>
 </table>
 </body>
@@ -496,8 +494,7 @@ exports.InvitationSentToExistentDependentUser_AR= (InvitationFrom,userName) => {
   </tr>
   <tr>
     <td class="footer">
-      For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
-    </td>
+    لمزيد من المعلومات اتصل بنا على <a href="mailto:info@voithy.com"> info@voithy.com </a>.    </td>
   </tr>
 </table>
 </body>
@@ -618,7 +615,7 @@ exports.InvitationSentToCareGiver_EN = (otp,InvitationFrom,userName) => {
     </tr>
     <tr>
       <td class="footer">
-        For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+        For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
       </td>
     </tr>
   </table>
@@ -720,7 +717,7 @@ exports.verifyAccount_EN = (VerifictionCode) => {
         </tr>
         <tr>
           <td class="footer">
-            For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+            For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
           </td>
         </tr>
       </table>
@@ -799,7 +796,7 @@ exports.forgetMessage_EN = ( code) => {
     </tr>
     <tr>
       <td class="footer">
-        For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+        For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
       </td>
     </tr>
   </table>
@@ -870,7 +867,7 @@ exports.resetSuccess_EN = (name) => {
         </tr>
         <tr>
           <td class="footer">
-            For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+            For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
           </td>
         </tr>
       </table>
@@ -947,8 +944,7 @@ exports.verifyAccount_AR = (VerifictionCode) => {
         </tr>
         <tr>
           <td class="footer">
-            For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
-          </td>
+          لمزيد من المعلومات اتصل بنا على <a href="mailto:info@voithy.com"> info@voithy.com </a>.          </td>
         </tr>
       </table>
     </body>
@@ -1026,8 +1022,7 @@ exports.forgetMessage_AR = ( code) => {
     </tr>
     <tr>
       <td class="footer">
-        For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
-      </td>
+      لمزيد من المعلومات اتصل بنا على <a href="mailto:info@voithy.com"> info@voithy.com </a>.      </td>
     </tr>
   </table>
 </body>
@@ -1098,8 +1093,7 @@ exports.resetSuccess_AR = (name) => {
         </tr>
         <tr>
           <td class="footer">
-            For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
-          </td>
+          لمزيد من المعلومات اتصل بنا على <a href="mailto:info@voithy.com"> info@voithy.com </a>.          </td>
         </tr>
       </table>
     </body>
@@ -1178,7 +1172,7 @@ exports.NewFeedBack_EN = (FeedBack) => {
     </tr>
     <tr>
       <td class="footer">
-        For more information, please visit <a href="https://voithy.com/">voithy.com</a> or contact us via <a href="mailto:info@voithy.com">info@voithy.com</a>.
+        For more information contact us at <a href="mailto:info@voithy.com">info@voithy.com</a>.
       </td>
     </tr>
   </table>

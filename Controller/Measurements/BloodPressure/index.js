@@ -8,8 +8,8 @@
 
 const Viewer =require("../../../DB/Schema/Viewers")
 const {SendPushNotificationToUserRegardlessLangAndOs,
-CheckProfilePermissions,GetBloodGlucoseMeasurementForProfileID,
-GetBloodGlucoseForProfileIDList,BindNickNameWithDependentSymptom} =require("../../../utils/HelperFunctions")
+CheckProfilePermissions,GetBloodPressureMeasurementForProfileID,
+GetBloodPressureForProfileIDList,BindNickNameWithDependentSymptom} =require("../../../utils/HelperFunctions")
 const {CreateNewMeasurementScheduler,CreateMeasurementsOccurrences} =require("../../../utils/ControllerHelpers")
 
 
@@ -17,14 +17,14 @@ const {
   successResMsg,
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
-const BloodGlucose = require("../../../DB/Schema/BloodGlucoseManualMeasurement");
+const BloodPressure = require("../../../DB/Schema/BloodPressureManualMeasurement");
 const MeasurementScheduler=require("../../../DB/Schema/MeasurementScheduler")
 const Profile = require("../../../DB/Schema/Profile")
 
 
 
 /**
- * create new BloodGlucose
+ * create new BloodPressure
  * 
  * @function
  * @memberof controllers
@@ -47,7 +47,7 @@ const Profile = require("../../../DB/Schema/Profile")
  * @returns {Object} - Returns created Symptom
  * @description 
  * -  check if the caller is the profile owner or has permission
- * - create new BloodGlucose
+ * - create new symptom
        
  * 
  */
@@ -55,17 +55,20 @@ const Profile = require("../../../DB/Schema/Profile")
 
 
 
-exports.BloodGlucoseMeasurement = async (req, res) => {
+exports.BloodPressureMeasurement = async (req, res) => {
  
     try {
   
       const {id} =req.id
       const {
         ProfileID,
-        glucoseLevel,
         MeasurementDateTime,
         MeasurementUnit,
         MeasurementNote,
+        Systolic,
+        Diastolic,
+        Pulse,
+        PulseUnit
 
        
       }=req.body
@@ -104,7 +107,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
       const viewer =await Viewer.findOne({
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID,
-       CanAddBloodGlucoseMeasurement:true,
+       CanAddBloodPressureMeasurement:true,
        IsDeleted:false
       })
       if(!viewer&&profile.Owner.User._id.toString()!==id){
@@ -121,10 +124,13 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
 
  
   
-      // create new BloodGlucoseMeasurement
-      const newBloodGlucoseMeasurement = new BloodGlucose({
+      // create new BloodPressureMeasurement
+      const newBloodPressureMeasurement = new BloodPressure({
         ProfileID,
-        glucoseLevel,
+        Systolic,
+        Diastolic,
+        Pulse,
+        PulseUnit,
         MeasurementDateTime,
         MeasurementUnit,
         MeasurementNote,
@@ -135,10 +141,10 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
   
       })
       
-      await newBloodGlucoseMeasurement.save()
+      await newBloodPressureMeasurement.save()
 
-    // populated BloodGlucose data
-    const PopulatedBloodGlucoseMeasurement=await BloodGlucose.findById(newBloodGlucoseMeasurement._id).populate({
+    // populated BloodPressure data
+    const PopulatedBloodPressureMeasurement=await BloodPressure.findById(newBloodPressureMeasurement._id).populate({
       path:"ProfileID",
       select:"firstName lastName img",
       populate:{
@@ -146,13 +152,13 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
         select:"firstName lastName img"
       }
     })
-    //deep clone populated BloodGlucose
-    const populatedPopulatedBloodGlucoseMeasurementClone=JSON.parse(JSON.stringify(PopulatedBloodGlucoseMeasurement))
+    //deep clone populated BloodPressure
+    const populatedPopulatedBloodPressureMeasurementClone=JSON.parse(JSON.stringify(PopulatedBloodPressureMeasurement))
     //send notification to his care circle
     const careCircle =await Viewer.find({
       DependentProfile:ProfileID,
       IsDeleted:false,
-      CanReadBloodGlucoseMeasurement:true,
+      CanReadBloodPressureMeasurement:true,
       notify:true
     })
     .populate("ViewerProfile")
@@ -161,8 +167,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
       if(viewer.ViewerProfile._id.toString()===viewerProfile._id.toString()){
         continue
       }
-      await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"BloodGlucoseMeasurement",{
-        BloodGlucoseMeasurement:populatedPopulatedBloodGlucoseMeasurementClone,
+      await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"BloodPressureMeasurement",{
+        BloodPressureMeasurement:populatedPopulatedBloodPressureMeasurementClone,
         ProfileInfoOfSender:{
           firstName:profile.Owner.User.firstName,
           lastName:profile.Owner.User.lastName,
@@ -174,8 +180,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
     }
     // notify profile dependent if the profile.Owner.User._id is not as id
     if(profile.Owner.User._id.toString() !== id){
-      await SendPushNotificationToUserRegardlessLangAndOs(viewerProfile,profile,"BloodGlucoseMeasurementAddToMe",{
-        BloodGlucoseMeasurement:populatedPopulatedBloodGlucoseMeasurementClone,
+      await SendPushNotificationToUserRegardlessLangAndOs(viewerProfile,profile,"BloodPressureMeasurementAddToMe",{
+        BloodPressureMeasurement:populatedPopulatedBloodPressureMeasurementClone,
         ProfileInfoOfSender:{
           firstName:viewerProfile.Owner.User.firstName,
           lastName:viewerProfile.Owner.User.lastName,
@@ -187,7 +193,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
     }
 
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Measurement_created"),data:populatedPopulatedBloodGlucoseMeasurementClone});
+      return successResMsg(res, 200, {message:req.t("Measurement_created"),data:populatedPopulatedBloodPressureMeasurementClone});
       
     } catch (err) {
       // return error response
@@ -199,7 +205,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
 
 
     /**
- * BloodGlucoseMeasurement
+ * BloodPressureMeasurement
  * 
  * @function
  * @memberof controllers
@@ -216,12 +222,12 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
  * @throws {Error} if the user is not the owner of the profile or has a permission 
  * 
  * 
- * @returns {Object} - Returns BloodGlucoses of that date range
+ * @returns {Object} - Returns symptoms of that date range
  * @description 
- *    return BloodGlucose with a date range and not deleted
+ *    return symptom with a date range and not deleted
      * ********************************
      * logic
-        return BloodGlucose with a date range and not deleted
+        return symptom with a date range and not deleted
      * 
      * 
        
@@ -229,7 +235,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
  */
 
   
-  exports.getBloodGlucoseMeasurement=async (req, res) => {
+  exports.getBloodPressureMeasurement=async (req, res) => {
   
     
     try {
@@ -266,7 +272,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
        ViewerProfile:viewerProfile._id,
        DependentProfile:ProfileID,
        IsDeleted:false,
-       CanReadBloodGlucoseMeasurement:true
+       CanReadBloodPressureMeasurement:true
       })
   
       if(!viewer&&profile.Owner.User._id.toString()!==id){
@@ -288,7 +294,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
      
     if(StartDate&&EndDate){
         
-      const BloodGlucoseArray =await BloodGlucose.find({
+      const BloodPressureArray =await BloodPressure.find({
         ProfileID:ProfileID,
         PlannedDateTime:{
           $gte:new Date(+StartDate),
@@ -309,13 +315,13 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
 
       
       // return successfully response
-      return successResMsg(res, 200, {message:req.t("Success"),data:BloodGlucoseArray});
+      return successResMsg(res, 200, {message:req.t("Success"),data:BloodPressureArray});
   
     
    
   
     }else{
-        const BloodGlucoseArray =await BloodGlucose.find({
+        const BloodPressureArray =await BloodPressure.find({
           ProfileID:ProfileID,
           isDeleted:false
     
@@ -330,7 +336,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
        
        
         // return successfully response
-        return successResMsg(res, 200, {message:req.t("Success"),data:BloodGlucoseArray});
+        return successResMsg(res, 200, {message:req.t("Success"),data:BloodPressureArray});
     
       
      
@@ -349,11 +355,11 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
   
 
  /**
- * edit BloodGlucoseMeasurement
+ * edit BloodPressureMeasurement
  * 
  * @function
  * @memberof controllers
- * @memberof BloodGlucoseMeasurement
+ * @memberof BloodPressureMeasurement
  * @param {Object} req - Express request object
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
@@ -369,13 +375,13 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
  * 
  * @throws {Error} if the user does not have a profile
  * @throws {Error} if the user is not the owner of the profile or has a permission
- * @throws {Error} if the BloodGlucoses is deleted 
- * @throws {Error} if the BloodGlucose does not exist
+ * @throws {Error} if the symptoms is deleted 
+ * @throws {Error} if the symptom does not exist
  * 
  * @returns {Object} - Returns edited Symptom
  * @description 
  * -  check if the caller is the profile owner or has permission
- * - get the BloodGlucose if it is not flagged as deleted 
+ * - get the symptom if it is not flagged as deleted 
        
  * 
  */
@@ -383,17 +389,20 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
 
 
 
-exports.EditBloodGlucoseMeasurement= async (req, res) => {
+exports.EditBloodPressureMeasurement= async (req, res) => {
   try {
 
     const {id} =req.id
     const {
       ProfileID,
-      glucoseLevel,
+      Systolic,
+      Diastolic,
+      Pulse,
+      PulseUnit,
       MeasurementDateTime,
       MeasurementUnit,
       MeasurementNote,
-      BloodGlucoseMeasurementID,
+      BloodPressureMeasurementID,
     }=req.body
 
     const profile =await Profile.findById(ProfileID)
@@ -420,7 +429,7 @@ exports.EditBloodGlucoseMeasurement= async (req, res) => {
      ViewerProfile:viewerProfile._id,
      DependentProfile:ProfileID,
      IsDeleted:false,
-     CanEditBloodGlucoseMeasurement:true
+     CanEditBloodPressureMeasurement:true
     })
     if(!viewer&&profile.Owner.User._id.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
@@ -437,31 +446,33 @@ exports.EditBloodGlucoseMeasurement= async (req, res) => {
  
 
 
-    // get the BloodGlucoseMeasurement
-
+    // get the BloodPressureMeasurement
     
-    const BloodGlucoseMeasurement =await BloodGlucose.findById(BloodGlucoseMeasurementID)
-    if(!BloodGlucoseMeasurement){
+    const BloodPressureMeasurement =await BloodPressure.findById(BloodPressureMeasurementID)
+    if(!BloodPressureMeasurement){
       return errorResMsg(res, 400, req.t("Measurement_not_found"));
     }
     // check if  deleted
-    if(BloodGlucoseMeasurement.isDeleted){
+    if(BloodPressureMeasurement.isDeleted){
       return errorResMsg(res, 400, req.t("Measurement_is_deleted"));
     }
-    // update the BloodGlucose
+    // update the symptom
 console.log("will update")
-    BloodGlucoseMeasurement.glucoseLevel=glucoseLevel
-    BloodGlucoseMeasurement.MeasurementDateTime=MeasurementDateTime
-    BloodGlucoseMeasurement.MeasurementUnit=MeasurementUnit
-    BloodGlucoseMeasurement.MeasurementNote=MeasurementNote
-    BloodGlucoseMeasurement.EditedBy=viewerProfile._id
-    BloodGlucoseMeasurement.Status=1
-    BloodGlucoseMeasurement.PlannedDateTime=MeasurementDateTime
-    BloodGlucoseMeasurement.MeasurementOccurred=true,
-
+    BloodPressureMeasurement.MeasurementDateTime=MeasurementDateTime
+    BloodPressureMeasurement.MeasurementUnit=MeasurementUnit
+    BloodPressureMeasurement.MeasurementNote=MeasurementNote
+    BloodPressureMeasurement.EditedBy=viewerProfile._id
+    BloodPressureMeasurement.Status=1
+    BloodPressureMeasurement.PlannedDateTime=MeasurementDateTime
+    BloodPressureMeasurement.MeasurementOccurred=true
+    BloodPressureMeasurement.Systolic=Systolic
+    BloodPressureMeasurement.Diastolic=Diastolic
+    BloodPressureMeasurement.Pulse=Pulse
+    BloodPressureMeasurement.PulseUnit=PulseUnit
+  
     
-    await BloodGlucoseMeasurement.save()
-    const PopulatedBloodGlucoseMeasurement=await BloodGlucose.findById(BloodGlucoseMeasurement._id).populate({
+    await BloodPressureMeasurement.save()
+    const PopulatedBloodPressureMeasurement=await BloodPressure.findById(BloodPressureMeasurement._id).populate({
       path:"ProfileID",
       select:"firstName lastName img",
       populate:{
@@ -469,49 +480,51 @@ console.log("will update")
         select:"firstName lastName img"
       }
     })
-   //deep clone populated BloodGlucose
-   const populatedPopulatedBloodGlucoseMeasurementClone=JSON.parse(JSON.stringify(PopulatedBloodGlucoseMeasurement))
-   //send notification to his care circle
-   const careCircle =await Viewer.find({
-     DependentProfile:ProfileID,
-     IsDeleted:false,
-     CanReadBloodGlucoseMeasurement:true,
-     notify:true
-   })
-   .populate("ViewerProfile")
-   for await (const viewer of careCircle) {
-     //skip the viewer if his ViewerProfile is the same as viewerProfile
-     if(viewer.ViewerProfile._id.toString()===viewerProfile._id.toString()){
-       continue
-     }
-     await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"BloodGlucoseMeasurement",{
-       BloodGlucoseMeasurement:populatedPopulatedBloodGlucoseMeasurementClone,
-       ProfileInfoOfSender:{
-         firstName:profile.Owner.User.firstName,
-         lastName:profile.Owner.User.lastName,
-         img:profile.Owner.User.img,
-         email:profile.Owner.User.email,
-         ProfileID:profile._id,
-       }
-     })
-   }
-   // notify profile dependent if the profile.Owner.User._id is not as id
-   if(profile.Owner.User._id.toString() !== id){
-     await SendPushNotificationToUserRegardlessLangAndOs(viewerProfile,profile,"BloodGlucoseMeasurementAddToMe",{
-       BloodGlucoseMeasurement:populatedPopulatedBloodGlucoseMeasurementClone,
-       ProfileInfoOfSender:{
-         firstName:viewerProfile.Owner.User.firstName,
-         lastName:viewerProfile.Owner.User.lastName,
-         img:viewerProfile.Owner.User.img,
-         email:viewerProfile.Owner.User.email,
-         ProfileID:viewerProfile._id,
-       }
-     })
-   }
+
+    //deep clone populated BloodPressure
+    const populatedPopulatedBloodPressureMeasurementClone=JSON.parse(JSON.stringify(PopulatedBloodPressureMeasurement))
+    //send notification to his care circle
+    const careCircle =await Viewer.find({
+      DependentProfile:ProfileID,
+      IsDeleted:false,
+      CanReadBloodPressureMeasurement:true,
+      notify:true
+    })
+    .populate("ViewerProfile")
+    for await (const viewer of careCircle) {
+      //skip the viewer if his ViewerProfile is the same as viewerProfile
+      if(viewer.ViewerProfile._id.toString()===viewerProfile._id.toString()){
+        continue
+      }
+      await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"BloodPressureMeasurement",{
+        BloodPressureMeasurement:populatedPopulatedBloodPressureMeasurementClone,
+        ProfileInfoOfSender:{
+          firstName:profile.Owner.User.firstName,
+          lastName:profile.Owner.User.lastName,
+          img:profile.Owner.User.img,
+          email:profile.Owner.User.email,
+          ProfileID:profile._id,
+        }
+      })
+    }
+    // notify profile dependent if the profile.Owner.User._id is not as id
+    if(profile.Owner.User._id.toString() !== id){
+      await SendPushNotificationToUserRegardlessLangAndOs(viewerProfile,profile,"BloodPressureMeasurementAddToMe",{
+        BloodPressureMeasurement:populatedPopulatedBloodPressureMeasurementClone,
+        ProfileInfoOfSender:{
+          firstName:viewerProfile.Owner.User.firstName,
+          lastName:viewerProfile.Owner.User.lastName,
+          img:viewerProfile.Owner.User.img,
+          email:viewerProfile.Owner.User.email,
+          ProfileID:viewerProfile._id,
+        }
+      })
+    }
+
 
    
   const responseData={
-    ...PopulatedBloodGlucoseMeasurement._doc,
+    ...PopulatedBloodPressureMeasurement._doc,
   }
     // return successfully response
     return successResMsg(res, 200, {message:req.t("Measurement_updated"),data:responseData});
@@ -541,12 +554,12 @@ console.log("will update")
  * 
  * @throws {Error} if the user does not have a profile
  * @throws {Error} if the user is not the owner of the profile or has a permission 
- * @throws {Error} if the BloodGlucose does not exist
+ * @throws {Error} if the symptom does not exist
  * 
  * @returns {Object} - Returns success message
  * @description 
  * -  check if the caller is the profile owner or has permission
- * -  flag the BloodGlucose as delete
+ * -  flag the symptom as delete
        
  * 
  */
@@ -554,14 +567,14 @@ console.log("will update")
 
 
 
-exports.DeleteBloodGlucoseMeasurement = async (req, res) => {
+exports.DeleteBloodPressureMeasurement = async (req, res) => {
  
   try {
 
     const {id} =req.id
     const {
       ProfileID,
-      BloodGlucoseMeasurementID
+      BloodPressureMeasurementID
     }=req.body
     /*
     
@@ -597,7 +610,7 @@ exports.DeleteBloodGlucoseMeasurement = async (req, res) => {
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
      DependentProfile:ProfileID,
-     CanDeleteBloodGlucoseMeasurement:true,
+     CanDeleteBloodPressureMeasurement:true,
      IsDeleted:false
 
     })
@@ -605,7 +618,7 @@ exports.DeleteBloodGlucoseMeasurement = async (req, res) => {
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }
      
-    // check if the user is the owner and has write permission or can add BloodGlucose
+    // check if the user is the owner and has write permission or can add symptom
 
     if(profile.Owner.User._id.toString() === id){
       if(!CheckProfilePermissions(profile,'CanManageMeasurement')){
@@ -614,19 +627,19 @@ exports.DeleteBloodGlucoseMeasurement = async (req, res) => {
     }
   
 
-    // get BloodGlucose
-    const BloodGlucoseMeasurement =await BloodGlucose.findByIdAndUpdate(BloodGlucoseMeasurementID,{
+    // get symptom
+    const BloodPressureMeasurement =await BloodPressure.findByIdAndUpdate(BloodPressureMeasurementID,{
       isDeleted:true
     })
-    if(!BloodGlucoseMeasurement){
-      return errorResMsg(res, 400, req.t("BloodGlucose_not_found"));
+    if(!BloodPressureMeasurement){
+      return errorResMsg(res, 400, req.t("BloodPressureMeasurement_not_found"));
     }
    
     
    
  
     // return successfully response
-    return successResMsg(res, 200, {message:req.t("BloodGlucoseMeasurement_deleted")});
+    return successResMsg(res, 200, {message:req.t("BloodPressureMeasurement_deleted")});
     
   } catch (err) {
     // return error response
@@ -635,7 +648,7 @@ exports.DeleteBloodGlucoseMeasurement = async (req, res) => {
   }
 };
 
-exports.getAllBloodGlucoseMeasurement=async (req, res) => {
+exports.getAllBloodPressureMeasurement=async (req, res) => {
   /**
    * get my doses and my dependents doses
    * 
@@ -703,14 +716,14 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
     const MyDependents =await Viewer.find({
       ViewerProfile:viewerProfile._id,
       IsDeleted:false,
-      CanReadBloodGlucoseMeasurement:true
+      CanReadBloodPressureMeasurement:true
     })
     const NickNameHashTable={}
     MyDependents.forEach(element => {
       NickNameHashTable[`${element.DependentProfile}`]=element.DependentProfileNickName
     });
     const dependentsProfiles =MyDependents.filter(elem=>{
-      return elem.CanReadBloodGlucoseMeasurement;
+      return elem.CanReadBloodPressureMeasurement;
     })
     const dependentsProfilesIDs =dependentsProfiles.map(elem=>{
 
@@ -720,22 +733,22 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
    
 
     // get caller doses
-    const MyBloodGlucoseMeasurement=await GetBloodGlucoseMeasurementForProfileID(ProfileID,queryDate,nextDay)
+    const MyBloodPressureMeasurement=await GetBloodPressureMeasurementForProfileID(ProfileID,queryDate,nextDay)
     // get Dependents Doses that has a general read perm
     console.log(dependentsProfilesIDs)
     //const DependentsSymptoms =await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay) 
-    const DependentsBloodGlucoseMeasurement=await GetBloodGlucoseForProfileIDList(dependentsProfilesIDs,queryDate,nextDay)
+    const DependentsBloodPressureMeasurement=await GetBloodPressureForProfileIDList(dependentsProfilesIDs,queryDate,nextDay)
 
     // bind nickname with dependent
 
-    const BindNickNameWithDependentList =await BindNickNameWithDependentSymptom(DependentsBloodGlucoseMeasurement,NickNameHashTable) 
+    const BindNickNameWithDependentList =await BindNickNameWithDependentSymptom(DependentsBloodPressureMeasurement,NickNameHashTable) 
 
   
    
 
       const finalResult={
-        CallerBloodGlucoseMeasurement:MyBloodGlucoseMeasurement,
-        DependentsBloodGlucoseMeasurement:BindNickNameWithDependentList
+        CallerBloodPressureMeasurement:MyBloodPressureMeasurement,
+        DependentsBloodPressureMeasurement:BindNickNameWithDependentList
       }
 
 
@@ -753,7 +766,7 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
   }
 };
 
-exports.CreateNewBloodGlucoseMeasurementScheduler = async (req, res) => {
+exports.CreateNewBloodPressureMeasurementScheduler = async (req, res) => {
  
   try {
 
@@ -788,7 +801,7 @@ exports.CreateNewBloodGlucoseMeasurementScheduler = async (req, res) => {
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
      DependentProfile:ProfileID,
-     CanAddBloodGlucoseMeasurement:true,
+     CanAddBloodPressureMeasurement:true,
      IsDeleted:false
     })
     if(!viewer&&profile.Owner.User._id.toString()!==id){
@@ -816,7 +829,7 @@ exports.CreateNewBloodGlucoseMeasurementScheduler = async (req, res) => {
     if(!jsonScheduler.EndDate){
       jsonScheduler.GenerateAutoOccurrence=true
     }
-    jsonScheduler.MeasurementType=0
+    jsonScheduler.MeasurementType=1
    // validate Scheduler 
    const ValidateScheduler= await CreateNewMeasurementScheduler(jsonScheduler,ProfileID,viewerProfile,req,res)
 
@@ -845,7 +858,7 @@ exports.CreateNewBloodGlucoseMeasurementScheduler = async (req, res) => {
 };
 
 
-exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
+exports.EditBloodPressureMeasurementScheduler=async (req, res) => {
   
  
   try {
@@ -880,7 +893,7 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
      DependentProfile:ProfileID,
-     CanEditBloodGlucoseMeasurement:true,
+     CanEditBloodPressureMeasurement:true,
      IsDeleted:false
     })
     if(!viewer&&profile.Owner.User._id.toString()!==id){
@@ -912,7 +925,7 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
     endOfYesterday.setHours(23, 59, 59, 999);
 
     // delete all the future Occurrences including today if its not 2 or 4
-   const deleted= await BloodGlucose.deleteMany({
+   const deleted= await BloodPressure.deleteMany({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
     PlannedDateTime:{$gte:endOfYesterday},
      Status: 0,
@@ -949,14 +962,14 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
 
-  const Measurements=await BloodGlucose.find({
+  const Measurements=await BloodPressure.find({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
     PlannedDateTime:{$gte:endOfYesterday,$lte:endOfToday},
     MeasurementOccurred:true
 
   })
    for await(const Measurement of Measurements){
-    await BloodGlucose.deleteMany({
+    await BloodPressure.deleteMany({
       MeasurementScheduler:newScheduler._id.toString(),
       PlannedDateTime:Measurement.PlannedDateTime,
       MeasurementOccurred:false
@@ -990,7 +1003,7 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
   }
 };
 
-exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
+exports.DeleteBloodPressureMeasurementScheduler=async (req, res) => {
   
  
   try {
@@ -1024,7 +1037,7 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
     const viewer =await Viewer.findOne({
      ViewerProfile:viewerProfile._id,
      DependentProfile:ProfileID,
-     CanDeleteBloodGlucoseMeasurement:true,
+     CanDeleteBloodPressureMeasurement:true,
      IsDeleted:false
     })
     if(!viewer&&profile.Owner.User._id.toString()!==id){
@@ -1056,7 +1069,7 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
     endOfYesterday.setHours(23, 59, 59, 999);
 
     // delete all the future Occurrences including today if its not 2 or 4
-   const deleted= await BloodGlucose.deleteMany({
+   const deleted= await BloodPressure.deleteMany({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
     PlannedDateTime:{$gte:endOfYesterday},
      Status: 0,
@@ -1068,7 +1081,7 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
     isDeleted:true
   },{new:true})
     
-  await BloodGlucose.updateMany({},{
+  await BloodPressure.updateMany({},{
     isDeleted:true
   })
   
@@ -1095,7 +1108,7 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
   }
 };
 
-exports.getBloodGlucoseMeasurementScheduler=async (req, res) => {
+exports.getBloodPressureMeasurementScheduler=async (req, res) => {
   
     
   try {
@@ -1131,7 +1144,7 @@ exports.getBloodGlucoseMeasurementScheduler=async (req, res) => {
      ViewerProfile:viewerProfile._id,
      DependentProfile:ProfileID,
      IsDeleted:false,
-     CanReadBloodGlucoseMeasurement:true
+     CanReadBloodPressureMeasurement:true
     })
 
     if(!viewer&&profile.Owner.User._id.toString()!==id){
@@ -1151,7 +1164,7 @@ exports.getBloodGlucoseMeasurementScheduler=async (req, res) => {
 
     
  
-      const BloodGlucoseArray =await MeasurementScheduler.find({
+      const BloodPressureArray =await MeasurementScheduler.find({
         ProfileID:ProfileID,
         isDeleted:false,
         MeasurementType:0
@@ -1167,7 +1180,7 @@ exports.getBloodGlucoseMeasurementScheduler=async (req, res) => {
      
      
       // return successfully response
-      return successResMsg(res, 200, {message:req.t("Success"),data:BloodGlucoseArray});
+      return successResMsg(res, 200, {message:req.t("Success"),data:BloodPressureArray});
   
     
    

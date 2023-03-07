@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const Profile =require("../DB/Schema/Profile")
 const MeasurementScheduler =require("../DB/Schema/MeasurementScheduler")
 const BloodGlucose =require("../DB/Schema/BloodGlucoseManualMeasurement")
+const BloodPressure =require("../DB/Schema/BloodPressureManualMeasurement")
 const {
   successResMsg,
   errorResMsg
@@ -221,8 +222,7 @@ return newScheduler
 }
 
 const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,viewerProfile,req,res,editApi)=>{
-  console.log("jsonScheduler",jsonScheduler.dosage) 
-  console.log("newScheduler",newScheduler.dosage)  
+  
   // create Occurrences
       /**
        *  -date and time are represented in ms format
@@ -329,7 +329,14 @@ const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,v
     
         
         // write occurrences to database
-        await BloodGlucose.insertMany(occurrences)
+        if(newScheduler.MeasurementType===0){
+          await BloodGlucose.insertMany(occurrences)
+        }
+        else if(newScheduler.MeasurementType===1){
+          await BloodPressure.insertMany(occurrences)
+        }
+
+        
     
     
      
@@ -401,8 +408,13 @@ const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,v
         
     
         // write occurrences to database
-        await BloodGlucose.insertMany(occurrences)
-    
+        if(newScheduler.MeasurementType===0){
+          await BloodGlucose.insertMany(occurrences)
+        }
+        else if(newScheduler.MeasurementType===1){
+          await BloodPressure.insertMany(occurrences)
+        }
+
     
     
         }

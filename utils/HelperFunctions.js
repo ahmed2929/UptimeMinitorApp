@@ -21,6 +21,7 @@ const mongoose = require('mongoose');
 const Occurrence = require("../DB/Schema/Occurrences");
 const Symptom = require("../DB/Schema/Symptoms");
 const BloodGlucose = require("../DB/Schema/BloodGlucoseManualMeasurement");
+const BloodPressure = require("../DB/Schema/BloodPressureManualMeasurement");
 // create refresh token
 
 /**
@@ -798,7 +799,7 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            await sendNotification(userprofile._id,Android_payload,"Android",15,payloadData)
                        } 
                    break;
-           case "BloodGlucoseMeasurementAddToMe":
+            case "BloodGlucoseMeasurementAddToMe":
                     //i case of only IOS
                        if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
@@ -841,7 +842,94 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            await sendNotification(userprofile._id,Android_payload,"Android",16,payloadData)
                        } 
                    break;
-            default:
+                   case "BloodPressureMeasurement":
+                    //i case of only IOS
+                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:17
+                               
+                           })
+                           await notification.save()
+                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                           await sendNotification(userprofile._id,payload,"IOS",17,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:17
+                               
+                           })
+                           await notification.save()
+                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                           await sendNotification(userprofile._id,payload,"Android",17,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                        //save notification in db
+                        const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:17
+                           
+                       })
+                       await notification.save()   
+                       const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+   
+                       const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       //case of both
+                           await sendNotification(userprofile._id,IOS_payload,"IOS",17,payloadData)
+                           await sendNotification(userprofile._id,Android_payload,"Android",17,payloadData)
+                       } 
+                   break;
+            case "BloodPressureMeasurementAddToMe":
+                    //i case of only IOS
+                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:18
+                               
+                           })
+                           await notification.save()
+                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                           await sendNotification(userprofile._id,payload,"IOS",18,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:18
+                               
+                           })
+                           await notification.save()
+                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                           await sendNotification(userprofile._id,payload,"Android",18,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                        //save notification in db
+                        const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:18
+                           
+                       })
+                       await notification.save()   
+                       const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+   
+                       const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       //case of both
+                           await sendNotification(userprofile._id,IOS_payload,"IOS",18,payloadData)
+                           await sendNotification(userprofile._id,Android_payload,"Android",18,payloadData)
+                       } 
+                   break;
+            
+                   default:
                 break;
 
         }
@@ -1234,7 +1322,92 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        await sendNotification(userprofile._id,Android_payload,"Android",16,payloadData)
                    } 
                break;
-            
+               case "BloodPressureMeasurement":
+                //i case of only IOS
+                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:17
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"IOS",17,payloadData)
+
+                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:17
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"Android",17,payloadData)
+
+                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                    //save notification in db
+                    const notification = new Notification({
+                       ProfileID:userprofile._id,
+                       data:payloadData,
+                       action:17
+                       
+                   })
+                   await notification.save()   
+                   const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+
+                   const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                   //case of both
+                       await sendNotification(userprofile._id,IOS_payload,"IOS",17,payloadData)
+                       await sendNotification(userprofile._id,Android_payload,"Android",17,payloadData)
+                   } 
+               break;
+        case "BloodPressureMeasurementAddToMe":
+                //i case of only IOS
+                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:18
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"IOS",18,payloadData)
+
+                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:18
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       await sendNotification(userprofile._id,payload,"Android",18,payloadData)
+
+                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                    //save notification in db
+                    const notification = new Notification({
+                       ProfileID:userprofile._id,
+                       data:payloadData,
+                       action:18
+                       
+                   })
+                   await notification.save()   
+                   const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+
+                   const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                   //case of both
+                       await sendNotification(userprofile._id,IOS_payload,"IOS",18,payloadData)
+                       await sendNotification(userprofile._id,Android_payload,"Android",18,payloadData)
+                   } 
+               break;
             default:
              break;
 
@@ -1945,6 +2118,126 @@ const GetBloodGlucoseForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
 
 }
 
+const GetBloodPressureMeasurementForProfileID=async(ProfileID,startDate,EndDate)=>{
+  try {
+      const BloodGlucoseMeasurement =await BloodPressure.find({
+          ProfileID:ProfileID,
+          PlannedDateTime:{
+            $gte:new Date(+startDate),
+            $lte:new Date (+EndDate)
+          },
+          isDeleted:false
+    
+        }).populate({
+          path:"ProfileID",
+          select:"firstName lastName img",
+          populate:{
+            path:"Owner.User",
+            select:"firstName lastName img"
+          }
+        })
+        return BloodGlucoseMeasurement
+
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+
+const GetBloodPressureForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
+  try {
+    const BloodPressureMeasurement = await BloodPressure.aggregate([
+      {
+        $match: {
+          ProfileID: { $in: ProfileIDsList },
+          PlannedDateTime: {
+            $gte: new Date(+startDate),
+            $lte: new Date(+EndDate)
+          },
+          isDeleted: false
+        }
+      },
+      {
+        $lookup: {
+          from: "profiles",
+          localField: "ProfileID",
+          foreignField: "_id",
+          as: "profile",
+        },
+      },
+      {
+        $unwind: "$profile",
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "profile.Owner.User",
+          foreignField: "_id",
+          as: "user",
+        },
+       
+      },
+      {
+        $unwind: "$user",
+      },
+
+      {
+        $group: {
+          _id: "$ProfileID",
+          BloodGlucoseMeasurement:{
+            $push: {
+              ProfileID: "$ProfileID",
+              Systolic:"$Systolic",
+              Diastolic:"$Diastolic",
+              Pulse:"$Pulse",
+              PulseUnit:"$PulseUnit",
+              MeasurementDateTime: "$MeasurementDateTime",
+              MeasurementUnit: "$MeasurementUnit",
+              MeasurementNote:"$MeasurementNote",
+              MeasurementSource:"$MeasurementSource",
+              CreatorProfile:"$CreatorProfile",
+              EditedBy:"$EditedBy",
+              PlannedDateTime:"$PlannedDateTime",
+              Status:"$Status",
+              _id: "$_id",
+             
+            },
+          },
+          owner: {
+            $first: "$user",
+          },
+          profile: {
+            $first: "$profile",
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          ProfileID: "$_id",
+          BloodPressureMeasurement: 1,
+          owner: {
+            firstName: "$owner.firstName",
+            lastName: "$owner.lastName",
+            email: "$owner.email",
+            img:"$owner.img"
+          },
+        },
+      },
+    ]);
+    
+  return BloodPressureMeasurement
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+
+
 const isValidEmail=(email)=> {
   const emailRegex = /^\S+@\S+\.\S+$/;
   return emailRegex.test(email);
@@ -1978,6 +2271,8 @@ module.exports={
     isValidEmail,
     GetBloodGlucoseMeasurementForProfileID,
     GetBloodGlucoseForProfileIDList,
+    GetBloodPressureMeasurementForProfileID,
+    GetBloodPressureForProfileIDList,
     GenerateMeasurementOccurrences,
     GenerateMeasurementOccurrencesWithDays
 }
