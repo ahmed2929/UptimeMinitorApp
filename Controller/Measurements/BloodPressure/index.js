@@ -9,7 +9,7 @@
 const Viewer =require("../../../DB/Schema/Viewers")
 const {SendPushNotificationToUserRegardlessLangAndOs,
 CheckProfilePermissions,GetBloodPressureMeasurementForProfileID,
-GetBloodPressureForProfileIDList,BindNickNameWithDependentSymptom} =require("../../../utils/HelperFunctions")
+GetBloodPressureForProfileIDList,BindNickNameWithDependentSymptom,UploadFileToAzureBlob} =require("../../../utils/HelperFunctions")
 const {CreateNewMeasurementScheduler,CreateMeasurementsOccurrences} =require("../../../utils/ControllerHelpers")
 
 
@@ -68,7 +68,8 @@ exports.BloodPressureMeasurement = async (req, res) => {
         Systolic,
         Diastolic,
         Pulse,
-        PulseUnit
+        PulseUnit,
+        Status
 
        
       }=req.body
@@ -122,7 +123,11 @@ exports.BloodPressureMeasurement = async (req, res) => {
         }
       }
 
- 
+  // upload voice if exists
+      let voice
+      if(req.files.voice&&req.files.voice[0]){
+        voice = await UploadFileToAzureBlob(req.files.voice[0])
+      }
   
       // create new BloodPressureMeasurement
       const newBloodPressureMeasurement = new BloodPressure({
@@ -135,9 +140,9 @@ exports.BloodPressureMeasurement = async (req, res) => {
         MeasurementUnit,
         MeasurementNote,
         CreatorProfile:viewerProfile._id,
-        Status:1,
+        Status:Status,
         PlannedDateTime:MeasurementDateTime,
-        MeasurementOccurred:true,
+        VoiceRecord:voice
   
       })
       
@@ -403,6 +408,8 @@ exports.EditBloodPressureMeasurement= async (req, res) => {
       MeasurementUnit,
       MeasurementNote,
       BloodPressureMeasurementID,
+      KeepOldVoice,
+      Status
     }=req.body
 
     const profile =await Profile.findById(ProfileID)
@@ -456,20 +463,26 @@ exports.EditBloodPressureMeasurement= async (req, res) => {
     if(BloodPressureMeasurement.isDeleted){
       return errorResMsg(res, 400, req.t("Measurement_is_deleted"));
     }
-    // update the symptom
+   
+    // store voice record to azure
+    let voice
+    if(req.files.voice&&req.files.voice[0]){
+      voice = await UploadFileToAzureBlob(req.files.voice[0])
+    }
+
+
 console.log("will update")
     BloodPressureMeasurement.MeasurementDateTime=MeasurementDateTime
     BloodPressureMeasurement.MeasurementUnit=MeasurementUnit
     BloodPressureMeasurement.MeasurementNote=MeasurementNote
     BloodPressureMeasurement.EditedBy=viewerProfile._id
-    BloodPressureMeasurement.Status=1
+    BloodPressureMeasurement.Status=Status
     BloodPressureMeasurement.PlannedDateTime=MeasurementDateTime
-    BloodPressureMeasurement.MeasurementOccurred=true
     BloodPressureMeasurement.Systolic=Systolic
     BloodPressureMeasurement.Diastolic=Diastolic
     BloodPressureMeasurement.Pulse=Pulse
     BloodPressureMeasurement.PulseUnit=PulseUnit
-  
+    KeepOldVoice==='true'?BloodPressureMeasurement.VoiceRecord:voice
     
     await BloodPressureMeasurement.save()
     const PopulatedBloodPressureMeasurement=await BloodPressure.findById(BloodPressureMeasurement._id).populate({
@@ -928,8 +941,8 @@ exports.EditBloodPressureMeasurementScheduler=async (req, res) => {
    const deleted= await BloodPressure.deleteMany({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
     PlannedDateTime:{$gte:endOfYesterday},
-     Status: 0,
-     MeasurementOccurred:false
+     Status: { $in: [0, 1, 3, 5] },
+    
     })
    console.log("deleted",deleted) 
   //make the Scheduler as archived 
@@ -957,7 +970,7 @@ exports.EditBloodPressureMeasurementScheduler=async (req, res) => {
     console.log("ValidateScheduler **************",ValidateScheduler)
     console.log("jsonScheduler **************",ValidateScheduler)
     // create Occurrences
-  const newScheduler= await CreateMeasurementsOccurrences(jsonScheduler,ValidateScheduler,ProfileID,viewerProfile,req,res)
+  const newScheduler= await CreateMeasurementsOccurrences(jsonScheduler,ValidateScheduler,ProfileID,viewerProfile,req,res,true)
 
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
@@ -965,14 +978,15 @@ exports.EditBloodPressureMeasurementScheduler=async (req, res) => {
   const Measurements=await BloodPressure.find({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
     PlannedDateTime:{$gte:endOfYesterday,$lte:endOfToday},
-    MeasurementOccurred:true
+    Status: { $in: [2,4] }
+    
 
   })
    for await(const Measurement of Measurements){
     await BloodPressure.deleteMany({
       MeasurementScheduler:newScheduler._id.toString(),
       PlannedDateTime:Measurement.PlannedDateTime,
-      MeasurementOccurred:false
+      Status: { $in: [0, 1, 3, 5] }
     })
 
   }
@@ -1071,23 +1085,15 @@ exports.DeleteBloodPressureMeasurementScheduler=async (req, res) => {
     // delete all the future Occurrences including today if its not 2 or 4
    const deleted= await BloodPressure.deleteMany({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
-    PlannedDateTime:{$gte:endOfYesterday},
-     Status: 0,
-     MeasurementOccurred:false
+     Status:  { $in: [0, 1, 3, 5] },
     })
+    
+    //  await BloodPressure.updateMany({MeasurementScheduler:OldMeasurementScheduler._id.toString(),PlannedDateTime:{$lte:new Date()}},{isDeleted:true})
    console.log("deleted",deleted) 
   //make the Scheduler as archived 
   const archived=await MeasurementScheduler.findByIdAndUpdate(MeasurementSchedulerID,{
     isDeleted:true
   },{new:true})
-    
-  await BloodPressure.updateMany({},{
-    isDeleted:true
-  })
-  
-    
-
-   
 
   
 

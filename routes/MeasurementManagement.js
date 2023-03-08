@@ -34,12 +34,14 @@ router.delete(
 
 router.post(
     "/add/BloodGlucose",
+    upload.fields([{name:"voice",maxCount:1}]),
     IsAuth(),
     BloodGlucoseController.BloodGlucoseMeasurement
 );
 
 router.put(
     "/Edit/BloodGlucose",
+    upload.fields([{name:"voice",maxCount:1}]),
     IsAuth(),
     BloodGlucoseController.EditBloodGlucoseMeasurement
 )
@@ -90,12 +92,14 @@ router.delete(
 
 router.post(
     "/add/BloodPressure",
+    upload.fields([{name:"voice",maxCount:1}]),
     IsAuth(),
     BloodPressureController.BloodPressureMeasurement
 );
 
 router.put(
     "/Edit/BloodPressure",
+    upload.fields([{name:"voice",maxCount:1}]),
     IsAuth(),
     BloodPressureController.EditBloodPressureMeasurement
 )

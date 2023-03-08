@@ -268,8 +268,11 @@ const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,v
         // generate occurrences data
     
         const occurrences=[]
-          
+        
+        for await (frequency of newScheduler.frequencies){
+
           let startDate = new Date(+newScheduler.StartDate);
+          let DoseTime = new Date(+frequency.DateTime);
           console.log("StartDate",startDate)
           console.log("json startdate",+newScheduler.StartDate)
           if(editApi){
@@ -279,17 +282,20 @@ const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,v
             if(startDate<today){
               startDate=today
 
-          let hours = startDate.getHours();
-          let minutes = startDate.getMinutes();
-          let seconds = startDate.getSeconds();
-          startDate=today
+          let hours = DoseTime.getHours();
+          let minutes = DoseTime.getMinutes();
+          let seconds = DoseTime.getSeconds();
+
           startDate.setHours(hours);
           startDate.setMinutes(minutes);
           startDate.setSeconds(seconds);
 
             }
 
+            }else{
+              startDate=new Date(+frequency.DateTime);
             }
+
 
 
 
@@ -325,88 +331,94 @@ const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,v
           
           const newOccurrences=await GenerateMeasurementOccurrences(occurrencePattern,start,end,OccurrencesData,req,res)
           occurrences.push(...newOccurrences);
-    
-    
-        
-        // write occurrences to database
-        if(newScheduler.MeasurementType===0){
-          await BloodGlucose.insertMany(occurrences)
-        }
-        else if(newScheduler.MeasurementType===1){
-          await BloodPressure.insertMany(occurrences)
+
         }
 
+           // write occurrences to database
+           if(newScheduler.MeasurementType===0){
+            await BloodGlucose.insertMany(occurrences)
+          }
+          else if(newScheduler.MeasurementType===1){
+            await BloodPressure.insertMany(occurrences)
+          }
+  
+  
         
-    
-    
-     
         
     
         }else if (newScheduler.ScheduleType=='0'||newScheduler.ScheduleType==0){
     
           // case user choose specific days
           const occurrences=[]
-        
-          let startDate = new Date(+newScheduler.StartDate);
-
-          if(editApi){
-            const today=new Date()
-            today.setHours(0, 0, 0, 0);
-
-            if(startDate<today){
           
-          let hours = startDate.getHours();
-          let minutes = startDate.getMinutes();
-          let seconds = startDate.getSeconds();
-          startDate=today
-          startDate.setHours(hours);
-          startDate.setMinutes(minutes);
-          startDate.setSeconds(seconds);
-
+          for await (frequency of newScheduler.frequencies){
+            let startDate = new Date(+newScheduler.StartDate);
+            let DoseTime = new Date(+frequency.DateTime);
+            console.log("StartDate",startDate)
+            console.log("json startdate",+newScheduler.StartDate)
+            if(editApi){
+              const today=new Date()
+              today.setHours(0, 0, 0, 0);
+  
+              if(startDate<today){
+                startDate=today
+  
+            let hours = DoseTime.getHours();
+            let minutes = DoseTime.getMinutes();
+            let seconds = DoseTime.getSeconds();
+  
+            startDate.setHours(hours);
+            startDate.setMinutes(minutes);
+            startDate.setSeconds(seconds);
+  
+              }
+  
+              }else{
+                startDate=new Date(+frequency.DateTime);
+              }
+  
+  
+  
+  
+            const OccurrencesData={
+              ProfileID,
+              MeasurementScheduler:newScheduler._id,
+              CreatorProfile:viewerProfile._id,
+              MeasurementType:newScheduler.MeasurementType,
+              Status:0
             }
-
+            const start=new Date(startDate)
+            
+            let end;
+            if(!newScheduler.EndDate){
+              var result
+              if(new Date(jsonScheduler.StartDate)<new Date()){
+                result = new Date();
+               result.setMonth(result.getMonth() + 3);
+               jsonScheduler.EndDate=result  
+             }else{
+                result = new Date(jsonScheduler.StartDate);
+               result.setMonth(result.getMonth() + 3);
+               jsonScheduler.EndDate=result
+             }
+   
+      
+              end=result
+            }else{
+              end=new Date(newScheduler.EndDate)
+      
+            }
+              EndOfCycle=new Date(end)
+      
+            
+      
+            const intervalDays=newScheduler.SpecificDays
+            
+            const newOccurrences=await GenerateMeasurementOccurrencesWithDays(intervalDays,start,EndOfCycle,OccurrencesData)
+            occurrences.push(...newOccurrences)
+      
           }
 
-          const OccurrencesData={
-            ProfileID,
-            MeasurementScheduler:newScheduler._id,
-            CreatorProfile:viewerProfile._id,
-            MeasurementType:newScheduler.MeasurementType,
-            Status:0
-          }
-          const start=new Date(startDate)
-          
-          let end;
-          if(!newScheduler.EndDate){
-            var result
-            if(new Date(jsonScheduler.StartDate)<new Date()){
-              result = new Date();
-             result.setMonth(result.getMonth() + 3);
-             jsonScheduler.EndDate=result  
-           }else{
-              result = new Date(jsonScheduler.StartDate);
-             result.setMonth(result.getMonth() + 3);
-             jsonScheduler.EndDate=result
-           }
- 
-    
-            end=result
-          }else{
-            end=new Date(newScheduler.EndDate)
-    
-          }
-            EndOfCycle=new Date(end)
-    
-          
-    
-          const intervalDays=newScheduler.SpecificDays
-          
-          const newOccurrences=await GenerateMeasurementOccurrencesWithDays(intervalDays,start,EndOfCycle,OccurrencesData)
-          occurrences.push(...newOccurrences)
-    
-    
-        
-    
         // write occurrences to database
         if(newScheduler.MeasurementType===0){
           await BloodGlucose.insertMany(occurrences)

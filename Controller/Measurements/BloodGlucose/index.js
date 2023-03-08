@@ -9,7 +9,7 @@
 const Viewer =require("../../../DB/Schema/Viewers")
 const {SendPushNotificationToUserRegardlessLangAndOs,
 CheckProfilePermissions,GetBloodGlucoseMeasurementForProfileID,
-GetBloodGlucoseForProfileIDList,BindNickNameWithDependentSymptom} =require("../../../utils/HelperFunctions")
+GetBloodGlucoseForProfileIDList,BindNickNameWithDependentSymptom,UploadFileToAzureBlob} =require("../../../utils/HelperFunctions")
 const {CreateNewMeasurementScheduler,CreateMeasurementsOccurrences} =require("../../../utils/ControllerHelpers")
 
 
@@ -66,6 +66,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
         MeasurementDateTime,
         MeasurementUnit,
         MeasurementNote,
+        Status
 
        
       }=req.body
@@ -119,6 +120,12 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
         }
       }
 
+      // upload voice if exists
+      let voice
+      if(req.files.voice&&req.files.voice[0]){
+        voice = await UploadFileToAzureBlob(req.files.voice[0])
+      }
+     
  
   
       // create new BloodGlucoseMeasurement
@@ -129,9 +136,9 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
         MeasurementUnit,
         MeasurementNote,
         CreatorProfile:viewerProfile._id,
-        Status:1,
+        Status:Status,
         PlannedDateTime:MeasurementDateTime,
-        MeasurementOccurred:true,
+        VoiceRecord:voice
   
       })
       
@@ -394,6 +401,8 @@ exports.EditBloodGlucoseMeasurement= async (req, res) => {
       MeasurementUnit,
       MeasurementNote,
       BloodGlucoseMeasurementID,
+      KeepOldVoice,
+      Status
     }=req.body
 
     const profile =await Profile.findById(ProfileID)
@@ -448,6 +457,14 @@ exports.EditBloodGlucoseMeasurement= async (req, res) => {
     if(BloodGlucoseMeasurement.isDeleted){
       return errorResMsg(res, 400, req.t("Measurement_is_deleted"));
     }
+
+    // store voice record to azure
+    let voice
+    if(req.files.voice&&req.files.voice[0]){
+      voice = await UploadFileToAzureBlob(req.files.voice[0])
+    }
+   
+
     // update the BloodGlucose
 console.log("will update")
     BloodGlucoseMeasurement.glucoseLevel=glucoseLevel
@@ -455,10 +472,9 @@ console.log("will update")
     BloodGlucoseMeasurement.MeasurementUnit=MeasurementUnit
     BloodGlucoseMeasurement.MeasurementNote=MeasurementNote
     BloodGlucoseMeasurement.EditedBy=viewerProfile._id
-    BloodGlucoseMeasurement.Status=1
+    BloodGlucoseMeasurement.Status=Status
     BloodGlucoseMeasurement.PlannedDateTime=MeasurementDateTime
-    BloodGlucoseMeasurement.MeasurementOccurred=true,
-
+    KeepOldVoice==='true'?BloodGlucoseMeasurement.VoiceRecord:voice
     
     await BloodGlucoseMeasurement.save()
     const PopulatedBloodGlucoseMeasurement=await BloodGlucose.findById(BloodGlucoseMeasurement._id).populate({
@@ -915,8 +931,7 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
    const deleted= await BloodGlucose.deleteMany({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
     PlannedDateTime:{$gte:endOfYesterday},
-     Status: 0,
-     MeasurementOccurred:false
+    Status: { $in: [0, 1, 3, 5] },
     })
    console.log("deleted",deleted) 
   //make the Scheduler as archived 
@@ -944,7 +959,7 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
     console.log("ValidateScheduler **************",ValidateScheduler)
     console.log("jsonScheduler **************",ValidateScheduler)
     // create Occurrences
-  const newScheduler= await CreateMeasurementsOccurrences(jsonScheduler,ValidateScheduler,ProfileID,viewerProfile,req,res)
+  const newScheduler= await CreateMeasurementsOccurrences(jsonScheduler,ValidateScheduler,ProfileID,viewerProfile,req,res,true)
 
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
@@ -952,14 +967,14 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
   const Measurements=await BloodGlucose.find({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
     PlannedDateTime:{$gte:endOfYesterday,$lte:endOfToday},
-    MeasurementOccurred:true
+    Status: { $in: [2,4] }
 
   })
    for await(const Measurement of Measurements){
     await BloodGlucose.deleteMany({
       MeasurementScheduler:newScheduler._id.toString(),
       PlannedDateTime:Measurement.PlannedDateTime,
-      MeasurementOccurred:false
+      Status: { $in: [0, 1, 3, 5] }
     })
 
   }
@@ -1058,9 +1073,8 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
     // delete all the future Occurrences including today if its not 2 or 4
    const deleted= await BloodGlucose.deleteMany({
     MeasurementScheduler:OldMeasurementScheduler._id.toString(),
-    PlannedDateTime:{$gte:endOfYesterday},
-     Status: 0,
-     MeasurementOccurred:false
+    Status:  { $in: [0, 1, 3, 5] },
+    
     })
    console.log("deleted",deleted) 
   //make the Scheduler as archived 
@@ -1068,9 +1082,6 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
     isDeleted:true
   },{new:true})
     
-  await BloodGlucose.updateMany({},{
-    isDeleted:true
-  })
   
     
 

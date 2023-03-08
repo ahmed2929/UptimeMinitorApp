@@ -1,6 +1,6 @@
 const express=require('express');
 const bodyParser=require('body-parser');
-const path      = require('path');
+const path = require('path');
 var cors = require('cors');
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
@@ -114,7 +114,7 @@ app.use((req,res,next)=>{
   app.use("/api/v1/admin",Admin);
 
   // protect routes with checkApiKeyAndSecret
- app.use(checkApiKeyAndSecret)
+ //app.use(checkApiKeyAndSecret)
   
   app.get("/", (req, res) => {
     res.status(200).json({
@@ -134,9 +134,6 @@ app.use((req,res,next)=>{
   app.use("/api/v1/share",Share)
   app.use("/api/v1/measurement",Measurement)
   
-
-
-
   //Handling 404 routes
     app.all("*", (req, res, next) => {
       console.log("path not found")

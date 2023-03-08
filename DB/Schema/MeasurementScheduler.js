@@ -55,7 +55,13 @@ var Scheduler = new Schema({
     MeasurementType:{
         type:Number,
         default:0 //0:for BloodGlucose ,1:BloodPressure
+    },
+    frequencies:[{
+      DateTime:{
+        type:Date,
+      }
     }
+    ]
  
 
  

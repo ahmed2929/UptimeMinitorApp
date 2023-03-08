@@ -933,8 +933,8 @@ exports.verifyAccount_AR = (VerifictionCode) => {
           <td>
             <h1>تفعيل الحساب </h1>
             <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
-            <p>Dear user,</p>
-            <p>شكرا لاستخدام فويثي كود التحقق الخاص بك هوا :</p>
+            <p>عزيزي المستخدم</p>
+            <p>شكرا لاستخدام فويثي كود التحقق الخاص بك هوا </p>
             <div class="otp">${VerifictionCode}</div>
             <p>يرجى إدخال OTP هذا في التطبيق للتحقق من حسابك</p>
             <p>إذا لم تطلب هذا التحقق ، يرجى تجاهل هذا البريد الإلكتروني.</p>

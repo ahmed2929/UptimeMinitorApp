@@ -17,7 +17,17 @@
 16:care giver added a new BloodGlucoseMeasurement to me
 17:dependent add a new BloodPressureMeasurement 
 18:care giver added a new BloodPressureMeasurement to me
-19:BloodGlucoseMeasurement Reminder to me
-20:BloodGlucoseMeasurement Reminder to my dependent
-21:BloodPressureMeasurement Reminder to me
-22:BloodPressureMeasurement Reminder to my dependent
+********************************************************
+19:BloodGlucoseMeasurement Reminder to me (0 to 1)
+20:BloodGlucoseMeasurement Reminder to my dependent (0 to 1) ultimate Owner 
+23:BloodGlucoseMeasurement 30m to me  (1 to 5)
+24:BloodGlucoseMeasurement 30m to my dependent (1 to 5) 
+25:BloodGlucoseMeasurement 60m to me  (5 to 3)
+26:BloodGlucoseMeasurement 60m to my dependent (5 to 3)
+*******************************************************
+21:BloodPressureMeasurement Reminder to me (0 to 1)
+22:BloodPressureMeasurement Reminder to my dependent (0 to 1) ultimate Owner
+27:BloodPressureMeasurement 30m to me  (1 to 5)
+28:BloodPressureMeasurement 30m to my dependent (1 to 5) 
+29:BloodPressureMeasurement 60m to me  (5 to 3)
+30:BloodPressureMeasurement 60m to my dependent (5 to 3)
