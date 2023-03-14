@@ -9,7 +9,7 @@
 const Viewer =require("../../../DB/Schema/Viewers")
 const {SendPushNotificationToUserRegardlessLangAndOs,
 CheckProfilePermissions,GetBloodPressureMeasurementForProfileID,
-GetBloodPressureForProfileIDList,BindNickNameWithDependentSymptom,UploadFileToAzureBlob} =require("../../../utils/HelperFunctions")
+GetBloodPressureForProfileIDList,BindNickNameWithDependentSymptom,UploadFileToAzureBlob,BindNickNameWithDependentMeasurement} =require("../../../utils/HelperFunctions")
 const {CreateNewMeasurementScheduler,CreateMeasurementsOccurrences} =require("../../../utils/ControllerHelpers")
 
 
@@ -180,6 +180,7 @@ exports.BloodPressureMeasurement = async (req, res) => {
           img:profile.Owner.User.img,
           email:profile.Owner.User.email,
           ProfileID:profile._id,
+          DependentProfileNickName:viewer.DependentProfileNickName
         }
       })
     }
@@ -193,6 +194,7 @@ exports.BloodPressureMeasurement = async (req, res) => {
           img:viewerProfile.Owner.User.img,
           email:viewerProfile.Owner.User.email,
           ProfileID:viewerProfile._id,
+         
         }
       })
     }
@@ -246,7 +248,7 @@ exports.BloodPressureMeasurement = async (req, res) => {
     try {
   
       const {id} =req.id
-      const {ProfileID,StartDate,EndDate}=req.query
+      const {ProfileID,StartDate,EndDate,Status}=req.query
       console.log(ProfileID)
                /*
       
@@ -305,6 +307,7 @@ exports.BloodPressureMeasurement = async (req, res) => {
           $gte:new Date(+StartDate),
           $lte:new Date (+EndDate)
         },
+        Status:Status||{$exists:true},
         isDeleted:false
   
       }).populate({
@@ -328,7 +331,8 @@ exports.BloodPressureMeasurement = async (req, res) => {
     }else{
         const BloodPressureArray =await BloodPressure.find({
           ProfileID:ProfileID,
-          isDeleted:false
+          isDeleted:false,
+          Status:Status||{$exists:true}
     
         }).populate({
           path:"ProfileID",
@@ -412,7 +416,7 @@ exports.EditBloodPressureMeasurement= async (req, res) => {
       Status
     }=req.body
 
-    const profile =await Profile.findById(ProfileID)
+    const profile =await Profile.findById(ProfileID).populate("Owner.User")
     if(!profile){
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
@@ -482,7 +486,7 @@ console.log("will update")
     BloodPressureMeasurement.Diastolic=Diastolic
     BloodPressureMeasurement.Pulse=Pulse
     BloodPressureMeasurement.PulseUnit=PulseUnit
-    KeepOldVoice==='true'?BloodPressureMeasurement.VoiceRecord:voice
+    BloodPressureMeasurement.VoiceRecord=KeepOldVoice==='true'?BloodPressureMeasurement.VoiceRecord:voice
     
     await BloodPressureMeasurement.save()
     const PopulatedBloodPressureMeasurement=await BloodPressure.findById(BloodPressureMeasurement._id).populate({
@@ -517,6 +521,7 @@ console.log("will update")
           img:profile.Owner.User.img,
           email:profile.Owner.User.email,
           ProfileID:profile._id,
+          DependentProfileNickName:viewer.DependentProfileNickName
         }
       })
     }
@@ -679,7 +684,8 @@ exports.getAllBloodPressureMeasurement=async (req, res) => {
     let {
     StartDate,
     ProfileID,
-    EndDate
+    EndDate,
+    Status
     }=req.query
     date=StartDate
 
@@ -746,15 +752,15 @@ exports.getAllBloodPressureMeasurement=async (req, res) => {
    
 
     // get caller doses
-    const MyBloodPressureMeasurement=await GetBloodPressureMeasurementForProfileID(ProfileID,queryDate,nextDay)
+    const MyBloodPressureMeasurement=await GetBloodPressureMeasurementForProfileID(ProfileID,queryDate,nextDay,Status)
     // get Dependents Doses that has a general read perm
     console.log(dependentsProfilesIDs)
     //const DependentsSymptoms =await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay) 
-    const DependentsBloodPressureMeasurement=await GetBloodPressureForProfileIDList(dependentsProfilesIDs,queryDate,nextDay)
-
+    const DependentsBloodPressureMeasurement=await GetBloodPressureForProfileIDList(dependentsProfilesIDs,queryDate,nextDay,Status)
+    console.log(DependentsBloodPressureMeasurement)
     // bind nickname with dependent
 
-    const BindNickNameWithDependentList =await BindNickNameWithDependentSymptom(DependentsBloodPressureMeasurement,NickNameHashTable) 
+    const BindNickNameWithDependentList =await BindNickNameWithDependentMeasurement(DependentsBloodPressureMeasurement,NickNameHashTable) 
 
   
    
@@ -931,7 +937,9 @@ exports.EditBloodPressureMeasurementScheduler=async (req, res) => {
     if(!OldMeasurementScheduler){
       return errorResMsg(res, 404, req.t("Scheduler_not_found"));
     }
-   
+    if(OldMeasurementScheduler.isDeleted){
+      return errorResMsg(res, 404, req.t("Scheduler_not_found"));
+    }
 
     const endOfYesterday = new Date();
     endOfYesterday.setDate(endOfYesterday.getDate() - 1);
@@ -963,7 +971,7 @@ exports.EditBloodPressureMeasurementScheduler=async (req, res) => {
     if(!jsonScheduler.EndDate){
       jsonScheduler.GenerateAutoOccurrence=true
     }
-    jsonScheduler.MeasurementType=0
+    jsonScheduler.MeasurementType=1
    // validate Scheduler 
    const ValidateScheduler= await CreateNewMeasurementScheduler(jsonScheduler,ProfileID,viewerProfile,req,res)
 
@@ -1074,6 +1082,9 @@ exports.DeleteBloodPressureMeasurementScheduler=async (req, res) => {
       // check if the Scheduler sent with the request is the same as the one in the database
 
     if(!OldMeasurementScheduler){
+      return errorResMsg(res, 404, req.t("Scheduler_not_found"));
+    }
+    if(OldMeasurementScheduler.isDeleted){
       return errorResMsg(res, 404, req.t("Scheduler_not_found"));
     }
    

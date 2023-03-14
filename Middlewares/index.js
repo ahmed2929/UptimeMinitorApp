@@ -40,7 +40,7 @@ i18next.use(Backend).use(i18nextMiddleware.LanguageDetector)
 
 
 module.exports=(app)=>{ 
-   // general middlewares
+   // general MiddleWares
 
    //serve static data
   // app.use(express.static(path.join(__dirname, '../public')));

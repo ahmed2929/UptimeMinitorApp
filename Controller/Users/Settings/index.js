@@ -201,7 +201,7 @@ exports.EditProfile = async (req, res) => {
       })
       //send OTP to verify email
       const verificationCode = await GenerateRandomCode(2);
-      const verificationExpiryDate =  Date.now()  + 8.64e+7 ;
+      const verificationExpiryDate =  Date.now()  + 600000 ;
        let verificationMessage;
        if(profile.lang==="en"){
          verificationMessage = messages.verifyAccount_EN(verificationCode);
@@ -334,7 +334,7 @@ exports.EditProfile = async (req, res) => {
       }
         //send OTP to verify email
         const verificationCode = await GenerateRandomCode(2);
-        const verificationExpiryDate =  Date.now()  + 8.64e+7 ;
+        const verificationExpiryDate =  Date.now()  + 600000 ;
          let verificationMessage;
          if(profile.lang==="en"){
            verificationMessage = messages.verifyAccount_EN(verificationCode);

@@ -137,16 +137,18 @@ exports.Notification = async (req, res) => {
 
     
         totalItems = await NotificationSchema.find({
-          ProfileID:ProfileID
-          
-
+          ProfileID:ProfileID,
+          isDeleted:false
+ 
           }).countDocuments();
           const totalNumberOfUnseen = await NotificationSchema.find({
             ProfileID:ProfileID,
+            isDeleted:false,
             Seen:false
             }).countDocuments();
           const notifications = await NotificationSchema.find({
-            ProfileID:ProfileID
+            ProfileID:ProfileID,
+            isDeleted:false
           
 
           })
@@ -170,6 +172,95 @@ exports.Notification = async (req, res) => {
   }
 };
 
+
+
+exports.ClearNotifications = async (req, res) => {
+ 
+  try {
+
+    const {id} =req.id
+    const {ProfileID,StartDate,EndDate,Seen}=req.body
+   
+
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(profile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(profile.Owner.User._id.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    if(StartDate&&EndDate){
+      await NotificationSchema.updateMany({
+        ProfileID: ProfileID,
+        createdAt: { $gte: new Date(+StartDate), $lte: new Date(+EndDate) },
+        Seen:  Seen || {$exists:true} // if Seen is not provided, this condition will be ignored
+      }, {
+        $set: { isDeleted: true }
+      });
+    }else{
+
+      await NotificationSchema.updateMany({
+        ProfileID: ProfileID,
+        Seen: Seen || {$exists:true}// if Seen is not provided, this condition will be ignored
+      }, {
+        $set: { isDeleted: true }
+      });
+
+
+    }
+   
+    //soft delete notifications
+    //await NotificationSchema.updateMany({ProfileID:ProfileID},{$set:{isDeleted:true}})
+       
+    return successResMsg(res, 200, {message:req.t("Notification_Cleared")});
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+exports.ClearSingleNotification = async (req, res) => {
+ 
+  try {
+
+    const {id} =req.id
+    const {ProfileID,NotificationID}=req.body
+   
+
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(profile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(profile.Owner.User._id.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    // update notification seen status
+    const notification =await NotificationSchema.findById(NotificationID)
+    if(!notification||notification.isDeleted){
+      return errorResMsg(res, 400, req.t("Notification_not_found"));
+    }
+    if(notification.ProfileID.toString()!=ProfileID.toString()){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    notification.isDeleted=true;
+    await notification.save()
+       
+    return successResMsg(res, 200, {message:req.t("Notification_Cleared")});
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
 
 
 

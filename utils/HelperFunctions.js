@@ -22,6 +22,7 @@ const Occurrence = require("../DB/Schema/Occurrences");
 const Symptom = require("../DB/Schema/Symptoms");
 const BloodGlucose = require("../DB/Schema/BloodGlucoseManualMeasurement");
 const BloodPressure = require("../DB/Schema/BloodPressureManualMeasurement");
+const EmailLogs =require("../DB/Schema/emailsLogs")
 // create refresh token
 
 /**
@@ -142,7 +143,7 @@ const getUserEmailFromId=async(id)=>{
           
           };
           
-         await mail.send(emailMessage, function (err, info) {
+        const info= await mail.send(emailMessage, function (err, info) {
             if (err) {
               console.log(err)
               throw new Error(err)
@@ -151,7 +152,17 @@ const getUserEmailFromId=async(id)=>{
             
             }
           });
+          console.info("email info ",info)
+          await EmailLogs.create({
+            ReceiverEmail:email,
+              AzureConfirmation:info
+          })
     } catch (error) {
+      await EmailLogs.create({
+        ReceiverEmail:email,
+        AzureConfirmation:info,
+        error:error
+    })
         console.log(error)
     }
     
@@ -260,12 +271,22 @@ const getUserEmailFromId=async(id)=>{
       var endDayResultWithOneDay = new Date(endDate);
       endDayResultWithOneDay.setDate(endDayResultWithOneDay.getDate() + 1);
       endDate = endDayResultWithOneDay;
-
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
 
       while (baseDate <= endDate ) {
+        let Status=0
+        if(new Date(baseDate)<new Date(oneHourAgo)){
+            Status=3
+        }else if(new Date(baseDate)<new Date(HalfAnHourAgo)){
+            Status=5
+        }else if (new Date(baseDate)<new Date()){
+            Status=1
+        }
           finalArrObj.push(
               {
                   PlannedDateTime:new Date(baseDate),
+                  Status:Status,
                   ...OccurrencesData
   
               }
@@ -308,6 +329,7 @@ const GenerateMeasurementOccurrencesWithDays=async (intervalDays,startDate,endDa
       endDate = endDayResultWithOneDay;
 
       while (baseDate <= endDate ) {
+
           console.log("while runs ",baseDate,endDate )
           const dayName=baseDate.toLocaleDateString('en', { weekday: 'long' })
           const shouldAdded=intervalDays.includes(dayName)
@@ -317,13 +339,21 @@ const GenerateMeasurementOccurrencesWithDays=async (intervalDays,startDate,endDa
           const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
           const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
 
-       
+            let Status=0
+            if(new Date(baseDate)<new Date(oneHourAgo)){
+                Status=3
+            }else if(new Date(baseDate)<new Date(HalfAnHourAgo)){
+                Status=5
+            }else if (new Date(baseDate)<new Date()){
+                Status=1
+            }
           if(shouldAdded){
 
           finalArrObj.push(
               {
                
                   PlannedDateTime:new Date(baseDate),
+                  Status:Status,
                   ...OccurrencesData
   
               }
@@ -1794,6 +1824,26 @@ const BindNickNameWithDependentSymptom=async(DependentsList,NickNameMap)=>{
 
 }
 
+
+const BindNickNameWithDependentMeasurement=async(DependentsList,NickNameMap)=>{
+  try {
+     const result=await DependentsList.map(elem=>{
+      const clonedObject = JSON.parse(JSON.stringify(elem));
+      return {
+          ...clonedObject,
+          DependentProfileNickName:NickNameMap[clonedObject.ProfileID]
+      }
+     })
+     return result
+
+  } catch (error) {
+      console.log(error)
+      
+  }
+
+}
+
+
 const GetSymptomForProfileID=async(ProfileID,startDate,EndDate)=>{
     try {
         const symptoms =await Symptom.find({
@@ -2002,7 +2052,7 @@ const CheckProfilePermissions=(profile,permission)=>{
 
 }
 
-const GetBloodGlucoseMeasurementForProfileID=async(ProfileID,startDate,EndDate)=>{
+const GetBloodGlucoseMeasurementForProfileID=async(ProfileID,startDate,EndDate,Status)=>{
     try {
         const BloodGlucoseMeasurement =await BloodGlucose.find({
             ProfileID:ProfileID,
@@ -2010,6 +2060,7 @@ const GetBloodGlucoseMeasurementForProfileID=async(ProfileID,startDate,EndDate)=
               $gte:new Date(+startDate),
               $lte:new Date (+EndDate)
             },
+            Status:Status||{$exists:true},
             isDeleted:false
       
           }).populate({
@@ -2030,7 +2081,7 @@ const GetBloodGlucoseMeasurementForProfileID=async(ProfileID,startDate,EndDate)=
 
 }
 
-const GetBloodGlucoseForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
+const GetBloodGlucoseForProfileIDList=async(ProfileIDsList,startDate,EndDate,Status)=>{
     try {
       const BloodGlucoseMeasurement = await BloodGlucose.aggregate([
         {
@@ -2040,6 +2091,7 @@ const GetBloodGlucoseForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
               $gte: new Date(+startDate),
               $lte: new Date(+EndDate)
             },
+            Status:Status||{$exists:true},
             isDeleted: false
           }
         },
@@ -2118,7 +2170,7 @@ const GetBloodGlucoseForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
 
 }
 
-const GetBloodPressureMeasurementForProfileID=async(ProfileID,startDate,EndDate)=>{
+const GetBloodPressureMeasurementForProfileID=async(ProfileID,startDate,EndDate,Status)=>{
   try {
       const BloodGlucoseMeasurement =await BloodPressure.find({
           ProfileID:ProfileID,
@@ -2126,6 +2178,7 @@ const GetBloodPressureMeasurementForProfileID=async(ProfileID,startDate,EndDate)
             $gte:new Date(+startDate),
             $lte:new Date (+EndDate)
           },
+       Status:Status||{$exists:true},
           isDeleted:false
     
         }).populate({
@@ -2146,7 +2199,7 @@ const GetBloodPressureMeasurementForProfileID=async(ProfileID,startDate,EndDate)
 
 }
 
-const GetBloodPressureForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
+const GetBloodPressureForProfileIDList=async(ProfileIDsList,startDate,EndDate,Status)=>{
   try {
     const BloodPressureMeasurement = await BloodPressure.aggregate([
       {
@@ -2156,6 +2209,7 @@ const GetBloodPressureForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>
             $gte: new Date(+startDate),
             $lte: new Date(+EndDate)
           },
+          Status:Status||{$exists:true},
           isDeleted: false
         }
       },
@@ -2186,7 +2240,7 @@ const GetBloodPressureForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>
       {
         $group: {
           _id: "$ProfileID",
-          BloodGlucoseMeasurement:{
+          BloodPressureMeasurement:{
             $push: {
               ProfileID: "$ProfileID",
               Systolic:"$Systolic",
@@ -2274,5 +2328,6 @@ module.exports={
     GetBloodPressureMeasurementForProfileID,
     GetBloodPressureForProfileIDList,
     GenerateMeasurementOccurrences,
-    GenerateMeasurementOccurrencesWithDays
+    GenerateMeasurementOccurrencesWithDays,
+    BindNickNameWithDependentMeasurement
 }

@@ -84,6 +84,11 @@ exports.CreateDependentA = async (req, res) => {
        
       }=req.body
   
+
+      if(!nickName&&!(firstName&&lastName)){
+        return errorResMsg(res, 400, req.t("please_enter_first_name_last_name_or_nick_name"));
+      }
+
         // check if the user has a profile
         const profile = await Profile.findById(ProfileID).populate("Owner.User")
         if(!profile){
@@ -105,13 +110,16 @@ exports.CreateDependentA = async (req, res) => {
          }
         }
      
-      if(phoneNumber){
+      if(phoneNumber&&phoneNumber!='null'){
         if(isNaN(phoneNumber)){
           return errorResMsg(res, 400, req.t("phone_number_is_not_valid"));
         }
         if(profile.Owner.User.mobileNumber.phoneNumber=== phoneNumber){
           return errorResMsg(res, 400, req.t("you_can_not_add_yourself_as_a_dependent"));
        }
+      }
+      if(phoneNumber==='null'){
+        phoneNumber=null
       }
       // if the caller is the profile owner then check his Permissions
       if(profile.Owner.User._id.toString() === id){
@@ -123,7 +131,7 @@ exports.CreateDependentA = async (req, res) => {
      
 
         // check for  email and mobile if it provided
-        if(email){
+        if(email&&email!='null'){
           if(!isValidEmail(email)){
             return errorResMsg(res, 400, req.t("email_is_not_valid"));
           }
@@ -134,6 +142,9 @@ exports.CreateDependentA = async (req, res) => {
             if(emailExist){
                 return errorResMsg(res, 400, req.t("email_exist"));
             }
+        }
+        if(email==='null'){
+          email=null
         }
         const mobileNumber ={
             phoneNumber:phoneNumber,
@@ -598,7 +609,7 @@ exports.CreateDependentA = async (req, res) => {
       //         //send notifications
       //          let RestPasswordCode = await GenerateRandomCode(6);
       //          let RestPasswordCode2= await GenerateRandomCode(6)
-      //          const ResetPasswordXpireDate =  Date.now()  + 8.64e+7 ;
+      //          const ResetPasswordXpireDate =  Date.now()  + 600000 ;
       //          RestPasswordCode+=RestPasswordCode2;
       //          if(newUser.lang==="en"){
       //           const invitation = messages.InvitationSentToDependent_EN(RestPasswordCode,profile.Owner.User.firstName,firstName);
@@ -791,6 +802,7 @@ exports.CreateDependentA = async (req, res) => {
                 ViewerProfile:masterProfile._id,
                 DependentProfile:dependentProfile._id,
                 CareGiverNickName:nickName,
+                Invitation:invitation._id,
                 ...permissions,
                 ...invitation.externalData,
 
@@ -1868,7 +1880,15 @@ exports.EditCareGiverPermissions = async (req, res) => {
       relationship.CanReadSpacificMeds=permissions.CanReadSpacificMeds
       relationship.notify=permissions.notify
       relationship.CareGiverNickName=nickName||relationship.CareGiverNickName
-      
+      // Measurements
+      relationship.CanReadBloodGlucoseMeasurement= permissions.CanReadBloodGlucoseMeasurement
+      relationship.CanEditBloodGlucoseMeasurement=permissions.CanEditBloodGlucoseMeasurement
+      relationship.CanDeleteBloodGlucoseMeasurement=permissions.CanDeleteBloodGlucoseMeasurement
+      relationship.CanAddBloodGlucoseMeasurement=permissions.CanAddBloodGlucoseMeasurement
+      relationship.CanReadBloodPressureMeasurement=permissions.CanReadBloodPressureMeasurement
+      relationship.CanEditBloodPressureMeasurement=permissions.CanEditBloodPressureMeasurement
+      relationship.CanDeleteBloodPressureMeasurement=permissions.CanDeleteBloodPressureMeasurement
+      relationship.CanAddBloodPressureMeasurement=permissions.CanAddBloodPressureMeasurement
      console.log("******",relationship)
      
       // save changes
@@ -1983,7 +2003,7 @@ exports.EditDependentInfoFull = async (req, res) => {
       if(!mongoose.isValidObjectId(ProfileID)){
           return errorResMsg(res, 400, req.t("invalid_profile_id"));
       }
-      const profile = await Profile.findById(ProfileID)
+      const profile = await Profile.findById(ProfileID).populate('Owner.User')
       if(!profile){
           return errorResMsg(res, 400, req.t("profile_not_found"));
       }
@@ -2083,8 +2103,8 @@ exports.EditDependentInfoFull = async (req, res) => {
        dependentAUser.email=email|| dependentAUser.email;
        dependentAUser.img=img|| dependentAUser.img;
        dependentAUser.email=email|| dependentAUser.email;
-       dependentAUser.phoneNumber=phoneNumber|| dependentAUser.phoneNumber;
-       dependentAUser.countryCode=countryCode|| dependentAUser.countryCode;
+       dependentAUser.mobileNumber.phoneNumber=phoneNumber|| dependentAUser.mobileNumber.phoneNumber;
+       dependentAUser.mobileNumber.countryCode=countryCode|| dependentAUser.mobileNumber.countryCode;
        await dependentAUser.save()
      
          const responseData ={
@@ -2093,8 +2113,8 @@ exports.EditDependentInfoFull = async (req, res) => {
              lastName:dependentAUser.lastName,
              nickName:relationship.nickName,
              email:dependentAUser.email,
-             phoneNumber:dependentAUser.phoneNumber,
-             countryCode:dependentAUser.countryCode,
+             phoneNumber:dependentAUser.mobileNumber.phoneNumber,
+             countryCode:dependentAUser.mobileNumber.countryCode,
              img:dependentAUser.img
          }
      

@@ -37,7 +37,7 @@ exports.authorizeRefreshToken = () => {
       
       if (!userID) {
         return res.status(401).json({
-          error: req.t("Unauthorized"),
+          error: req.t("Invalid_Refresh_token"),
           status: "error",
         });
       } else {
@@ -46,7 +46,7 @@ exports.authorizeRefreshToken = () => {
       }
     } catch {
       res.status(401).json({
-        error: req.t("Unauthorized"),
+        error: req.t("Invalid_Refresh_token"),
         status: "error",
       });
     }

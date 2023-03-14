@@ -16,8 +16,16 @@ router.get(
     ReportController.getReportSingleMed
 );
 
-
-
+router.get(
+    "/BloodGlucose",
+    IsAuth(),
+    ReportController.getBloodGlucoseMeasurementReport
+);
+router.get(
+    "/BloodPressure",
+    IsAuth(),
+    ReportController.getBloodPressureMeasurementReport
+);
 
 
 module.exports = router;

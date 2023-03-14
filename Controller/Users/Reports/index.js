@@ -11,6 +11,9 @@ const UserMedication = require("../../../DB/Schema/UserMedication");
 const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
+const BloodGlucose =require("../../../DB/Schema/BloodGlucoseManualMeasurement")
+const BloodPressure =require("../../../DB/Schema/BloodPressureManualMeasurement")
+const {CheckProfilePermissions} =require("../../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
@@ -202,7 +205,7 @@ exports.getReport=async (req, res) => {
        const responseData=[];
    
        for (const elem of doses) {
-         const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity")
+         const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity type")
          .populate("Scheduler")
           .populate("user")
          .select("dosage")
@@ -219,6 +222,7 @@ exports.getReport=async (req, res) => {
               StartDate:med.Scheduler.StartDate,
               EndDate:med.Scheduler.EndDate,
               GenerateAutoOccurrence:med.Scheduler.GenerateAutoOccurrence,
+              type:med.type
 
            },
            confirmed:elem.confirmed,
@@ -331,7 +335,7 @@ exports.getReport=async (req, res) => {
       const responseData=[];
   
       for (const elem of doses) {
-        const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity")
+        const med =await UserMedication.findById(elem._id.Medication).select("name img unit strength quantity type")
         .populate("Scheduler")
         .populate("user")
         .select("dosage")
@@ -351,6 +355,8 @@ exports.getReport=async (req, res) => {
             StartDate:med.Scheduler.StartDate,
             EndDate:med.Scheduler.EndDate,
             GenerateAutoOccurrence:med.Scheduler.GenerateAutoOccurrence,
+            type:med.type
+
 
          },
           confirmed:elem.confirmed,
@@ -595,4 +601,243 @@ exports.getReport=async (req, res) => {
   };
   
   
+  exports.getBloodGlucoseMeasurementReport=async (req, res) => {
   
+    
+    try {
+  
+      const {id} =req.id
+      const {ProfileID,StartDate,EndDate}=req.query
+      console.log(ProfileID)
+               /*
+      
+      check permission 
+      
+      */
+  
+      const profile =await Profile.findById(ProfileID).populate("Owner.User")
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      // get the viewer permissions
+      const viewerProfile =await Profile.findOne({
+      "Owner.User":id
+      })
+      if(!viewerProfile){
+         return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      const viewer =await Viewer.findOne({
+       ViewerProfile:viewerProfile._id,
+       DependentProfile:ProfileID,
+       IsDeleted:false,
+       CanReadBloodGlucoseMeasurement:true
+      })
+  
+      if(!viewer&&profile.Owner.User._id.toString()!==id){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+  
+      // check if the user is the owner or has a read permissions
+        // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        //   return errorResMsg(res, 401, req.t("Unauthorized"));
+        // }
+    
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanReadMeasurement')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
+      
+     
+    if(StartDate&&EndDate){
+        
+      const BloodGlucoseArray =await BloodGlucose.find({
+        ProfileID:ProfileID,
+        MeasurementDateTime:{
+          $gte:new Date(+StartDate),
+          $lte:new Date (+EndDate)
+        },
+        isDeleted:false,
+        Status:2
+  
+      }).populate({
+        path:"ProfileID",
+        select:"firstName lastName img",
+        populate:{
+          path:"Owner.User",
+          select:"firstName lastName img"
+        }
+      })
+     
+     
+
+      
+      // return successfully response
+      return successResMsg(res, 200, {message:req.t("Success"),data:BloodGlucoseArray});
+  
+    
+   
+  
+    }else{
+        const BloodGlucoseArray =await BloodGlucose.find({
+          ProfileID:ProfileID,
+          isDeleted:false,
+          isDeleted:false,
+          Status:2
+    
+        }).populate({
+          path:"ProfileID",
+          select:"firstName lastName img",
+          populate:{
+            path:"Owner.User",
+            select:"firstName lastName img"
+          }
+        })
+       
+       
+        // return successfully response
+        return successResMsg(res, 200, {message:req.t("Success"),data:BloodGlucoseArray});
+    
+      
+     
+    }
+   
+  
+ 
+     
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+  exports.getBloodPressureMeasurementReport=async (req, res) => {
+  
+    
+    try {
+  
+      const {id} =req.id
+      const {ProfileID,StartDate,EndDate}=req.query
+      console.log(ProfileID)
+               /*
+      
+      check permission 
+      
+      */
+  
+      const profile =await Profile.findById(ProfileID).populate("Owner.User")
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      // get the viewer permissions
+      const viewerProfile =await Profile.findOne({
+      "Owner.User":id
+      })
+      if(!viewerProfile){
+         return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(viewerProfile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      const viewer =await Viewer.findOne({
+       ViewerProfile:viewerProfile._id,
+       DependentProfile:ProfileID,
+       IsDeleted:false,
+       CanReadBloodPressureMeasurement:true
+      })
+  
+      if(!viewer&&profile.Owner.User._id.toString()!==id){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+  
+      // check if the user is the owner or has a read permissions
+        // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.read){
+        //   return errorResMsg(res, 401, req.t("Unauthorized"));
+        // }
+    
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanReadMeasurement')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
+      
+     
+    if(StartDate&&EndDate){
+        
+      const BloodGlucoseArray =await BloodPressure.find({
+        ProfileID:ProfileID,
+        MeasurementDateTime:{
+          $gte:new Date(+StartDate),
+          $lte:new Date (+EndDate)
+        },
+        isDeleted:false,
+        Status:2
+  
+      }).populate({
+        path:"ProfileID",
+        select:"firstName lastName img",
+        populate:{
+          path:"Owner.User",
+          select:"firstName lastName img"
+        }
+      })
+     
+     
+
+      
+      // return successfully response
+      return successResMsg(res, 200, {message:req.t("Success"),data:BloodGlucoseArray});
+  
+    
+   
+  
+    }else{
+        const BloodGlucoseArray =await BloodPressure.find({
+          ProfileID:ProfileID,
+          isDeleted:false,
+          Status:2
+    
+        }).populate({
+          path:"ProfileID",
+          select:"firstName lastName img",
+          populate:{
+            path:"Owner.User",
+            select:"firstName lastName img"
+          }
+        })
+       
+       
+        // return successfully response
+        return successResMsg(res, 200, {message:req.t("Success"),data:BloodGlucoseArray});
+    
+      
+     
+    }
+   
+  
+ 
+     
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };

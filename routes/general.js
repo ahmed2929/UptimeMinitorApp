@@ -31,6 +31,22 @@ router.post(
     IsAuth(),
     generalController.MakeNotificationSeen
 );
+router.post(
+    "/clear/notifications",
+    IsAuth(),
+    generalController.ClearNotifications
+);
+
+
+router.post(
+    "/clear/single/notification",
+    IsAuth(),
+    generalController.ClearSingleNotification
+);
+
+
+
+
 router.get(
     "/static",
     generalController.GetStaticData

@@ -2,3 +2,5 @@ node_modules
 test.js
 .env
 TestSendEmail.js
+bashScript.sh
+test.js

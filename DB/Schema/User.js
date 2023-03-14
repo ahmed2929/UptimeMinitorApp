@@ -41,11 +41,12 @@ var userSchema = new Schema({
   mobileNumber:{
     countryCode:{
       type:String,
+      default:null
     
     },
     phoneNumber:{
       type:String,
-     
+      default:null
     }
   },
   RestPasswordCode:{

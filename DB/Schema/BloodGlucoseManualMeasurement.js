@@ -53,6 +53,9 @@ var BloodGlucoseManualMeasurementSchema = new Schema({
             type:String,
             default:null
         
+        },
+        Fasting:{
+            type:Number,// 0: fasting 1: not fasting
         }
 
    

@@ -12,8 +12,8 @@ exports.signUpValidationRules = () => {
             min: 5
         }).withMessage("Password_is_too_short"),
         body("firstName").notEmpty().withMessage('firstName_is_required').isLength({max:15}).withMessage("firstName_max"),
-        body("lastName").notEmpty().withMessage('lasttName_is_required').isLength({max:15}).withMessage("lastName_max"),
-        body("mobileNumber.countryCode").notEmpty().withMessage("country_code_is_required").isLength({max:5}).withMessage("country_code_invalid"),
+        body("lastName").notEmpty().withMessage('lastName_is_required').isLength({max:15}).withMessage("lastName_max"),
+       body("mobileNumber.countryCode").notEmpty().withMessage("country_code_is_required").isLength({max:5}).withMessage("country_code_invalid"),
         body("mobileNumber.phoneNumber").notEmpty().withMessage("phone_number_is_required").isLength({max:15}).isNumeric().withMessage("phone_number_invalid")
 
     ]

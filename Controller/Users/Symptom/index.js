@@ -199,6 +199,7 @@ exports.CreateSymptom = async (req, res) => {
           img:profile.Owner.User.img,
           email:profile.Owner.User.email,
           ProfileID:profile._id,
+          DependentProfileNickName:viewer.DependentProfileNickName
         }
       })
     }

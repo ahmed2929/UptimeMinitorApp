@@ -136,8 +136,8 @@ exports.InvitationSentToExistentCareGiverUser_AR = (InvitationFrom,userName) => 
       <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
       <p> لديك دعوة جديدة </p>
       <p> يرجى فتح فويثي للتحقق من ذلك</p>
-      <p>Thank you,</p>
-      <p>The Voithy Team</p>
+      <p>شكرا لك</p>
+      <p>فريق فويثي</p>
     </td>
   </tr>
   <tr>
@@ -413,8 +413,8 @@ exports.InvitationSentToMyDependent_AR= (InvitationFrom,userName) => {
       <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
       <p> لديك دعوة جديدة </p>
       <p> يرجى فتح فويثي للتحقق من ذلك</p>
-      <p>Thank you,</p>
-      <p>The Voithy Team</p>
+      <p>شكرا لك</p>
+      <p>فريق فويثي</p>
     </td>
   </tr>
   <tr>
@@ -488,8 +488,8 @@ exports.InvitationSentToExistentDependentUser_AR= (InvitationFrom,userName) => {
       <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
       <p> لديك دعوة جديدة </p>
       <p> يرجى فتح فويثي للتحقق من ذلك</p>
-      <p>Thank you,</p>
-      <p>The Voithy Team</p>
+      <p>شكرا لك</p>
+      <p>فريق فويثي</p>
     </td>
   </tr>
   <tr>
@@ -959,7 +959,7 @@ exports.forgetMessage_AR = ( code) => {
     <!DOCTYPE html>
 <html dir="rtl">
 <head>
-  <title>Voithy Password Reset</title>
+  <title>اعادة تعين كلمة المرور</title>
   <style>
     /* Cool styles using CSS */
     body {
@@ -1008,16 +1008,16 @@ exports.forgetMessage_AR = ( code) => {
   <table>
     <tr>
       <td>
-        <h1>إعادة تعيين كلمة المرور Voithy</h1>
+        <h1>إعادة تعيين كلمة المرور </h1>
         <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
         <p>عزيزي المستخدم</p>
-        <p>نت تتلقى هذا البريد الإلكتروني لأنك طلبت إعادة تعيين كلمة المرور لحساب Voithy الخاص بك.</p>
-        <p>Your verification OTP is:</p>
+        <p> تتلقى هذا البريد الإلكتروني لأنك طلبت إعادة تعيين كلمة المرور لحساب  الخاص بك.</p>
+        <p>كود اعادة تعين كلمة المرور:</p>
         <div class="otp">${code}</div>
         <p>يرجى إدخال OTP هذا في التطبيق لإعادة تعيين كلمة المرور الخاصة بك</p>
         <p>ذا لم تطلب إعادة تعيين كلمة المرور هذه ، فيرجى تجاهل هذا البريد الإلكتروني.</p>
         <p>شكرًا لك</p>
-        <p>فريق Voithy</p>
+        <p>فريق فويثي</p>
       </td>
     </tr>
     <tr>
@@ -1088,7 +1088,7 @@ exports.resetSuccess_AR = (name) => {
           <td>
           <p>تمت اعادة تعين كلمة المرور نجاح.</p>
             <p>شكرًا لك،</p>
-            <p>فريق Voithy</p>
+            <p>فريق فويثي</p>
           </td>
         </tr>
         <tr>

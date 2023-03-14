@@ -83,6 +83,39 @@ var InvitationsSchema = new Schema({
             type:Boolean,
             default:false,
         },
+        CanReadBloodGlucoseMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+        CanEditBloodGlucoseMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+        CanDeleteBloodGlucoseMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+        CanAddBloodGlucoseMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+        CanReadBloodPressureMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+        CanEditBloodPressureMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+        CanDeleteBloodPressureMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+        CanAddBloodPressureMeasurement:{
+            type:Boolean,
+            default:true,
+        },
+    
     },
     AccountType:{
         /**

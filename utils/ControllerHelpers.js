@@ -305,7 +305,7 @@ const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,v
             MeasurementScheduler:newScheduler._id,
             CreatorProfile:viewerProfile._id,
             MeasurementType:newScheduler.MeasurementType,
-            Status:0
+           
           }
           const start=new Date(startDate)
           let end;
@@ -385,7 +385,7 @@ const CreateMeasurementsOccurrences=async(jsonScheduler,newScheduler,ProfileID,v
               MeasurementScheduler:newScheduler._id,
               CreatorProfile:viewerProfile._id,
               MeasurementType:newScheduler.MeasurementType,
-              Status:0
+            
             }
             const start=new Date(startDate)
             

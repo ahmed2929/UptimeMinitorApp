@@ -9,7 +9,7 @@
 const Viewer =require("../../../DB/Schema/Viewers")
 const {SendPushNotificationToUserRegardlessLangAndOs,
 CheckProfilePermissions,GetBloodGlucoseMeasurementForProfileID,
-GetBloodGlucoseForProfileIDList,BindNickNameWithDependentSymptom,UploadFileToAzureBlob} =require("../../../utils/HelperFunctions")
+GetBloodGlucoseForProfileIDList,BindNickNameWithDependentSymptom,UploadFileToAzureBlob,BindNickNameWithDependentMeasurement} =require("../../../utils/HelperFunctions")
 const {CreateNewMeasurementScheduler,CreateMeasurementsOccurrences} =require("../../../utils/ControllerHelpers")
 
 
@@ -66,7 +66,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
         MeasurementDateTime,
         MeasurementUnit,
         MeasurementNote,
-        Status
+        Status,
+        Fasting
 
        
       }=req.body
@@ -138,7 +139,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
         CreatorProfile:viewerProfile._id,
         Status:Status,
         PlannedDateTime:MeasurementDateTime,
-        VoiceRecord:voice
+        VoiceRecord:voice,
+        Fasting:Fasting
   
       })
       
@@ -176,6 +178,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
           img:profile.Owner.User.img,
           email:profile.Owner.User.email,
           ProfileID:profile._id,
+          DependentProfileNickName:viewer.DependentProfileNickName
         }
       })
     }
@@ -189,6 +192,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
           img:viewerProfile.Owner.User.img,
           email:viewerProfile.Owner.User.email,
           ProfileID:viewerProfile._id,
+       
+
         }
       })
     }
@@ -203,8 +208,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
     }
   };
   
-
-
+ 
+ 
     /**
  * BloodGlucoseMeasurement
  * 
@@ -228,7 +233,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
  *    return BloodGlucose with a date range and not deleted
      * ********************************
      * logic
-        return BloodGlucose with a date range and not deleted
+     return BloodGlucose with a date range and not deleted
      * 
      * 
        
@@ -242,7 +247,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
     try {
   
       const {id} =req.id
-      const {ProfileID,StartDate,EndDate}=req.query
+      const {ProfileID,StartDate,EndDate,Status}=req.query
       console.log(ProfileID)
                /*
       
@@ -301,6 +306,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
           $gte:new Date(+StartDate),
           $lte:new Date (+EndDate)
         },
+        Status:Status||{$exists:true},
         isDeleted:false
   
       }).populate({
@@ -324,7 +330,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
     }else{
         const BloodGlucoseArray =await BloodGlucose.find({
           ProfileID:ProfileID,
-          isDeleted:false
+          isDeleted:false,
+          Status:Status||{$exists:true},
     
         }).populate({
           path:"ProfileID",
@@ -402,10 +409,11 @@ exports.EditBloodGlucoseMeasurement= async (req, res) => {
       MeasurementNote,
       BloodGlucoseMeasurementID,
       KeepOldVoice,
-      Status
+      Status,
+      Fasting
     }=req.body
 
-    const profile =await Profile.findById(ProfileID)
+    const profile =await Profile.findById(ProfileID).populate("Owner.User")
     if(!profile){
       return errorResMsg(res, 400, req.t("Profile_not_found"));
     }
@@ -431,6 +439,7 @@ exports.EditBloodGlucoseMeasurement= async (req, res) => {
      IsDeleted:false,
      CanEditBloodGlucoseMeasurement:true
     })
+   
     if(!viewer&&profile.Owner.User._id.toString()!==id){
       return errorResMsg(res, 400, req.t("Unauthorized"));
     }
@@ -474,7 +483,9 @@ console.log("will update")
     BloodGlucoseMeasurement.EditedBy=viewerProfile._id
     BloodGlucoseMeasurement.Status=Status
     BloodGlucoseMeasurement.PlannedDateTime=MeasurementDateTime
-    KeepOldVoice==='true'?BloodGlucoseMeasurement.VoiceRecord:voice
+    BloodGlucoseMeasurement.VoiceRecord=KeepOldVoice==='true'?BloodGlucoseMeasurement.VoiceRecord:voice
+    BloodGlucoseMeasurement.Fasting=Fasting
+
     
     await BloodGlucoseMeasurement.save()
     const PopulatedBloodGlucoseMeasurement=await BloodGlucose.findById(BloodGlucoseMeasurement._id).populate({
@@ -508,6 +519,8 @@ console.log("will update")
          img:profile.Owner.User.img,
          email:profile.Owner.User.email,
          ProfileID:profile._id,
+         DependentProfileNickName:viewer.DependentProfileNickName
+
        }
      })
    }
@@ -521,6 +534,8 @@ console.log("will update")
          img:viewerProfile.Owner.User.img,
          email:viewerProfile.Owner.User.email,
          ProfileID:viewerProfile._id,
+         
+
        }
      })
    }
@@ -669,7 +684,8 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
     let {
     StartDate,
     ProfileID,
-    EndDate
+    EndDate,
+    Status
     }=req.query
     date=StartDate
 
@@ -736,15 +752,15 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
    
 
     // get caller doses
-    const MyBloodGlucoseMeasurement=await GetBloodGlucoseMeasurementForProfileID(ProfileID,queryDate,nextDay)
+    const MyBloodGlucoseMeasurement=await GetBloodGlucoseMeasurementForProfileID(ProfileID,queryDate,nextDay,Status)
     // get Dependents Doses that has a general read perm
     console.log(dependentsProfilesIDs)
     //const DependentsSymptoms =await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay) 
-    const DependentsBloodGlucoseMeasurement=await GetBloodGlucoseForProfileIDList(dependentsProfilesIDs,queryDate,nextDay)
+    const DependentsBloodGlucoseMeasurement=await GetBloodGlucoseForProfileIDList(dependentsProfilesIDs,queryDate,nextDay,Status)
 
     // bind nickname with dependent
 
-    const BindNickNameWithDependentList =await BindNickNameWithDependentSymptom(DependentsBloodGlucoseMeasurement,NickNameHashTable) 
+    const BindNickNameWithDependentList =await BindNickNameWithDependentMeasurement(DependentsBloodGlucoseMeasurement,NickNameHashTable) 
 
   
    
@@ -921,7 +937,9 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
     if(!OldMeasurementScheduler){
       return errorResMsg(res, 404, req.t("Scheduler_not_found"));
     }
-   
+    if(OldMeasurementScheduler.isDeleted){
+      return errorResMsg(res, 404, req.t("Scheduler_not_found"));
+    }
 
     const endOfYesterday = new Date();
     endOfYesterday.setDate(endOfYesterday.getDate() - 1);
@@ -1064,7 +1082,9 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
     if(!OldMeasurementScheduler){
       return errorResMsg(res, 404, req.t("Scheduler_not_found"));
     }
-   
+    if(OldMeasurementScheduler.isDeleted){
+      return errorResMsg(res, 404, req.t("Scheduler_not_found"));
+    }
 
     const endOfYesterday = new Date();
     endOfYesterday.setDate(endOfYesterday.getDate() - 1);

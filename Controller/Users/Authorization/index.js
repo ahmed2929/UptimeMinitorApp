@@ -67,7 +67,7 @@ exports.signUp = async (req, res) => {
     // generate verification Code and verification expire for user .
     // verification expire date after 24 hours
     const verificationCode = await GenerateRandomCode(2);
-    const verificationExpiryDate =  Date.now()  + 8.64e+7 ;
+    const verificationExpiryDate =  Date.now()  + 600000  ;
 
     const UserInfo={
         ...req.body,
@@ -291,7 +291,7 @@ exports.SendRestPasswordCode= async (req, res) => {
      }
 
      const RestPasswordCode = await GenerateRandomCode(2);
-     const ResetPasswordExpiryDate =  Date.now()  + 8.64e+7 ;
+     const ResetPasswordExpiryDate =  Date.now()  + 600000;
      if(user.lang==="en"){
       const ForgetPasswordMessage = messages.forgetMessage_EN(RestPasswordCode);
       await SendEmailToUser(user.email,ForgetPasswordMessage)
@@ -368,7 +368,9 @@ exports.GenerateAccessResetPasswordToken= async (req, res) => {
    if(user.ResetPasswordExpiryDate<=Date.now()){
       return errorResMsg(res, 406, req.t("code_is_expired"));
    }
-
+   user.RestPasswordCode=""
+    user.ResetPasswordExpiryDate=""
+    await user.save();
    const token = GenerateToken(user._id)
 
     // return successfully response
@@ -603,7 +605,7 @@ exports.ResendVerificationCode = async (req, res) => {
      }
 
      const verificationCode = await GenerateRandomCode(2);
-     const verificationExpiryDate =  Date.now()  + 8.64e+7 ;
+     const verificationExpiryDate =  Date.now()  + 600000 ;
       let verificationMessage;
       if(user.lang==="en"){
         verificationMessage = messages.verifyAccount_EN(verificationCode);
@@ -654,9 +656,7 @@ exports.ResendVerificationCode = async (req, res) => {
 exports.GenerateAccessToken = async (req, res) => {
   try {
     const UserID=req.id.id
-    const user = await User.findOne({
-      UserID,
-    });
+    const user = await User.findById(UserID);
 
     // check if user exists and if the password is correct
     if (!user) {
