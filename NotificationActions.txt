@@ -31,3 +31,6 @@
 28:BloodPressureMeasurement 30m to my dependent (1 to 5) 
 29:BloodPressureMeasurement 60m to me  (5 to 3)
 30:BloodPressureMeasurement 60m to my dependent (5 to 3)
+
+********************************************************
+50:general notifications

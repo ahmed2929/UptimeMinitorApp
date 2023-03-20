@@ -30,8 +30,7 @@ var Scheduler = new Schema({
     type:Number,
     enum:[0,1,2,3], // 0: Days of week schedule , 1: As Needed  , 2: Every Day , 3: Days Interval
     default:2
-  }
-  ,
+  },
   
   DaysInterval:{
     type:Number,

@@ -996,7 +996,7 @@ exports.CreateNewMed = async (req, res) => {
       // delete all future occurrences
       await Occurrence.deleteMany({Medication:MedId,PlannedDateTime:{$gt:new Date()}})
       // update the old ocuurences to be suspended
-      await Occurrence.updateMany({Medication:MedId,PlannedDateTime:{$lte:new Date()}},{isSuspended:true})
+      await Occurrence.updateMany({Medication:MedId,PlannedDateTime:{$lte:new Date()}},{ IsDeleted:true})
       // update medication deleted flag
       console.log(Scheduler)
       Medication.isDeleted=true;

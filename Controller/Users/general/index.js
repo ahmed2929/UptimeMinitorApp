@@ -262,6 +262,40 @@ exports.ClearSingleNotification = async (req, res) => {
   }
 };
 
+exports.ClearMultiNotification = async (req, res) => {
+ 
+  try {
+
+    const {id} =req.id
+    const {ProfileID,NotificationIDs}=req.body
+   
+
+
+    const profile =await Profile.findById(ProfileID)
+    if(!profile){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(profile.Deleted){
+      return errorResMsg(res, 400, req.t("Profile_not_found"));
+    }
+    if(profile.Owner.User._id.toString()!==id){
+      return errorResMsg(res, 400, req.t("Unauthorized"));
+    }
+    // update notification 
+    const notifications =await NotificationSchema.updateMany({
+      _id:{$in:NotificationIDs},
+    },
+    {
+      $set:{isDeleted:true}
+    })
+   
+    return successResMsg(res, 200, {message:req.t("Notification_Cleared")});
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
 
 
 /**

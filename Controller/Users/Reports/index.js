@@ -150,6 +150,7 @@ exports.getReport=async (req, res) => {
            ProfileID: mongoose.Types.ObjectId(ProfileID),
            PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
            isSuspended:false,
+           IsDeleted:false,
           
          }
        },
@@ -280,6 +281,7 @@ exports.getReport=async (req, res) => {
           PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
           Medication:{$in:ids},
           isSuspended:false,
+          IsDeleted:false,
         }
       },
       
@@ -521,7 +523,9 @@ exports.getReport=async (req, res) => {
     
            ProfileID: mongoose.Types.ObjectId(ProfileID),
            PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
-            Medication:mongoose.Types.ObjectId(MedID)
+            Medication:mongoose.Types.ObjectId(MedID),
+            IsDeleted:false,
+            isSuspended:false
        }).populate(
        {
           path:"Medication",
@@ -559,7 +563,9 @@ exports.getReport=async (req, res) => {
         ProfileID: mongoose.Types.ObjectId(ProfileID),
         PlannedDateTime:{$gte:new Date(+StartDate),$lte:new Date(+EndDate)},
          Medication:mongoose.Types.ObjectId(MedID),
-         isSuspended:false
+         isSuspended:false,
+         IsDeleted:false,
+        
     }).populate(
       {
          path:"Medication",

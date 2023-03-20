@@ -5,7 +5,10 @@ const xlsx =require("xlsx")
 const Access = require("../../DB/Schema/apiAccess");
 const crypto = require('crypto');
 const FeedBack =require("../../DB/Schema/Feedback")
-
+const Profile =require("../../DB/Schema/Profile")
+const User =require("../../DB/Schema/User")
+const Notification =require("../../DB/Schema/Notifications")
+const {SendPushNotificationToUserRegardlessLangAndOs} =require("../../utils/HelperFunctions")
 
 const {
   successResMsg,
@@ -219,3 +222,38 @@ exports.GetFeedBacks = async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+// send notifications to all users
+exports.SendNotificationToAllUsers = async (req, res) => {
+  try {
+
+    const {title_ar,body_ar,title_en,body_en,data} =req.body
+    const profiles =await Profile.find({}).populate("Owner.User")
+    const clonedData=JSON.parse(JSON.stringify(data))
+    for await (let profile of profiles) {
+
+      await SendPushNotificationToUserRegardlessLangAndOs(profile,profile,"GeneralNotification",{
+        Data:clonedData,
+        title_ar,
+        body_ar,
+        title_en,
+        body_en
+      
+      })
+
+    }
+
+    // return successful response
+    return successResMsg(res, 200, {message:req.t("Notification_Sent_Successfully")});
+
+ 
+
+   
+        
+     
+   } catch (err) {
+     // return error response
+     console.log(err)
+     return errorResMsg(res, 500, err);
+   }
+}

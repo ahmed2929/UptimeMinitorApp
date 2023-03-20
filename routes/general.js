@@ -44,6 +44,12 @@ router.post(
     generalController.ClearSingleNotification
 );
 
+router.post(
+    "/clear/multiple/notifications",
+    IsAuth(),
+    generalController.ClearMultiNotification
+);
+
 
 
 

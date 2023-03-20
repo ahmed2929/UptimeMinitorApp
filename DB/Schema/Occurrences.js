@@ -74,6 +74,14 @@ var OccurrencesSchema = new Schema({
   },
   Ringtone:{
     type:String,
+  },
+  IsDeleted:{
+    type:Boolean,
+    default:false
+  },
+  SuspensionID:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'SuspendedMedications'
   }
 
  

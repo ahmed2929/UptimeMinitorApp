@@ -18,6 +18,21 @@ router.post(
     IsAuth(),
     DosesController.SuspendDoses
 );
+router.get(
+    "/active/Suspension",
+    IsAuth(),
+    DosesController.GetSuspension
+);
+router.put(
+    "/edit/Suspension",
+    IsAuth(),
+    DosesController.EditSuspension
+);
+router.post(
+    "/unsuspend",
+    IsAuth(),
+    DosesController.UnSuspend
+);
 
 
 router.post(

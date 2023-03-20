@@ -516,3 +516,38 @@ exports.NewMeasurementAddedByMyDependnet_EN_APNS=(patientName,NewSymptomID,Notif
         }
     }
 }
+
+
+exports.GeneralNotification_APNS=(title,body,data,action,NotificationID)=>{
+    return {
+        "aps":{
+            "alert":{
+                 
+            "title": title,
+            "body": body
+            },
+            "sound": "default",
+            "data":{
+                "Data": data,
+                "NotificationActionType":`${action}`,
+                "NotificationID":`${NotificationID}`
+            }
+        }
+    }
+}
+
+exports.GeneralNotification_GCM=(title,body,data,action,NotificationID)=>{
+    return {
+        "notification":{
+            "title": title,
+            "body": body,
+            "sound": "default",
+        },
+        "data":{
+            "Data": data,
+            "NotificationActionType":`${action}`,
+            "NotificationID":`${NotificationID}`,
+            
+        }
+    }
+}

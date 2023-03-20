@@ -31,6 +31,11 @@ router.get(
     adminController.GetFeedBacks
 );
 
+router.post(
+    "/send/notifications/to/all/users",
+    adminController.SendNotificationToAllUsers
+);
+
 
 
 module.exports = router;

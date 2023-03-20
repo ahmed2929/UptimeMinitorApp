@@ -57,11 +57,17 @@ exports.signUp = async (req, res) => {
   try {
     // get user with email
     const user = await User.findOne(
-      { "$or": [ { email: req.body.email }, { 'mobileNumber.phoneNumber':req.body.mobileNumber.phoneNumber} ] }
+      {email: req.body.email }
     );
 
+    const userMobile=await User.findOne({
+       'mobileNumber.phoneNumber':req.body.mobileNumber.phoneNumber,
+        'mobileNumber.countryCode':req.body.mobileNumber.countryCode,
+        verified:true
+    })
+    
     // check if user exists and return error if user already exists
-    if (user) {
+    if (user||userMobile) {
       return errorResMsg(res, 423, req.t("email_is_already_taken_Or_phone"));
     }
     // generate verification Code and verification expire for user .

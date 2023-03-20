@@ -872,7 +872,7 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            await sendNotification(userprofile._id,Android_payload,"Android",16,payloadData)
                        } 
                    break;
-                   case "BloodPressureMeasurement":
+            case "BloodPressureMeasurement":
                     //i case of only IOS
                        if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
@@ -959,6 +959,50 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        } 
                    break;
             
+             case "GeneralNotification":
+                    //i case of only IOS
+                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:50
+                               
+                           })
+                           await notification.save()
+                           payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_en,payloadData.body_en,payloadData,50)
+                           await sendNotification(userprofile._id,payload,"IOS",50,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                           //save notification in db
+                           const notification = new Notification({
+                               ProfileID:userprofile._id,
+                               data:payloadData,
+                               action:50
+                               
+                           })
+                           await notification.save()
+                           payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_en,payloadData.body_en,payloadData,50)
+                           await sendNotification(userprofile._id,payload,"Android",50,payloadData)
+   
+                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                        //save notification in db
+                        const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:50
+                           
+                       })
+                       await notification.save()   
+                       const IOS_payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_en,payloadData.body_en,payloadData,50)
+   
+                       const Android_payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_en,payloadData.body_en,payloadData,50)
+                       //case of both
+                           await sendNotification(userprofile._id,IOS_payload,"IOS",50,payloadData)
+                           await sendNotification(userprofile._id,Android_payload,"Android",50,payloadData)
+                       } 
+                   break;
+                   
                    default:
                 break;
 
@@ -1438,7 +1482,53 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        await sendNotification(userprofile._id,Android_payload,"Android",18,payloadData)
                    } 
                break;
-            default:
+               case "GeneralNotification":
+                //i case of only IOS
+                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:50
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_ar,payloadData.body_ar,payloadData,50)
+                       await sendNotification(userprofile._id,payload,"IOS",50,payloadData)
+
+                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
+                       //save notification in db
+                       const notification = new Notification({
+                           ProfileID:userprofile._id,
+                           data:payloadData,
+                           action:50
+                           
+                       })
+                       await notification.save()
+                       payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_ar,payloadData.body_ar,payloadData,50)
+                       await sendNotification(userprofile._id,payload,"Android",50,payloadData)
+
+                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
+                    //save notification in db
+                    const notification = new Notification({
+                       ProfileID:userprofile._id,
+                       data:payloadData,
+                       action:50
+                       
+                   })
+                   await notification.save()   
+                   const IOS_payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_ar,payloadData.body_ar,payloadData,50)
+
+                   const Android_payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_ar,payloadData.body_ar,payloadData,50)
+                   //case of both
+                       await sendNotification(userprofile._id,IOS_payload,"IOS",50,payloadData)
+                       await sendNotification(userprofile._id,Android_payload,"Android",50,payloadData)
+                   } 
+               break;
+               
+            
+            
+               default:
              break;
 
         }
@@ -1589,7 +1679,8 @@ const GetDosesForProfileID=async(ProfileID,startDate,EndDate)=>{
         const CallerDoses =await Occurrence.find({
             ProfileID:ProfileID,
             PlannedDateTime:{$gte:startDate,$lt:EndDate},
-            isSuspended:false
+            isSuspended:false,
+            IsDeleted:false,
       
           }).select(
             "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID"
@@ -1613,6 +1704,7 @@ const GetDosesForListOfProfiles=async(ProfileIDs,startDate,EndDate)=>{
                 ProfileID: { $in: ProfileIDs },
                 PlannedDateTime: { $gte: startDate, $lt: new Date(+EndDate) },
                 isSuspended: false,
+                IsDeleted:false,
               },
             },
             {
@@ -1705,6 +1797,7 @@ const GetDosesForListOfMedications=async(MedicationIDSList,startDate,EndDate)=>{
                 Medication: { $in: MedicationIDSList },
                 PlannedDateTime: { $gte: startDate, $lt: new Date(+EndDate) },
                 isSuspended: false,
+                IsDeleted:false,
               },
             },
             {
