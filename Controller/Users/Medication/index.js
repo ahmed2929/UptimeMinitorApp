@@ -13,7 +13,7 @@ const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
 const Profile =require("../../../DB/Schema/Profile")
-const {CreateNewScheduler,CreateOccurrences} =require("../../../utils/ControllerHelpers")
+const {CreateNewScheduler,CreateOccurrences,getMedInfoFromFhirPrescription,getDoseInfoFromFhirPrescription} =require("../../../utils/ControllerHelpers")
 const {
   successResMsg,
   errorResMsg
@@ -1018,3 +1018,65 @@ exports.CreateNewMed = async (req, res) => {
   
 
   
+  exports.CreateNewMedFhir = async (req, res) => {
+ 
+    try {
+  
+      const {id} =req.id
+      const {
+        ProfileID,
+        Prescription
+      
+      }=req.body
+      
+
+     
+    
+      const authorized =await CheckRelationShipBetweenCareGiverAndDependent(ProfileID,id)
+      if(!authorized){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      const [viewer,profile,viewerProfile]=authorized
+
+
+       // check if the user is the owner and has write permission or can add meds
+   
+       if(profile.Owner.User._id.toString()!==id){
+         // check if the user has add med permission
+         const hasAddMedPermissonToMeds=viewer.CanAddMeds;
+   
+         if(!hasAddMedPermissonToMeds){
+           return errorResMsg(res, 401, req.t("Unauthorized"));
+         }
+         
+       }
+
+       if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanAddMeds')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
+      const DeepClonedPrescription = JSON.parse(JSON.stringify(Prescription))
+      //generate dose Occurrence based on dosageInstruction in DeepClonedPrescription
+      // get med information 
+      const medInfo = await getMedInfoFromFhirPrescription(DeepClonedPrescription)
+      const doseInfo =await getDoseInfoFromFhirPrescription(DeepClonedPrescription)
+
+      console.log("medInfo",doseInfo)
+     
+  
+
+     
+  
+     
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("med_created"),data:responseData});
+      
+    } catch (err) {
+      // return error response
+      console.log("error is ",err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+    

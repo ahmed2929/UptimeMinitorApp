@@ -6,8 +6,7 @@
  */
 
 
-const User = require("../../../DB/Schema/User");
-const Profile = require("../../../DB/Schema/Profile");
+const User = require("../../../DB/Schema/Admin");
 const messages = require("../../../Messages/Email/index")
 const {SendEmailToUser} =require("../../../utils/HelperFunctions")
 const {RegisterAndroidDevice,RegisterIOSDevice,DeleteRegistration} =require("../../../config/SendNotification")
@@ -60,73 +59,19 @@ exports.signUp = async (req, res) => {
       {email: req.body.email }
     );
 
-    const userMobile=await User.findOne({
-       'mobileNumber.phoneNumber':req.body.mobileNumber.phoneNumber,
-        'mobileNumber.countryCode':req.body.mobileNumber.countryCode,
-        verified:true
-    })
-    
     // check if user exists and return error if user already exists
-    if (user||userMobile) {
-      return errorResMsg(res, 423, req.t("email_is_already_taken_Or_phone"));
+    if (user) {
+      return errorResMsg(res, 423, req.t("email_is_already_taken"));
     }
-    // generate verification Code and verification expire for user .
-    // verification expire date after 24 hours
-    const verificationCode = await GenerateRandomCode(2);
-    const verificationExpiryDate =  Date.now()  + 600000  ;
 
     const UserInfo={
         ...req.body,
-        verificationCode,
-        verificationExpiryDate,
-        temp:true
+      
     }
 
     const newUser = await User.create(UserInfo);
-    const newProfile =await Profile.create({
-      Owner:{
-        User:newUser._id
-      },
-      lang:req.body.lang||"en",      
-
-    })
-    newUser.profile=newProfile._id
-
- 
 
     await newUser.save()
-    // create user token
-    const token = GenerateToken(newUser._id);
-    const refreshToken = GenerateRefreshToken(newUser._id);
-    
-
-    // create data to be returned
-    // const data = {
-    //   token,
-    //   refreshToken,
-    //   user:{
-    //     firstName:req.body.firstName,
-    //     lastName:req.body.lastName,
-    //     email:req.body.email,
-    //     lang:req.body.lang||"en",
-    //     verified:newUser.verified||false,
-    //     profile:newProfile._id
-        
-    //   }
-   
-    // };
-
-    if(newUser.lang==="en"){
-      const verificationMessage = messages.verifyAccount_EN(verificationCode);
-      await SendEmailToUser(newUser.email,verificationMessage)
-    }else{
-      const verificationMessage = messages.verifyAccount_AR(verificationCode);
-      
-      await SendEmailToUser(newUser.email,verificationMessage)
-    }
-
-   
-
     // return successfully response
     return successResMsg(res, 201, req.t("registration_successful"));
   } catch (err) {
@@ -169,54 +114,21 @@ exports.logIn = async (req, res) => {
     const {
       email,
       password,
-      DeviceToken,
-      DeviceOs
     } = req.body;
     // check if user exists and select password
     console.log("email is ",email)
     const user = await User.findOne({
       email,
-      IsDependent:false
     }).select("+password");
-    console.log("user i s ",user)
     if(!user){
       return errorResMsg(res, 401, req.t("User_not_found"));
-    }
-    if(user.verified===false){
-      return errorResMsg(res, 401, req.t("Please_Verify_Your_Account"));
     }
     // check if user exists and if the password is correct
     if (!user || !(await user.correctPassword(password, user.password))) {
       // return error message if password is wrong
       return errorResMsg(res, 401, req.t("Incorrect_email_or_password"));
     }
-    const userProfile=await Profile.findById(user.profile)
-
-    if(DeviceToken&&DeviceToken.length>0&&DeviceOs&&DeviceOs.length>0){
-     
-      // and new DeviceToken and DeviceOs into the userProfile.NotificationInfo if the DeviceToken and os does not exist in the array
-    let NotificationRegister;
-      if(!userProfile.NotificationInfo.DevicesTokens.some((item)=>item.DeviceToken===DeviceToken&&item.DeviceOs===DeviceOs)){
-        // assign the new device to the user profile 
-        if(DeviceOs==="IOS"){
-          userProfile.NotificationInfo.IOS=true
-          NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
-        }else if(DeviceOs==="Android"){
-          userProfile.NotificationInfo.Android=true
-          NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
-        }else{
-          return errorResMsg(res, 401, req.t("Invalid_os_type"));
-        }
-        userProfile.NotificationInfo.DevicesTokens.push({
-          DeviceToken,
-          DeviceOs,
-          NotificationRegister
-        })
-        await userProfile.save()
-      
-      }
-      
-    }
+    
 
     // create user token
     const token = GenerateToken(user._id)
@@ -230,15 +142,10 @@ exports.logIn = async (req, res) => {
         lastName:user.lastName,
         email:user.email,
         lang:user.lang,
-        verified:user.verified,
-        profile:user.profile,
-        img:user.img,
-        Permissions:userProfile.Permissions,
+     
 
         
-      },
-      NotificationInfo:userProfile.NotificationInfo.DevicesTokens,
-      ShouldRestPassword:user.ShouldRestPassword
+      }
     };
     // return successfully response
     return successResMsg(res, 200, data);
@@ -419,7 +326,6 @@ exports.ResetPassword = async (req, res) => {
 
     const {id} = req.id;
   
-
     const user = await User.findById(id);
    
      if(!user){
@@ -427,7 +333,6 @@ exports.ResetPassword = async (req, res) => {
      }
 
     user.password=NewPassword
-    user.ShouldRestPassword=false
     await user.save();
     if(user.lang==="en"){
       const resetSuccessfully=messages.resetSuccess_EN(user.firstName)
@@ -443,194 +348,6 @@ exports.ResetPassword = async (req, res) => {
   }
 };
 
-
-/**
- * verify account
- *
- * @function
- * @memberof controllers
- * @memberof Auth
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Object} req.body - request body
- * @param {string} req.body.verifyCode - verify code
- * @param {string} req.body.email - user email
- * @throws {Error} if the email is not found
- * @throws {Error} if the user is already verified
- * @throws {Error} if the code is not valid
- * @throws {Error} if the code is expired
- * @returns {string} -message account_has_been_activated
- *
-   * @description
-    * 
-    * The function starts by destructuring the code and email from the request body.
-    * compares the verify code with the code sent to the user
-    * if the are match and not expired set the verify to true
-    * else return error
-    * 
-   */
-
-exports.VerifyAccount = async (req, res) => {
-  try {
-    const {
-      verifyCode,
-      email,
-      DeviceToken,
-      DeviceOs
-    } = req.body;
-  
-    if(!email){
-      return  errorResMsg(res, 406, req.t("Email_is_required"));
-    }
-    const user = await User.findOne({email:email});
-   
-     // check for if the code is correct and has not expired
-
-     if(!user){
-      return  errorResMsg(res, 406, req.t("user_is_not_found"));
-     }
-     
-     if(user.verified){
-      return  errorResMsg(res, 406, req.t("user_is_already_activated"));
-     }
-
-
-     
-     if(user.verificationCode.toString()!==verifyCode.toString()){
-     console.log(user.verificationCode.toString(),verifyCode.toString())
-        return errorResMsg(res, 406, req.t("verifyCode_is_not_valid"));
-     }
-     
-     if(user.verificationExpiryDate<=Date.now()){
-        return errorResMsg(res, 406, 'verifyCode_is_expired');
-     }
-     //activate user
-    user.verified=true;
-    user.verificationCode="";
-    user.verificationExpiryDate=""
-    user.temp=false
-    await user.save();
-    const token = GenerateToken(user._id)
-    const refreshToken = GenerateRefreshToken(user._id);
-    const userProfile=await Profile.findById(user.profile)
-
-    if(DeviceToken&&DeviceToken.length>0&&DeviceOs&&DeviceOs.length>0){
-     
-      // and new DeviceToken and DeviceOs into the userProfile.NotificationInfo if the DeviceToken and os does not exist in the array
-    let NotificationRegister;
-      if(!userProfile.NotificationInfo.DevicesTokens.some((item)=>item.DeviceToken===DeviceToken&&item.DeviceOs===DeviceOs)){
-        // assign the new device to the user profile 
-        if(DeviceOs==="IOS"){
-          userProfile.NotificationInfo.IOS=true
-          NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
-        }else if(DeviceOs==="Android"){
-          userProfile.NotificationInfo.Android=true
-          NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
-        }else{
-          return errorResMsg(res, 401, req.t("Invalid_os_type"));
-        }
-        userProfile.NotificationInfo.DevicesTokens.push({
-          DeviceToken,
-          DeviceOs,
-          NotificationRegister
-        })
-        await userProfile.save()
-      
-      }
-      
-    }
-
-    const data = {
-      token,
-      refreshToken,
-      user:{
-        firstName:user.firstName,
-        lastName:user.lastName,
-        email:user.email,
-        lang:user.lang,
-        verified:user.verified,
-        profile:user.profile,
-        img:user.img,
-        Permissions:userProfile.Permissions,
-
-        
-      },
-      NotificationInfo:userProfile.NotificationInfo.DevicesTokens,
-      ShouldRestPassword:user.ShouldRestPassword
-    };
-    return successResMsg(res, 200, {message:req.t("account_has_been_activated"),data:data});
-  } catch (err) {
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-
-/**
- * resend verify code
- *
- * @function
- * @memberof controllers
- * @memberof Auth
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Object} req.body - request body
- * @param {string} req.body.email - user email
- * @throws {Error} if the email is not found
- * @throws {Error} if the user is already verified
- * @returns {string} - message is activation_code_has_been_sent
- *
-   * @description
-    * 
-    * The function starts by destructuring the email from the request body.
-    * resend activation code to the user if he is not verified 
-    * 
-   */
-
-
-
-exports.ResendVerificationCode = async (req, res) => {
-  try {
-  
-    const {email} = req.body;
-    if (!email) {
-      return    errorResMsg(res, 406, req.t("Email_is_required"));
-
-    }
-
-    const user = await User.findOne({email:email});
-    console.log("user is ",email)
-     if(!user){
-      return  errorResMsg(res, 406, req.t("user_is_not_found"));
-     }
-
-     if(user.verified){
-      return  errorResMsg(res, 406, req.t("user_is_already_activated"));
-     }
-
-     const verificationCode = await GenerateRandomCode(2);
-     const verificationExpiryDate =  Date.now()  + 600000 ;
-      let verificationMessage;
-      if(user.lang==="en"){
-        verificationMessage = messages.verifyAccount_EN(verificationCode);
-      }else{
-        verificationMessage = messages.verifyAccount_AR(verificationCode);
-      }
-     
-
-
-    user.verificationCode=verificationCode;
-    user.verificationExpiryDate=verificationExpiryDate;
-    await user.save();
-
-    await SendEmailToUser(user.email,verificationMessage)
-     
-    return successResMsg(res, 200, {message:req.t("activation_code_has_been_sent")});
-  } catch (err) {
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
 
 
 /**
@@ -684,117 +401,5 @@ exports.GenerateAccessToken = async (req, res) => {
   }
 };
 
-
-/**
- * logout user
- *
- * @function
- * @memberof controllers
- * @memberof Auth
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Object} req.body - request body
- * @param {string} req.body.ProfileID - user profile id
- * @returns {string} - success message
- *
-   * @description
-   logout user
-   */
-      exports.logOut = async (req, res) => {
- 
-        try {
-          const {
-            ProfileID,
-            DeviceToken
-          
-          } = req.body;
-          const {id} =req.id
-
-          const profile =await Profile.findById(ProfileID).populate("Owner.User")
-    
-          if(!profile){
-            return errorResMsg(res, 400, req.t("Profile_not_found"));
-          }
-    
-          if(profile.Deleted){
-            return errorResMsg(res, 400, req.t("Profile_not_found"));
-          }
-    
-          if(profile.Owner.User._id.toString()!==id){
-            return errorResMsg(res, 400, req.t("Unauthorized"));
-          }
-          //delete device token from NotificationInfo.DevicesTokens if DeviceToken === DeviceToken
-          
-          const index = profile.NotificationInfo.DevicesTokens.findIndex((elem)=>{
-            return elem.DeviceToken===DeviceToken
-          })
-          const RegistrationObject= profile.NotificationInfo.DevicesTokens[index].NotificationRegister
-          if(index!==-1){
-            profile.NotificationInfo.DevicesTokens.splice(index,1)
-            await profile.save()
-          }
-          // unregister user profile id from azure notification hub
-          const result=await DeleteRegistration(RegistrationObject.RegistrationId,profile._id)
-
-          console.log(result)
-         
-          return successResMsg(res, 200, {message:req.t("user_logged_out")});
-        } catch (err) {
-          // return error response
-          console.log(err)
-          return errorResMsg(res, 500, err);
-        }
-      };
-
-
-
-      exports.getUserProfileInfo = async (req, res) => {
- 
-        try {
-          const {
-            ProfileID
-          } = req.query;
-          const {id} =req.id
-          
-          const userProfile=await Profile.findById(ProfileID).populate("Owner.User")
-          const IsMaster=await IsMasterOwnerToThatProfile(id,userProfile)
-          if(userProfile.Owner.User._id.toString()!==id&&!IsMaster){
-            return errorResMsg(res, 400, req.t("Unauthorized"));
-          }
-
-
-          const user=await User.findOne({
-            profile:ProfileID,
-          })
-         
-          // create data to be returned
-          const data = {
-            user:{
-              firstName:user.firstName,
-              lastName:user.lastName,
-              email:user.email,
-              lang:user.lang,
-              verified:user.verified,
-              profile:user.profile,
-              img:user.img,
-              phoneNumber:user.mobileNumber.phoneNumber?user.mobileNumber.phoneNumber:null,
-              countryCode:user.mobileNumber.countryCode?user.mobileNumber.countryCode:null,
-              gender:userProfile.gender,
-              DateOfBirth:userProfile.DateOfBirth,
-              Permissions:userProfile.Permissions,
-
-      
-              
-            },
-            ShouldRestPassword:user.ShouldRestPassword
-          };
-          // return successfully response
-          return successResMsg(res, 200, data);
-        } catch (err) {
-          // return error response
-          console.log(err)
-          return errorResMsg(res, 500, err);
-        }
-      };
 
       

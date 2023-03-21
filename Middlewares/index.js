@@ -110,11 +110,9 @@ app.use((req,res,next)=>{
   next();
 })
 
-
-  app.use("/api/v1/admin",Admin);
-
   // protect routes with checkApiKeyAndSecret
- app.use(checkApiKeyAndSecret)
+// app.use(checkApiKeyAndSecret)
+ app.use("/api/v1/admin",Admin);
 
   
   app.get("/", (req, res) => {

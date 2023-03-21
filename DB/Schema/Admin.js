@@ -33,7 +33,7 @@ var AdminSchema = new Schema({
   RestPasswordCode:{
     type:String
   },
-  ResetPasswordXpireDate:{
+  ResetPasswordExpiryDate:{
     type:Date
   },
   lang:{
@@ -45,13 +45,13 @@ var AdminSchema = new Schema({
  
 },{ timestamps: true });
 
-userSchema.pre("save", async function (next) {
+AdminSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-userSchema.methods.correctPassword = async function (
+AdminSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {

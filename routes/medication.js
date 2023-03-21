@@ -17,6 +17,13 @@ router.post(
     MedicationController.CreateNewMed
 );
 
+router.post(
+    "/create/new/med/fhir",
+    IsAuth(),
+    MedicationController.CreateNewMedFhir
+);
+
+
 router.put(
     "/edit/med",
     upload.single("img"),

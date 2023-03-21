@@ -50,7 +50,11 @@ router.post(
     generalController.ClearMultiNotification
 );
 
-
+router.post(
+    "/read/multiple/notifications",
+    IsAuth(),
+    generalController.MakeMultiNotificationSeen
+);
 
 
 router.get(

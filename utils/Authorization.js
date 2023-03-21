@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Access = require("../DB/Schema/apiAccess");
 const mongoose=require("mongoose")
+const User =require("../DB/Schema/User")
+const Admin =require("../DB/Schema/Admin")
 exports.authorization = () => {
   return (req, res, next) => {
     try {
@@ -15,8 +17,21 @@ exports.authorization = () => {
           status: "error",
         });
       } else {
-        req.id=userID
-        next();
+        //check if the user is active  const id=
+        User.findById(mongoose.Types.ObjectId(userID))
+        .then(user=>{
+          console.log("promise runs")
+          if(!user){
+            return res.status(401).json({
+              error: req.t("Unauthorized"),
+              status: "error",
+            });
+          }
+          req.id=userID
+          next();
+        })
+     
+       
       }
     } catch(err) {
       console.log(err)
@@ -41,8 +56,19 @@ exports.authorizeRefreshToken = () => {
           status: "error",
         });
       } else {
-        req.id=userID
-        next();
+        
+        User.findById(mongoose.Types.ObjectId(userID))
+        .then(user=>{
+          console.log("promise runs")
+          if(!user){
+            return res.status(401).json({
+              error: req.t("Unauthorized"),
+              status: "error",
+            });
+          }
+          req.id=userID
+          next();
+        })
       }
     } catch {
       res.status(401).json({
@@ -52,6 +78,89 @@ exports.authorizeRefreshToken = () => {
     }
   };
 };
+
+
+// admin
+
+exports.authorizationAdmin = () => {
+  return (req, res, next) => {
+    try {
+     
+      const token = req.headers.authorization.split(" ")[1];
+      
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const userID = decodedToken;
+      if (!userID) {
+        return res.status(401).json({
+          error: req.t("Unauthorized"),
+          status: "error",
+        });
+      } else {
+        //check if the user is active  const id=
+        Admin.findById(mongoose.Types.ObjectId(userID))
+        .then(user=>{
+          console.log("promise runs")
+          if(!user){
+            return res.status(401).json({
+              error: req.t("Unauthorized"),
+              status: "error",
+            });
+          }
+          req.id=userID
+          next();
+        })
+     
+       
+      }
+    } catch(err) {
+      console.log(err)
+      res.status(401).json({
+        error: req.t("Unauthorized"),
+        status: "error",
+      });
+    }
+  };
+};
+
+exports.authorizeRefreshTokenAdmin = () => {
+  return (req, res, next) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      const userID = decodedToken;
+      
+      if (!userID) {
+        return res.status(401).json({
+          error: req.t("Invalid_Refresh_token"),
+          status: "error",
+        });
+      } else {
+        
+        Admin.findById(mongoose.Types.ObjectId(userID))
+        .then(user=>{
+          console.log("promise runs")
+          if(!user){
+            return res.status(401).json({
+              error: req.t("Unauthorized"),
+              status: "error",
+            });
+          }
+          req.id=userID
+          next();
+        })
+      }
+    } catch {
+      res.status(401).json({
+        error: req.t("Invalid_Refresh_token"),
+        status: "error",
+      });
+    }
+  };
+};
+
+
+
+
 
 exports.checkApiKeyAndSecret=(req, res, next)=>{
   const apiKey = req.get('X-API-KEY');
@@ -93,4 +202,5 @@ exports.checkApiKeyAndSecret=(req, res, next)=>{
       });
     });
 }
+
 

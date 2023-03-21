@@ -662,9 +662,115 @@ const CreateOccurrences=async(jsonScheduler,newScheduler,id,newMed,MedInfo,Profi
 }
 
 
+const getMedInfoFromFhirPrescription=async(Prescription)=>{
+
+
+    try {
+
+        const medInfo={}
+
+        medInfo.Name=Prescription.contained[0]?Prescription.contained[0].code.coding[0].display:''
+        medInfo.MedID=Prescription.contained[0]?Prescription.contained[0].id:''
+        medInfo.Note=Prescription.note[0]?Prescription.note[0].text:''
+        medInfo.PrescriptionAuthoredOn=Prescription.authoredOn?Prescription.authoredOn:''
+        medInfo.PrescriptionID=Prescription.id?Prescription.id:''
+        medInfo.quantity=Prescription.dispenseRequest.quantity?Prescription.dispenseRequest.quantity.value:''
+        medInfo.unit=Prescription.dispenseRequest.quantity?Prescription.dispenseRequest.quantity.unit:''
+
+        return medInfo
+
+        
+      } catch (error) {
+        console.log(error)
+        return errorResMsg(res, 500, req.t("internal_server_error"));
+      }
+
+
+}
+
+const getDoseInfoFromFhirPrescription=async(Prescription)=>{
+
+
+  try {
+
+    const result=[]
+    Prescription.dosageInstruction.forEach((dose)=>{
+      const DoseInfo={}
+
+      DoseInfo.text=dose.text?dose.text:''
+      DoseInfo.additionalInstruction=dose.additionalInstruction?dose.additionalInstruction[0].coding[0].display:''
+      DoseInfo.frequency=dose.timing?dose.timing.repeat.frequency:''
+      DoseInfo.period=dose.timing?dose.timing.repeat.period:''
+      DoseInfo.periodUnit=dose.timing?dose.timing.repeat.periodUnit:''
+      DoseInfo.route=dose.route?dose.route.coding[0].display:''
+      DoseInfo.asNeededBoolean=dose.asNeededBoolean?dose.asNeededBoolean:''
+      DoseInfo.asNeededCodeableConcept=dose.asNeededCodeableConcept?dose.asNeededCodeableConcept:''
+      DoseInfo.site=dose.site?dose.site:''
+      DoseInfo.rateQuantity=dose.doseAndRate?dose.doseAndRate[0].doseQuantity.value:''
+      DoseInfo.rateUnit=dose.doseAndRate?dose.doseAndRate[0].doseQuantity.unit:''
+      DoseInfo.rateRange=dose.rateRange?dose.rateRange:''
+      DoseInfo.maxDosePerPeriod=dose.maxDosePerPeriod?dose.maxDosePerPeriod:''
+      DoseInfo.maxDosePerAdministration=dose.maxDosePerAdministration?dose.maxDosePerAdministration:''
+      DoseInfo.maxDosePerLifetime=dose.maxDosePerLifetime?dose.maxDosePerLifetime:''
+      DoseInfo.timing=dose.timing?dose.timing:''
+      DoseInfo.boundsDuration=dose.timing?dose.timing.repeat.boundsDuration:''
+      DoseInfo.boundsPeriod=dose.timing?dose.timing.repeat.boundsPeriod:''
+
+
+
+      result.push(DoseInfo)
+
+    })
+
+
+     
+      return result
+
+      
+    } catch (error) {
+      console.log(error)
+      return errorResMsg(res, 500, req.t("internal_server_error"));
+    }
+
+
+}
+
+const generateDoseOccurrenceFromFhirInfo =async(MedInfo,DoseInfo)=>{
+  try {
+
+  if(DoseInfo.boundsPeriod){
+    const start=new Date(DoseInfo.boundsPeriod.start)
+    const end=new Date(DoseInfo.boundsPeriod.end)
+    const intervalDays=DoseInfo.timing.repeat.frequency
+    const OccurrencesData={
+      PlannedDose:DoseInfo.rateQuantity,
+      ProfileID,
+      CreatorProfile:viewerProfile._id,
+      DosageID:doseElement._id,
+      Scheduler:newScheduler._id,
+      Ringtone:newMed.Ringtone
+    }
+    const newOccurrences=await GenerateOccurrencesWithDays(id,newMed._id,MedInfo,newScheduler._id,intervalDays,start,end,OccurrencesData)
+    return newOccurrences
+  }
+
+
+    
+
+      
+    } catch (error) {
+      console.log(error)
+      return errorResMsg(res, 500, req.t("internal_server_error"));
+    }
+
+
+}
+
 module.exports={
     CreateNewScheduler,
     CreateOccurrences,
     CreateNewMeasurementScheduler,
-    CreateMeasurementsOccurrences
+    CreateMeasurementsOccurrences,
+    getMedInfoFromFhirPrescription,
+    getDoseInfoFromFhirPrescription
 }
