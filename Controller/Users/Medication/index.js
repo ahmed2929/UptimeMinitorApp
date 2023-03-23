@@ -13,7 +13,7 @@ const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers")
 const mongoose = require("mongoose");
 const Profile =require("../../../DB/Schema/Profile")
-const {CreateNewScheduler,CreateOccurrences,getMedInfoFromFhirPrescription,getDoseInfoFromFhirPrescription} =require("../../../utils/ControllerHelpers")
+const {CreateNewScheduler,CreateOccurrences,getMedInfoFromFhirPrescription,getDoseInfoFromFhirPrescription,createMedicationFromFhirPrescription,generateOccurrencesFhir,createSchedulerFromFhirPrescription} =require("../../../utils/ControllerHelpers")
 const {
   successResMsg,
   errorResMsg
@@ -1062,8 +1062,46 @@ exports.CreateNewMed = async (req, res) => {
       // get med information 
       const medInfo = await getMedInfoFromFhirPrescription(DeepClonedPrescription)
       const doseInfo =await getDoseInfoFromFhirPrescription(DeepClonedPrescription)
-
-      console.log("medInfo",doseInfo)
+      // create medication
+      const medication =await createMedicationFromFhirPrescription(medInfo,doseInfo,ProfileID)
+      // create scheduler
+      const schedulers =await createSchedulerFromFhirPrescription(doseInfo,medication._id)
+      medication.Scheduler=schedulers[0]._id
+      await medication.save()
+   for await (const scheduler of schedulers){
+   await scheduler.save()
+   }
+     const occurrences=[]
+     doseInfo.forEach((dose)=>{
+      let startDate;
+      let endDate;
+      if(dose.boundsPeriod){
+         startDate=new Date(dose.boundsPeriod.start)
+         endDate=new Date(dose.boundsPeriod.end)
+  
+      }else if(dose.boundsDuration){
+        startDate=new Date()
+        endDate=new Date()
+        endDate.setDate(startDate.getDate()+dose.boundsDuration)
+      }else{
+        startDate=new Date()
+        endDate=new Date()
+        endDate.setDate(startDate.getDate()+90)
+      }
+      const result= generateOccurrencesFhir(startDate,endDate,dose,ProfileID,medInfo,medication._id)
+      occurrences.push(...result)
+     
+    })
+   const insertion= await Occurrence.insertMany(occurrences)
+    const responseData={
+    medInfo,
+    doseInfo,
+    insertion,
+    createdMed:medication,
+    scheduler:schedulers
+    }
+     
+     
      
   
 

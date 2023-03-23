@@ -1683,7 +1683,7 @@ const GetDosesForProfileID=async(ProfileID,startDate,EndDate)=>{
             IsDeleted:false,
       
           }).select(
-            "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID"
+            "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID RejectionStatus"
           ).populate("Scheduler")
           
           return CallerDoses
@@ -1751,6 +1751,7 @@ const GetDosesForListOfProfiles=async(ProfileIDs,startDate,EndDate)=>{
                     Medication: "$Medication",
                     Scheduler: "$scheduler",
                     MedInfo: "$MedInfo",
+                    RejectionStatus: "$RejectionStatus",
                     _id: "$_id",
                    
                   },
@@ -1844,6 +1845,7 @@ const GetDosesForListOfMedications=async(MedicationIDSList,startDate,EndDate)=>{
                     Medication: "$Medication",
                     Scheduler: "$scheduler",
                     MedInfo: "$MedInfo",
+                    RejectionStatus: "$RejectionStatus",
                     _id: "$_id",
                    
                   },

@@ -49,6 +49,15 @@ router.get(
     IsAuth(),
     CircleController.Dependents
 );
+
+router.get(
+    "/single/dependent",
+    IsAuth(),
+    CircleController.GetDependentProfileInfo
+);
+
+
+
 router.get(
     "/caregiver",
     IsAuth(),

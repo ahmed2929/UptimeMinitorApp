@@ -888,9 +888,6 @@ exports.EditSingleDose=async (req, res) => {
         return errorResMsg(res, 400, req.t("Invalid_status"));
       }
 
-      if(Status==dose.Status){
-        return errorResMsg(res, 400, req.t("Dose_status_already_changed"));
-      }
       const Medication=await UserMedication.findById(dose.Medication)
       if(!Medication){
         return errorResMsg(res, 400, req.t("Medication_not_found"));
@@ -916,7 +913,7 @@ exports.EditSingleDose=async (req, res) => {
 
       // change dose status
 
-      if(Status==4&&RejectionStatus){
+      if(Status==4&&RejectionStatus!=undefined){
         dose.RejectionStatus=RejectionStatus
       }
 
@@ -926,7 +923,7 @@ exports.EditSingleDose=async (req, res) => {
 
 
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Dose_Status_Changed")});
+      return successResMsg(res, 200, {message:req.t("Dose_Status_Changed"),data:dose});
 
     } catch (err) {
       // return error response
@@ -934,7 +931,7 @@ exports.EditSingleDose=async (req, res) => {
       return errorResMsg(res, 500, err);
     }
   };
-
+  
 
 
    /**
@@ -1065,7 +1062,7 @@ exports.EditSingleDose=async (req, res) => {
           IsDeleted:false
 
         }).select(
-          "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id"
+          "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id RejectionStatus"
         ).populate("Scheduler")
           // return successful response
       return successResMsg(res, 200, {message:req.t("Success"),data:doses});
@@ -1079,7 +1076,7 @@ exports.EditSingleDose=async (req, res) => {
           Medication:{$in:hasSpacificReadPermissions}
 
         }).select(
-          "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id"
+          "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id RejectionStatus"
         ).populate("Scheduler")
 
           // return successful response

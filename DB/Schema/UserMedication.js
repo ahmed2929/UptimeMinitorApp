@@ -36,7 +36,6 @@ var MedicationSchema = new Schema({
   },
   type:{
     type:String,
-    enum : ['pill','liquid','injection','inhaler','patch','implant','intrauterine device','suppository','topical','other'],
     default: 'pill'
   },
   Scheduler:{
@@ -80,6 +79,10 @@ var MedicationSchema = new Schema({
   Ringtone:{
     type:String,
     default:'default'
+  },
+  fhir:{
+    type:Boolean,
+    default:false
   }
  
 

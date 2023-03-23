@@ -28,7 +28,7 @@ var Scheduler = new Schema({
   },
   ScheduleType:{
     type:Number,
-    enum:[0,1,2,3], // 0: Days of week schedule , 1: As Needed  , 2: Every Day , 3: Days Interval
+    enum:[0,1,2,3,4], // 0: Days of week schedule , 1: As Needed  , 2: Every Day , 3: Days Interval,4:fhir
     default:2
   },
   
@@ -76,6 +76,10 @@ var Scheduler = new Schema({
       default:false
     },
     Archived:{
+      type:Boolean,
+      default:false
+    },
+    fhir:{
       type:Boolean,
       default:false
     }

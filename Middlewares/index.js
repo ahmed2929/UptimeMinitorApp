@@ -50,10 +50,11 @@ module.exports=(app)=>{
     app.use(bodyParser.json());
       //Enable cors
      
-    app.use(cors());
+  
    //HTTP headers
    app.use(helmet());
 
+   app.use(cors());
   //  app.use((req, res, next) => {
   //   res.set('Cross-Origin-Resource-Policy', 'cross-origin');
   //   next();

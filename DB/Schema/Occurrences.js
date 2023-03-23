@@ -82,6 +82,10 @@ var OccurrencesSchema = new Schema({
   SuspensionID:{
     type:mongoose.Schema.Types.ObjectId,
     ref:'SuspendedMedications'
+  },
+  fhir:{
+    type:Boolean,
+    default:false
   }
 
  

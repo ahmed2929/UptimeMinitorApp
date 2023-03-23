@@ -1173,6 +1173,99 @@ retrieves the dependents of the user from from the viewer collection which depen
     }
   }; 
 
+  exports.GetDependentProfileInfo = async (req, res) => {
+    /**
+       * get the user dependents 
+       */
+ 
+    try {
+  
+      const {id} =req.id
+      const {
+        ProfileID,
+        DependentProfileID
+       
+      }=req.query
+        // make sure that the api consumer is authorized
+        if(!mongoose.isValidObjectId(ProfileID)){
+            return errorResMsg(res, 400, req.t("invalid_profile_id"));
+        }
+        const profile = await Profile.findById(ProfileID).populate({
+            path:"Dependents.Dependent",
+           
+          
+        }).populate({
+            path:"Dependents.viewer",
+            populate: {
+              path: 'DependentProfile',
+              select:'User Deleted IsDependent',
+              populate:{
+                  path:'Owner.User',
+                  select:'firstName lastName nickName img email mobileNumber img'
+              }
+            },
+          
+        }).populate({
+          path:"Dependents.Profile",
+          select:'Deleted MasterProfiles IsDependent',
+          populate:{
+            path:'Owner.User',
+            select:'IsDependent'
+        }
+        }).populate({
+          path: 'Dependents.viewer',
+            populate:{
+              path:"CanReadSpacificMeds.Med",
+              select:"name"
+              
+            }
+        })
+        if(!profile){
+            return errorResMsg(res, 400, req.t("profile_not_found"));
+        }
+        if(profile.Deleted){
+          return errorResMsg(res, 400, req.t("Profile_not_found"));
+        }
+        const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      
+  
+        if(profile.Owner.User._id.toString()!=id&&!IsMaster){
+            return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
+        }
+       
+         
+        const filteredData=profile.Dependents.filter((item)=>{
+          return !item.Profile.Deleted
+        })
+        const FlaggedResult=filteredData.map(elem=>{
+          const clonedObject = JSON.parse(JSON.stringify(elem));
+          const isFound = elem.Profile.MasterProfiles?elem.Profile.MasterProfiles.includes(ProfileID):false;
+          const IsInterDependent= elem.Profile.Owner.User.IsDependent
+         console.log(elem.Profile)
+          return{
+            ...clonedObject,
+            CanEditProfileInfo:isFound,
+            IsInternalDependent:isFound&&IsInterDependent
+          }
+        })
+        responseData=[
+            ...FlaggedResult
+        ]
+        const filter =responseData.filter((dependent)=>{
+          return dependent.Profile._id.toString()==DependentProfileID
+        })
+        if(filter.length<1){
+          return errorResMsg(res, 400, req.t("dependent_not_found"));
+        }
+        // return successfully response
+        return successResMsg(res, 200, {message:req.t("dependent"),data:filter[0]});
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  }; 
 
 /**
 
@@ -1878,7 +1971,6 @@ exports.EditCareGiverPermissions = async (req, res) => {
       relationship.CanAddMeds=permissions.CanAddMeds
       relationship.CanWriteSymptoms=permissions.CanWriteSymptoms
       relationship.CanReadSpacificMeds=permissions.CanReadSpacificMeds
-      relationship.notify=permissions.notify
       relationship.CareGiverNickName=nickName||relationship.CareGiverNickName
       // Measurements
       relationship.CanReadBloodGlucoseMeasurement= permissions.CanReadBloodGlucoseMeasurement
@@ -1919,7 +2011,8 @@ exports.EditDependentInfo = async (req, res) => {
     const {
       ProfileID,
       ViewerID,
-      nickName
+      nickName,
+      notify
     }=req.body
 
 
@@ -1958,7 +2051,10 @@ exports.EditDependentInfo = async (req, res) => {
       // update the relationship
      
       relationship.DependentProfileNickName=nickName||relationship.DependentProfileNickName
-      
+      if(typeof notify=="boolean"){
+        relationship.notify=notify
+      }
+    
      
      
       // save changes
@@ -1995,6 +2091,7 @@ exports.EditDependentInfoFull = async (req, res) => {
       email,
       phoneNumber,
       countryCode,
+      notify
 
     }=req.body
 
@@ -2033,7 +2130,10 @@ exports.EditDependentInfoFull = async (req, res) => {
       // update the relationship
      
       relationship.DependentProfileNickName=nickName||relationship.DependentProfileNickName
-      
+      if(notify){
+        relationship.notify=notify=='false'?false:true
+      }
+    
       // save changes
       await relationship.save()
 
