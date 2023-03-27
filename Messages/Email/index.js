@@ -878,10 +878,12 @@ exports.resetSuccess_EN = (name) => {
 
 
 exports.verifyAccount_AR = (VerifictionCode) => {
-	return `<!DOCTYPE html>
-   <html dir="rtl">
+	return `
+  <!DOCTYPE html>
+   <html dir="rtl" lang="ar">
     
     <head>
+     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
       <title>Voithy Verification</title>
       <style>
         /* Cool styles using CSS */
@@ -917,7 +919,7 @@ exports.verifyAccount_AR = (VerifictionCode) => {
           font-weight: bold;
           color: #295788;
           text-align: center;
-          margin-top: 20px;
+          margin-top: 55px;
         }
         .footer {
           text-align: center;
@@ -925,15 +927,20 @@ exports.verifyAccount_AR = (VerifictionCode) => {
           font-size: 12px;
           color: #666;
         }
+        p{
+            float: right;
+        }
+        table {   direction: rtl; }
+        td {   direction: rtl; }
       </style>
     </head>
     <body>
-      <table>
+      <table dir="rtl">
         <tr>
-          <td>
+          <td td dir="rtl">
             <h1>تفعيل الحساب </h1>
             <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
-            <p>عزيزي المستخدم</p>
+            <p> عزيزي المستخدم، </p>
             <p>شكرا لاستخدام فويثي كود التحقق الخاص بك هوا </p>
             <div class="otp">${VerifictionCode}</div>
             <p>يرجى إدخال OTP هذا في التطبيق للتحقق من حسابك</p>
@@ -949,6 +956,7 @@ exports.verifyAccount_AR = (VerifictionCode) => {
       </table>
     </body>
     </html>
+         
          `
 }
 

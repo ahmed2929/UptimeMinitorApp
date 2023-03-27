@@ -22,6 +22,10 @@ var LinkSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:"Symptom"
 
+    },
+    ProfileID:{
+        type:Schema.Types.ObjectId,
+        ref:"Profile"
     }
 
   

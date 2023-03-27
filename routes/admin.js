@@ -17,7 +17,7 @@ router.post("/auth/generate/access/token",authorizeRefreshToken(),adminAuthContr
 router.put("/auth/resetpassword", IsAuth(),adminAuthController.ResetPassword);
 
 // Statics
-router.get("/general/statics", IsAuth(),adminController.Statics);
+router.post("/general/statics", IsAuth(),adminController.Statics);
 
 
 

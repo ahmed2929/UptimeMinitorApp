@@ -16,6 +16,7 @@ const Dose = require("../../../DB/Schema/Occurrences");
 const Notifications =require("../../../DB/Schema/Notifications")
 const BloodPressure = require("../../../DB/Schema/BloodPressureManualMeasurement");
 const BloodGlucose = require("../../../DB/Schema/BloodGlucoseManualMeasurement");
+const mongoose = require("mongoose");
 
 const {
   successResMsg,
@@ -269,21 +270,27 @@ exports.SendNotificationToAllUsers = async (req, res) => {
 exports.Statics = async (req, res) => {
  
   try {
+    const profiles =req.body.profiles
+    // exclude the array of profile ids form the query
+    //convert string in ids array to mongodb id
+   
+    const ids = profiles.map(id => mongoose.Types.ObjectId(id)); 
+
 
     
-    const Users = await User.find().count({IsDependent:false})
-    const VerifiedUsers = await User.find({verified:true,IsDependent:false}).count()
-    const UnverifiedUsers = await User.find({verified:false,IsDependent:false}).count()
+    const Users = await User.find({IsDependent:false,profile:{ $nin: ids }}).count()
+    const VerifiedUsers = await User.find({verified:true,IsDependent:false,profile:{ $nin: ids }}).count()
+    const UnverifiedUsers = await User.find({verified:false,IsDependent:false,profile:{ $nin: ids }}).count()
     const InternalDependentUsers =await User.find({IsDependent:true}).count()
-    const Symptoms = await Symptom.find({isDeleted:false}).count()
-    const Medications = await Medication.find({isDeleted:false}).count()
-    const ConfirmedDoses = await Dose.find({isDeleted:false,Status:2}).count()
-    const RejectedDoses = await Dose.find({isDeleted:false,Status:4}).count()
-    const AllDoses = await Dose.find({isDeleted:false}).count()
-    const notifications = await Notifications.find().count()
-    const Links = await Link.find().count()
-    const BloodGlucoseReadings = await BloodGlucose.find({Status:2}).count()
-    const BloodPressureReadings = await BloodPressure.find({Status:2}).count()
+    const Symptoms = await Symptom.find({isDeleted:false,Profile:{ $nin: ids }}).count()
+    const Medications = await Medication.find({isDeleted:false,ProfileID:{ $nin: ids }}).count()
+    const ConfirmedDoses = await Dose.find({isDeleted:false,Status:2,ProfileID:{ $nin: ids }}).count()
+    const RejectedDoses = await Dose.find({isDeleted:false,Status:4,ProfileID:{ $nin: ids }}).count()
+    const AllDoses = await Dose.find({isDeleted:false,ProfileID:{ $nin: ids }}).count()
+    const notifications = await Notifications.find({ProfileID:{ $nin: ids }}).count()
+    const Links = await Link.find({ProfileID:{ $nin: ids }}).count()
+    const BloodGlucoseReadings = await BloodGlucose.find({Status:2,ProfileID:{ $nin: ids }}).count()
+    const BloodPressureReadings = await BloodPressure.find({Status:2,ProfileID:{ $nin: ids }}).count()
 
     const statistics = {
       verifiedUsers: VerifiedUsers,

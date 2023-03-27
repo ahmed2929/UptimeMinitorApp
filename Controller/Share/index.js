@@ -43,7 +43,8 @@ exports.GenerateSharableSymptomLink = async (req, res) => {
         ActionType:0,
         SymptomData:symptom._id,
         ExpireDate:ExpireDate,
-        MaxUses:MaxUses
+        MaxUses:MaxUses,
+        ProfileID:ProfileID
     })
 
     await link.save()
