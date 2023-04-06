@@ -116,7 +116,7 @@ exports.CreateSymptom = async (req, res) => {
   
       if(profile.Owner.User._id.toString()!==id){
         // check if the user has add med permission
-        const hasAddMedPermissonToMeds=viewer.CanWriteSymptoms;
+        const hasAddMedPermissonToMeds=viewer.CanAddSymptoms;
   
         if(!hasAddMedPermissonToMeds){
           return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -130,25 +130,25 @@ exports.CreateSymptom = async (req, res) => {
         }
       }
 
-      //case the owner dont has write permission
+      //case the owner don`t has write permission
       // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
       //   return errorResMsg(res, 401, req.t("Unauthorized"));
       // }
   
   
       let img
-      // store the image to aure
+      // store the image to azure
       if(req.files.img&&req.files.img[0]){
          img = await UploadFileToAzureBlob(req.files.img[0])
       }
-      // store voice record to auzre
+      // store voice record to azure
       let voice
       if(req.files.voice&&req.files.voice[0]){
         voice = await UploadFileToAzureBlob(req.files.voice[0])
       }
      
   
-      // create new Symtom
+      // create new Symptom
       const newSymton = new Symptom({
         img,
         Profile:ProfileID,
@@ -182,7 +182,8 @@ exports.CreateSymptom = async (req, res) => {
       DependentProfile:ProfileID,
       IsDeleted:false,
       CanReadSymptoms:true,
-      notify:true
+      notify:true,
+    'NotificationSettings.NewSymptom':true
     })
     .populate("ViewerProfile")
     for await (const viewer of careCircle) {
@@ -507,7 +508,7 @@ exports.EditSymptom = async (req, res) => {
 
     if(profile.Owner.User._id.toString()!==id){
       // check if the user has add med permission
-      const CanEditSymptom=viewer.CanWriteSymptoms;
+      const CanEditSymptom=viewer.CanEditSymptoms;
 
       if(!CanEditSymptom){
         return errorResMsg(res, 401, req.t("Unauthorized"));
@@ -658,7 +659,7 @@ exports.DeleteSymptom = async (req, res) => {
 
     if(profile.Owner.User._id.toString()!==id){
       // check if the user has add med permission
-      const CanDeleteSymptom=viewer.CanWriteSymptoms;
+      const CanDeleteSymptom=viewer.CanDeleteSymptoms;
 
       if(!CanDeleteSymptom){
         return errorResMsg(res, 401, req.t("Unauthorized"));

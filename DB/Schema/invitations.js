@@ -20,7 +20,53 @@ var InvitationsSchema = new Schema({
         ref:"Dependent",
     },
     permissions:{
-        CanWriteMeds:{
+        CanDeleteAllMeds:{
+            type:Boolean,
+            default:true,
+        },
+        CanEditAllMeds:{
+            type:Boolean,
+            default:true,
+        },
+         CanReadAllMeds:{
+            type:Boolean,
+            default:true,
+        },
+        CanAddMeds:{
+            type:Boolean,
+            default:true,
+        },
+    
+        //Symptom
+    
+         // CanWriteSymptoms:{
+        //     type:Boolean,
+        //     default:true,
+        // },
+        CanReadSymptoms:{
+            type:Boolean,
+            default:true,
+        },
+        CanDeleteSymptoms:{
+            type:Boolean,
+            default:true,
+        },
+        CanEditSymptoms:{
+            type:Boolean,
+            default:true,
+        },
+        CanAddSymptoms:{
+            type:Boolean,
+            default:true,
+        },
+       /////////////Doses////////////
+     
+    
+        // CanWriteDoses:{
+        //     type:Boolean,
+        //     default:false,
+        // },
+        CanSuspendDoses:{
             type:Boolean,
             default:true,
         },
@@ -28,58 +74,42 @@ var InvitationsSchema = new Schema({
             type:Boolean,
             default:true,
         },
-        CanReadRefile:{
+        CanAddNewDose:{
             type:Boolean,
             default:true,
         },
-        CanReadAllMeds:{
+        CanEditDoses:{
             type:Boolean,
             default:true,
         },
-        CanReadSymptoms:{
+        CanChangeDoseStatus:{
             type:Boolean,
             default:true,
         },
-        CanWriteSymptoms:{
+    
+    
+    
+       ///////////Refile////////////////
+    //    CanReadRefile:{
+    //     type:Boolean,
+    //     default:true,
+    //     },
+    
+        /////////Share/////////////////
+       
+        CanShareAllMeds:{
             type:Boolean,
             default:false,
         },
-        CanAddMeds:{
+        CanShareAllSymptoms:{
             type:Boolean,
-            default:true,
+            default:false,
         },
-        CanReadSpacificMeds:[{
-            Med:{
-                type:Schema.Types.ObjectId,
-                 ref:"UserMedication",
-            },
-            CanRead:{
-                type:Boolean,
-                default:true,
-            },
-            CanWrite:{
-                type:Boolean,
-                default:true,
-            },
-            CanReadDoses:{
-                type:Boolean,
-                default:true,
-            },
-            CanReadRefile:{
-                type:Boolean,
-                default:true,
-            },
-            CanWriteRefile:{
-                type:Boolean,
-                default:false,
-            },
-            CanWriteDoses:{
-                type:Boolean,
-                default:false,
-            }
-            
-        }],
-        CanWriteDoses:{
+        CanShareAllDoses:{
+            type:Boolean,
+            default:false,
+        },
+        CanShareAllInfo:{
             type:Boolean,
             default:false,
         },
@@ -115,6 +145,78 @@ var InvitationsSchema = new Schema({
             type:Boolean,
             default:true,
         },
+        CanReadSpacificMeds:[{
+            Med:{
+                type:Schema.Types.ObjectId,
+                 ref:"UserMedication",
+            },
+            //MED
+            // CanWrite:{
+            //     type:Boolean,
+            //     default:true,
+            // },
+            CanRead:{
+                type:Boolean,
+                default:true,
+            },
+            CanEdit:{
+                type:Boolean,
+                default:true,
+            },
+            CanDelete:{
+                type:Boolean,
+                default:true,
+            },
+    ///////////////Doses////////////////     
+    // CanWriteDoses:{
+    //     type:Boolean,
+    //     default:false,
+    // }
+            CanSuspendDoses:{
+                type:Boolean,
+                default:true,
+            },
+    
+            CanAddNewDose:{
+                type:Boolean,
+                default:true,
+            },
+            CanEditDoses:{
+                type:Boolean,
+                default:true,
+            },
+            CanChangeDoseStatus:{
+                type:Boolean,
+                default:true,
+            },
+    
+            CanReadDoses:{
+                type:Boolean,
+                default:true,
+            },
+            //////Refile/////
+            // CanReadRefile:{
+            //     type:Boolean,
+            //     default:true,
+            // },
+            // CanWriteRefile:{
+            //     type:Boolean,
+            //     default:false,
+            // },
+            //////Share/////
+            CanShareMedInfo:{
+                type:Boolean,
+                default:false,
+            },
+            CanShareDosesInfo:{
+                type:Boolean,
+                default:false,
+            }
+          
+            
+        }],
+
+     
     
     },
     AccountType:{

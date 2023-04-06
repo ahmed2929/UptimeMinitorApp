@@ -728,7 +728,7 @@ exports.GenerateAccessToken = async (req, res) => {
           const index = profile.NotificationInfo.DevicesTokens.findIndex((elem)=>{
             return elem.DeviceToken===DeviceToken
           })
-          const RegistrationObject= profile.NotificationInfo.DevicesTokens[index].NotificationRegister
+          const RegistrationObject= profile.NotificationInfo.DevicesTokens[index]?profile.NotificationInfo.DevicesTokens[index].NotificationRegister:null
           if(index!==-1){
             profile.NotificationInfo.DevicesTokens.splice(index,1)
             await profile.save()

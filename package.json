@@ -5,7 +5,8 @@
   "main": "app",
   "scripts": {
     "start": "node app.js",
-    "test": "jest --watchAll --verbose tests"
+    "test": "jest --watchAll --verbose tests",
+    "generateDocs":"jsdoc -c jsdoc.json"
   },
   "author": "voithy",
   "license": "ISC",

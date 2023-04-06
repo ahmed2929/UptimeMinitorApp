@@ -1685,6 +1685,13 @@ const GetDosesForProfileID=async(ProfileID,startDate,EndDate)=>{
           }).select(
             "PlannedDateTime PlannedDose Status Medication Scheduler MedInfo _id ProfileID RejectionStatus"
           ).populate("Scheduler")
+           .populate({
+            path:"Medication",
+            populate:{
+              path:"Scheduler"
+            }
+          })
+          
           
           return CallerDoses
 

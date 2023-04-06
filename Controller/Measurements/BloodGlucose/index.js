@@ -162,7 +162,8 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
       DependentProfile:ProfileID,
       IsDeleted:false,
       CanReadBloodGlucoseMeasurement:true,
-      notify:true
+      notify:true,
+      'NotificationSettings.NewBloodGlucoseReading':true
     })
     .populate("ViewerProfile")
     for await (const viewer of careCircle) {
@@ -503,7 +504,8 @@ console.log("will update")
      DependentProfile:ProfileID,
      IsDeleted:false,
      CanReadBloodGlucoseMeasurement:true,
-     notify:true
+     notify:true,
+     'NotificationSettings.NewBloodGlucoseReading':true
    })
    .populate("ViewerProfile")
    for await (const viewer of careCircle) {

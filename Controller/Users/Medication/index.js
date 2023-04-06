@@ -442,11 +442,11 @@ exports.CreateNewMed = async (req, res) => {
   
       if(profile.Owner.User._id.toString()!==id){
         // check if the user has add med permission
-        const hasWritePermissonToAllMeds=viewer.CanWriteMeds;
+        const hasWritePermissonToAllMeds=viewer.CanEditAllMeds;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatMed=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===MedId.toString()){
-            return med.CanWrite
+            return med.CanEdit
           }
         }) 
         if(!(hasWritePermissonToAllMeds||hasWritePermissonToThatMed)){
@@ -965,11 +965,11 @@ exports.CreateNewMed = async (req, res) => {
   
       if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToThatMed=viewer.CanWriteMeds;
+        const hasWritePermissonToThatMed=viewer.CanDeleteAllMeds;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===MedId){
-            return med.CanWrite
+            return med.CanDelete
           }
         }) 
         if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){

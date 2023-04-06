@@ -55,6 +55,17 @@ router.get(
     IsAuth(),
     SettingsController.GetUserFeedBacks
 )
+router.get(
+    "/notification/settings",
+    IsAuth(),
+    SettingsController.getNotificationSettings
+)
+router.put(
+    "/edit/notification/settings",
+    IsAuth(),
+    SettingsController.EditNotificationSettings
+)
+
 
 
 

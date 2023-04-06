@@ -24,7 +24,8 @@ const {
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 
-const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile,CheckProfilePermissions,isValidEmail} =require("../../../utils/HelperFunctions")
+const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile,CheckProfilePermissions,isValidEmail} =require("../../../utils/HelperFunctions");
+const Viewer = require("../../../DB/Schema/Viewers");
 
 
 
@@ -156,13 +157,13 @@ exports.EditProfile = async (req, res) => {
   }
   
   exports.ChangeEmail = async (req, res) => {
-  
+
     try {
   
       const {id} =req.id
-      const {ProfileID,newEmail}=req.body
+      const {ProfileID,newEmail,Password}=req.body
      
-      const profile =await Profile.findById(ProfileID)
+      const profile =await Profile.findById(ProfileID).populate('Owner.User')
       if(!profile){
         return errorResMsg(res, 400, req.t("Profile_not_found"));
       }
@@ -185,6 +186,14 @@ exports.EditProfile = async (req, res) => {
          return errorResMsg(res, 400, req.t("email_is_not_valid"));
        
       }}
+
+      const user =await User.findById(profile.Owner.User._id).select("+password");
+      // check if the old password is correct
+   
+      const isMatch=await user.correctPassword(Password,user.password)
+      if (!isMatch) {
+        return errorResMsg(res, 400, req.t("Invalid_Password"));
+      }
   
  
 
@@ -193,6 +202,33 @@ exports.EditProfile = async (req, res) => {
       })
       if(searchForEmail){
         return errorResMsg(res, 400, req.t("Email_already_exists"));
+      }
+      const tempEmailFound=await TempEmails.findOne({
+        email:newEmail,
+      })
+      // if email found not create new one
+      if(tempEmailFound){
+             // register temp user with that email
+     
+      //send OTP to verify email
+      const verificationCode = await GenerateRandomCode(2);
+      const verificationExpiryDate =  Date.now()  + 600000 ;
+       let verificationMessage;
+       if(profile.lang==="en"){
+         verificationMessage = messages.verifyAccount_EN(verificationCode);
+       }else{
+         verificationMessage = messages.verifyAccount_AR(verificationCode);
+       }
+      
+  
+  
+       tempEmailFound.verificationCode=verificationCode;
+       tempEmailFound.verificationExpiryDate=verificationExpiryDate;
+     await tempEmailFound.save();
+  
+     await SendEmailToUser(tempEmailFound.email,verificationMessage)
+      return successResMsg(res, 200, {message:req.t("OPT_has_sent")});
+
       }
       // register temp user with that email
       const tempEmail=new TempEmails({
@@ -213,7 +249,7 @@ exports.EditProfile = async (req, res) => {
   
        tempEmail.verificationCode=verificationCode;
        tempEmail.verificationExpiryDate=verificationExpiryDate;
-     await tempEmail.save();
+      await tempEmail.save();
   
      await SendEmailToUser(tempEmail.email,verificationMessage)
       return successResMsg(res, 200, {message:req.t("OPT_has_sent")});
@@ -535,3 +571,136 @@ exports.EditProfile = async (req, res) => {
       return errorResMsg(res, 500, err);
     }
   };
+
+/**
+ * Get notification settings (caregiver/dependent level)
+ * @async
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {string} req.id - User ID
+ * @param {string} req.query.ProfileID - Profile ID
+ * @param {string} req.query.DependentProfileID - Dependent Profile ID
+ * @returns {Object} - Returns notification settings of a viewer (caregiver/dependent)
+ */
+  exports.getNotificationSettings= async (req,res)=>{
+    try {
+      const {id}=req.id
+      const {ProfileID,DependentProfileID}=req.query
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+      const viewer =await Viewer.findOne({
+        ViewerProfile:ProfileID,
+        DependentProfile:DependentProfileID
+      })
+      if(!viewer){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      return successResMsg(res, 200, {data:viewer.NotificationSettings});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+
+
+  }
+
+
+  /**
+ * Edit notification settings
+ * @async
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {string} req.id - User ID
+ * @param {string} req.body.ProfileID - Profile ID
+ * @param {string} req.body.DependentProfileID - Dependent Profile ID
+ * @param {Object} req.body.NotificationSettings - Notification settings object
+ * @returns {Object} - Returns updated notification settings of a viewer (caregiver/dependent)
+ *
+ * @description This API allows you to edit the notification settings of a viewer (caregiver/dependent). The `ProfileID` parameter is used to identify the profile of the viewer, and the `DependentProfileID` parameter is used to identify the dependent profile of the viewer. The `NotificationSettings` parameter is an object containing the updated notification settings of the viewer. The function returns a promise that resolves with an object containing the updated notification settings of the viewer.
+ *
+ * @example
+ * // Request body
+ * {
+  "ProfileID":"63f612e311bbf29952f1cf0f",
+   "DependentProfileID":"63f64d946d3833e2b435776c",
+   "NotificationSettings":{
+        "DoseNotify30m": true,
+            "DoseNotify60m": true,
+            "MedRefile": true,
+            "NewSymptom": false,
+            "NewBloodGlucoseReading": true,
+            "BloodGlucoseReminder30m": true,
+            "BloodGlucoseReminder60m": true,
+            "NewBloodPressureReading": true,
+            "BloodPressureReminder30m": true,
+            "BloodPressureReminder60m": true
+   }
+}
+ *
+ * // Response body
+ * {
+ *   ""data": {
+            "DoseNotify30m": true,
+            "DoseNotify60m": true,
+            "MedRefile": true,
+            "NewSymptom": false,
+            "NewBloodGlucoseReading": true,
+            "BloodGlucoseReminder30m": true,
+            "BloodGlucoseReminder60m": true,
+            "NewBloodPressureReading": true,
+            "BloodPressureReminder30m": true,
+            "BloodPressureReminder60m": true
+        }
+ * }
+ */
+
+
+  exports.EditNotificationSettings= async (req,res)=>{
+    try {
+      const {id}=req.id
+      const {ProfileID,DependentProfileID,NotificationSettings}=req.body
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&&!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+      const viewer =await Viewer.findOne({
+        ViewerProfile:ProfileID,
+        DependentProfile:DependentProfileID
+      })
+      viewer.NotificationSettings=NotificationSettings
+      await viewer.save()
+      if(!viewer){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      return successResMsg(res, 200, {data:viewer.NotificationSettings});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+
+
+  }

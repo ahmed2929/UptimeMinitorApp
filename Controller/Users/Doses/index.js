@@ -11,6 +11,7 @@ const UserMedication = require("../../../DB/Schema/UserMedication");
 const Occurrence = require("../../../DB/Schema/Occurrences");
 const Viewer =require("../../../DB/Schema/Viewers");
 const SuspendedMedications=require("../../../DB/Schema/SuspendedMedication")
+const User =require("../../../DB/Schema/User")
 const {
   successResMsg,
   errorResMsg
@@ -85,7 +86,6 @@ exports.EditSingleDose=async (req, res) => {
       const {id} =req.id
       let {
       OccurrenceId,
-      MedInfo,
       PlannedDateTime,
       PlannedDose,
       ProfileID
@@ -143,11 +143,11 @@ exports.EditSingleDose=async (req, res) => {
 
       if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToAllMeds=viewer.CanWriteDoses;
+        const hasWritePermissonToAllMeds=viewer.CanEditDoses;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===oldOccurrence.Medication.toString()){
-            return med.CanWriteDoses
+            return med.CanEditDoses
           }
         })
         if(!(hasWritePermissonToThatDose||hasWritePermissonToAllMeds)){
@@ -170,21 +170,29 @@ exports.EditSingleDose=async (req, res) => {
 
       // start edit Occurrence
 
+
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
+      let Status
+      if(new Date(PlannedDateTime)){
+          Status=0
+        if(new Date(PlannedDateTime)<new Date(oneHourAgo)){
+            Status=3
+        }else if(new Date(PlannedDateTime)<new Date(HalfAnHourAgo)){
+            Status=5
+        }else if (new Date(PlannedDateTime)<new Date()){
+            Status=1
+        }
+      }
+    
+
+
+
       // update
       oldOccurrence.PlannedDateTime=PlannedDateTime||oldOccurrence.PlannedDateTime
       oldOccurrence.PlannedDose=PlannedDose||oldOccurrence.PlannedDose
-      oldOccurrence.MedInfo={
-        strength:MedInfo.strength||oldOccurrence.MedInfo.strength,
-        unit:MedInfo.unit||oldOccurrence.MedInfo.unit,
-        quantity:MedInfo.quantity||oldOccurrence.MedInfo.quantity,
-        instructions:MedInfo.instructions||oldOccurrence.MedInfo.instructions,
-        condition:MedInfo.condition||oldOccurrence.MedInfo.condition,
-        type:MedInfo.type||oldOccurrence.MedInfo.type,
-        name:MedInfo.name||oldOccurrence.MedInfo.name,
-        ScheduleType:MedInfo.ScheduleType||oldOccurrence.MedInfo.ScheduleType,
-
-      }
       oldOccurrence.EditedBy=viewerProfile._id
+      oldOccurrence.Status=Status
       await oldOccurrence.save()
 
       // return successful response
@@ -288,11 +296,11 @@ exports.EditSingleDose=async (req, res) => {
 
       if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToThatMed=viewer.CanWriteMeds;
+        const hasWritePermissonToThatMed=viewer.CanSuspendDoses;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===Scheduler.medication.toString()){
-            return med.CanWrite
+            return med.CanSuspendDoses
           }
         })
         if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){
@@ -504,7 +512,7 @@ exports.EditSingleDose=async (req, res) => {
       EndDate,
       ProfileID,
       SuspensionNote,
-      SuspensionID
+      SuspensionID,
       }=req.body
 
       // check for permison
@@ -549,11 +557,11 @@ exports.EditSingleDose=async (req, res) => {
 
       if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToThatMed=viewer.CanWriteMeds;
+        const hasWritePermissonToThatMed=viewer.CanSuspendDoses;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
           if(med.Med.toString()===Scheduler.medication.toString()){
-            return med.CanWrite
+            return med.CanSuspendDoses
           }
         })
         if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){
@@ -639,7 +647,8 @@ exports.EditSingleDose=async (req, res) => {
       let {
       UnSuspensionNote,
       SuspensionID,
-      ProfileID
+      ProfileID,
+      MedID
       }=req.body
 
   
@@ -674,11 +683,11 @@ exports.EditSingleDose=async (req, res) => {
 
       if(profile.Owner.User._id.toString()!=id){
         // check if the user has add med permission
-        const hasWritePermissonToThatMed=viewer.CanWriteMeds;
+        const hasWritePermissonToThatMed=viewer.CanSuspendDoses;
         // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
         const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
-          if(med.Med.toString()===Scheduler.medication.toString()){
-            return med.CanWrite
+          if(med.Med.toString()===MedID.toString()){
+            return med.CanSuspendDoses
           }
         })
         if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){
@@ -873,7 +882,20 @@ exports.EditSingleDose=async (req, res) => {
       }
       const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
       if(profile.Owner.User._id.toString()!==id&&!IsMaster){
+        //check he has CanChangeDoseStatus
+        const ViewerProfile = await User.findById(id)
+      const viewer=await Viewer.findOne({DependentProfile:profile._id,ViewerProfile:ViewerProfile.profile,IsDeleted:false})
+      const CanChangeStatusSpacificMed=viewer.CanReadSpacificMeds.find((med)=>{
+        if(med.Med.toString()===dose.Medication.toString()){
+          return med.CanChangeDoseStatus
+        }
+      }) 
+      if(!viewer){
         return errorResMsg(res, 400, req.t("Unauthorized"));
+      }else if(!(viewer.CanChangeDoseStatus||CanChangeStatusSpacificMed)){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+        
       }
       //case the owner dont has write permission
       // if(profile.Owner.toString()===id&&!profile.Owner.Permissions.write){
@@ -1231,8 +1253,19 @@ exports.EditSingleDose=async (req, res) => {
       const DependentsSpacificDoses =await GetDosesForListOfMedications(DependentsSpacificMedsIDS,queryDate,nextDay)
       console.log(DependentsSpacificDoses)
       // bind nickname with dependent
+      const result=[...DependentsGeneralDoses,...DependentsSpacificDoses]
+      for await (doseObject of result){
 
-      const BindNickNameWithDependentList =await BindNickNameWithDependent([...DependentsGeneralDoses,...DependentsSpacificDoses],NickNameHashTable)
+       for await (SingleDose of doseObject.doses){
+         const medication =await UserMedication.findById(SingleDose.Medication).populate('Scheduler')
+         SingleDose.Medication=medication
+
+       }
+     }
+
+     
+
+      const BindNickNameWithDependentList =await BindNickNameWithDependent(result,NickNameHashTable)
 
 
 
@@ -1360,11 +1393,11 @@ exports.EditSingleDose=async (req, res) => {
 
     if(profile.Owner.User._id.toString()!=id){
       // check if the user has add med permission
-      const hasWritePermissonToThatMed=viewer.CanWriteDoses;
+      const hasWritePermissonToThatMed=viewer.CanAddNewDose;
       // check CanReadSpacificMeds array inside viewer for the CanWrite permission for that MedID
       const hasWritePermissonToThatDose=viewer.CanReadSpacificMeds.find((med)=>{
         if(med.Med.toString()===MedID){
-          return med.CanWriteDoses
+          return med.CanAddNewDose
         }
       })
       if(!(hasWritePermissonToThatDose||hasWritePermissonToThatMed)){

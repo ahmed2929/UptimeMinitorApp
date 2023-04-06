@@ -193,8 +193,9 @@ exports.CreateDependentA = async (req, res) => {
         // create new viewer for the dependent user
         const newViewer = new Viewer({
             ViewerProfile:ProfileID,
-            CanWriteDoses:true,
-            CanWriteSymptoms:true,
+            CanAddSymptoms:true,
+            CanEditSymptoms:true,
+            CanDeleteSymptoms:true,
             DependentProfileNickName:nickName,
           
             
@@ -1962,14 +1963,26 @@ exports.EditCareGiverPermissions = async (req, res) => {
       }
       // update the relationship
       console.log(permissions)
-      relationship.CanWriteMeds=permissions.CanWriteMeds
+      //relationship.CanWriteMeds=permissions.CanWriteMeds
+      relationship.CanDeleteAllMeds=permissions.CanDeleteAllMeds
+      relationship.CanEditAllMeds=permissions.CanEditAllMeds
       relationship.CanReadDoses=permissions.CanReadDoses
-      relationship.CanWriteDoses=permissions.CanWriteDoses
+      //relationship.CanWriteDoses=permissions.CanWriteDoses
+      relationship.CanAddNewDose=permissions.CanAddNewDose
+      relationship.CanEditDoses=permissions.CanEditDoses
+      relationship.CanChangeDoseStatus=permissions.CanChangeDoseStatus
+      relationship.CanSuspendDoses=permissions.CanSuspendDoses
+      
       relationship.CanReadRefile=permissions.CanReadRefile
       relationship.CanReadAllMeds=permissions.CanReadAllMeds
       relationship.CanReadSymptoms=permissions.CanReadSymptoms
       relationship.CanAddMeds=permissions.CanAddMeds
-      relationship.CanWriteSymptoms=permissions.CanWriteSymptoms
+      //relationship.CanWriteSymptoms=permissions.CanWriteSymptoms
+      relationship.CanDeleteSymptoms=permissions.CanDeleteSymptoms
+      relationship.CanEditSymptoms=permissions.CanEditSymptoms
+      relationship.CanAddSymptoms=permissions.CanAddSymptoms
+
+
       relationship.CanReadSpacificMeds=permissions.CanReadSpacificMeds
       relationship.CareGiverNickName=nickName||relationship.CareGiverNickName
       // Measurements

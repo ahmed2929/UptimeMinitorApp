@@ -164,7 +164,8 @@ exports.BloodPressureMeasurement = async (req, res) => {
       DependentProfile:ProfileID,
       IsDeleted:false,
       CanReadBloodPressureMeasurement:true,
-      notify:true
+      notify:true,
+      'NotificationSettings.NewBloodPressureReading':true
     })
     .populate("ViewerProfile")
     for await (const viewer of careCircle) {

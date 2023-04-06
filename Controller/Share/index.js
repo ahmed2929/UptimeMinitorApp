@@ -1,11 +1,13 @@
 const Profile = require("../../DB/Schema/Profile");
 const Link = require("../../DB/Schema/Link");
 const Symptom = require("../../DB/Schema/Symptoms");
+const Viewer =require("../../DB/Schema/Viewers")
 const {UploadFileToAzureBlob,IsMasterOwnerToThatProfile}=require("../../utils/HelperFunctions")
 const {
   successResMsg,
   errorResMsg
 } = require("../../utils/ResponseHelpers");
+const User = require("../../DB/Schema/User");
 
 
 exports.GenerateSharableSymptomLink = async (req, res) => {
@@ -26,8 +28,15 @@ exports.GenerateSharableSymptomLink = async (req, res) => {
     }
     const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
     if(profile.Owner.User._id.toString()!==id&&!IsMaster){
-        
-      return errorResMsg(res, 400, req.t("Unauthorized"));
+      const ViewerProfile = await User.findById(id)
+      const viewer=await Viewer.findOne({DependentProfile:profile._id,ViewerProfile:ViewerProfile.profile,IsDeleted:false
+      })
+      if(!viewer){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }else if(!(viewer.CanShareAllSymptoms||viewer.CanShareAllInfo)){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      
     }
     const symptom =await Symptom.findById(SymptomID)
     if(!symptom){

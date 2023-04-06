@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Controller/Users/Settings/index.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/your-github-username/pet-adoption-center-sdk" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h3>Namespaces</h3><ul><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessResetPasswordToken">exports.GenerateAccessResetPasswordToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessResetPasswordToken">exports.GenerateAccessResetPasswordToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessToken">exports.GenerateAccessToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.GenerateAccessToken">exports.GenerateAccessToken</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResendVerificationCode">exports.ResendVerificationCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResetPassword">exports.ResetPassword</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.ResetPassword">exports.ResetPassword</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.SendRestPasswordCode">exports.SendRestPasswordCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.SendRestPasswordCode">exports.SendRestPasswordCode</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.VerifyAccount">exports.VerifyAccount</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.logIn">exports.logIn</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.logIn">exports.logIn</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.logOut">exports.logOut</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.signUp">exports.signUp</a></li><li data-type='method' style='display: none;'><a href="Auth.html#.exports.signUp">exports.signUp</a></li></ul></li><li></li><li><a href="Doses.html">Doses</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Doses.html#.exports.ChangeDoseStatus">exports.ChangeDoseStatus</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.EditSingleDose">exports.EditSingleDose</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.SuspendDoses">exports.SuspendDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.TakeAsNeededDose">exports.TakeAsNeededDose</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getAllDoses">exports.getAllDoses</a></li><li data-type='method' style='display: none;'><a href="Doses.html#.exports.getDoses">exports.getDoses</a></li></ul></li><li><a href="HelperFunctions.html">HelperFunctions</a><ul class='methods'><li data-type='method' style='display: none;'><a href="HelperFunctions.html#.GenerateRefreshToken">GenerateRefreshToken</a></li></ul></li><li><a href="Measurement.html">Measurement</a></li><li></li><li><a href="MedicalCircle.html">MedicalCircle</a><ul class='methods'><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.Cancelinvitationifitisstillpending">Cancel invitation if it is still pending</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.DeleteDependent">DeleteDependent</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.EditCareGiverPermissions">EditCareGiverPermissions</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.deleteCareGiverPermissions">deleteCareGiverPermissions</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.AddCareGiver">exports.AddCareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CareGiver">exports.CareGiver</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatus">exports.ChangeInvitationStatus</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.ChangeInvitationStatusToAcceptDependent">exports.ChangeInvitationStatusToAcceptDependent</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentA">exports.CreateDependentA</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.CreateDependentB">exports.CreateDependentB</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.Dependents">exports.Dependents</a></li><li data-type='method' style='display: none;'><a href="MedicalCircle.html#.exports.getInvitations">exports.getInvitations</a></li></ul></li><li><a href="Medication.html">Medication</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Medication.html#.exports.CreateNewMed">exports.CreateNewMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.EditMed">exports.EditMed</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.deleteMedicationCycle">exports.deleteMedicationCycle</a></li><li data-type='method' style='display: none;'><a href="Medication.html#.exports.getMedication">exports.getMedication</a></li></ul></li><li><a href="Report.html">Report</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReport">exports.getReport</a></li><li data-type='method' style='display: none;'><a href="Report.html#.exports.getReportSingleMed">exports.getReportSingleMed</a></li></ul></li><li><a href="Settings.html">Settings</a></li><li></li><li><a href="Symptom.html">Symptom</a><ul class='methods'><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.BloodGlucoseMeasurement">exports.BloodGlucoseMeasurement</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.BloodPressureMeasurement">exports.BloodPressureMeasurement</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.CreateSymptom">exports.CreateSymptom</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.DeleteBloodGlucoseMeasurement">exports.DeleteBloodGlucoseMeasurement</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.DeleteBloodPressureMeasurement">exports.DeleteBloodPressureMeasurement</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.DeleteSymptom">exports.DeleteSymptom</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.EditSymptom">exports.EditSymptom</a></li><li data-type='method' style='display: none;'><a href="Symptom.html#.exports.getSymptoms">exports.getSymptoms</a></li></ul></li><li><a href="general.html">general</a></li><li><a href="routes.html">routes</a></li></ul><h3>Global</h3><ul><li><a href="global.html#EditNotificationSettings">EditNotificationSettings</a></li><li><a href="global.html#InvitationSentToCareGiverToBeMaster_AR">InvitationSentToCareGiverToBeMaster_AR</a></li><li><a href="global.html#InvitationSentToCareGiver_AR">InvitationSentToCareGiver_AR</a></li><li><a href="global.html#InvitationSentToDependent_EN">InvitationSentToDependent_EN</a></li><li><a href="global.html#getNotificationSettings">getNotificationSettings</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Controller/Users/Settings/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+/**
+ * @file controller/Settings/index.js
+ * @namespace controllers
+ * @namespace Settings
+ * 
+ */
+
+
+
+const User = require("../../../DB/Schema/User");
+const Profile = require("../../../DB/Schema/Profile");
+const {UploadFileToAzureBlob}=require("../../../utils/HelperFunctions")
+const messages = require("../../../Messages/Email/index")
+const {SendEmailToUser} =require("../../../utils/HelperFunctions")
+const TempEmails = require("../../../DB/Schema/TempEmails")
+const Occurrence = require("../../../DB/Schema/Occurrences");
+const SchedulerSchema = require("../../../DB/Schema/Scheduler");
+const UserMedication = require("../../../DB/Schema/UserMedication");
+const Invitation =require("../../../DB/Schema/invitations")
+const FeedBack =require("../../../DB/Schema/Feedback")
+const {
+  successResMsg,
+  errorResMsg
+} = require("../../../utils/ResponseHelpers");
+
+const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThatProfile,CheckProfilePermissions,isValidEmail} =require("../../../utils/HelperFunctions");
+const Viewer = require("../../../DB/Schema/Viewers");
+
+
+
+exports.EditProfile = async (req, res) => {
+ 
+    try {
+  
+      const {id} =req.id
+      const {ProfileID,firstName,lastName,countryCode,phoneNumber,gender,DateOfBirth,KeepOldImg}=req.body
+     
+  
+  
+      const profile =await Profile.findById(ProfileID).populate('Owner.User')
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      console.log(profile.Owner.User,id)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
+  
+      if(phoneNumber){
+       if(isNaN(phoneNumber)){
+         return errorResMsg(res, 400, req.t("phone_number_is_not_valid"));
+       
+      }
+    }
+      const searchForPhone =await User.findOne({
+        "mobileNumber.countryCode":countryCode,
+        "mobileNumber.phoneNumber":phoneNumber,
+      })
+      if(searchForPhone){
+        if(searchForPhone._id.toString()!==id){
+          return errorResMsg(res, 400, req.t("Phone_number_already_exist"));
+        }
+      }
+
+     
+      let img=null
+      // store the image to azure
+      if(req.file){
+         img = await UploadFileToAzureBlob(req.file)
+      }
+      // update profile info
+      
+      profile.gender=Number(gender)>=0?Number(gender):profile.gender
+      console.log(Number(gender)>=0?Number(gender):profile.gender)
+      console.log(Number(gender))
+      profile.DateOfBirth=DateOfBirth?new Date(+DateOfBirth):null||profile.DateOfBirth
+      console.log(gender)
+      await profile.save()
+      const user=await User.findById(id)
+
+      user.mobileNumber.countryCode=countryCode||user.mobileNumber.countryCode
+      user.mobileNumber.phoneNumber=phoneNumber||user.mobileNumber.phoneNumber
+      user.firstName=firstName||user.firstName
+      user.lastName=lastName||user.lastName
+      user.img=KeepOldImg==='true'?user.img:img
+      await user.save()
+      
+         
+      return successResMsg(res, 200, {message:req.t("profile_info_updated")});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+  exports.ChangePassword = async (req, res) => {
+  
+    try {
+  
+      const {id} =req.id
+      const {ProfileID,OldPassword,newPassword}=req.body
+     
+  
+  
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+      if(!OldPassword||!newPassword){
+        return errorResMsg(res, 400, req.t("Invalid_Password"));
+      }
+      const user =await User.findById(id).select("+password");
+      // check if the old password is correct
+   
+      const isMatch=await user.correctPassword(OldPassword,user.password)
+      if (!isMatch) {
+        return errorResMsg(res, 400, req.t("Invalid_Password"));
+      }
+      // save new password to user
+      user.password=newPassword
+      await user.save()
+     
+      return successResMsg(res, 200, {message:req.t("Password_changed")});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  
+  
+  }
+  
+  exports.ChangeEmail = async (req, res) => {
+
+    try {
+  
+      const {id} =req.id
+      const {ProfileID,newEmail,Password}=req.body
+     
+      const profile =await Profile.findById(ProfileID).populate('Owner.User')
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
+      if(newEmail){
+        if(!isValidEmail(newEmail)){
+         return errorResMsg(res, 400, req.t("email_is_not_valid"));
+       
+      }}
+
+      const user =await User.findById(profile.Owner.User._id).select("+password");
+      // check if the old password is correct
+   
+      const isMatch=await user.correctPassword(Password,user.password)
+      if (!isMatch) {
+        return errorResMsg(res, 400, req.t("Invalid_Password"));
+      }
+  
+ 
+
+      const searchForEmail =await User.findOne({
+        email:newEmail
+      })
+      if(searchForEmail){
+        return errorResMsg(res, 400, req.t("Email_already_exists"));
+      }
+      const tempEmailFound=await TempEmails.findOne({
+        email:newEmail,
+      })
+      // if email found not create new one
+      if(tempEmailFound){
+             // register temp user with that email
+     
+      //send OTP to verify email
+      const verificationCode = await GenerateRandomCode(2);
+      const verificationExpiryDate =  Date.now()  + 600000 ;
+       let verificationMessage;
+       if(profile.lang==="en"){
+         verificationMessage = messages.verifyAccount_EN(verificationCode);
+       }else{
+         verificationMessage = messages.verifyAccount_AR(verificationCode);
+       }
+      
+  
+  
+       tempEmailFound.verificationCode=verificationCode;
+       tempEmailFound.verificationExpiryDate=verificationExpiryDate;
+     await tempEmailFound.save();
+  
+     await SendEmailToUser(tempEmailFound.email,verificationMessage)
+      return successResMsg(res, 200, {message:req.t("OPT_has_sent")});
+
+      }
+      // register temp user with that email
+      const tempEmail=new TempEmails({
+        email:newEmail,
+        profile:ProfileID
+      })
+      //send OTP to verify email
+      const verificationCode = await GenerateRandomCode(2);
+      const verificationExpiryDate =  Date.now()  + 600000 ;
+       let verificationMessage;
+       if(profile.lang==="en"){
+         verificationMessage = messages.verifyAccount_EN(verificationCode);
+       }else{
+         verificationMessage = messages.verifyAccount_AR(verificationCode);
+       }
+      
+  
+  
+       tempEmail.verificationCode=verificationCode;
+       tempEmail.verificationExpiryDate=verificationExpiryDate;
+      await tempEmail.save();
+  
+     await SendEmailToUser(tempEmail.email,verificationMessage)
+      return successResMsg(res, 200, {message:req.t("OPT_has_sent")});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  
+  
+  }
+  
+  exports.verifyChangedEmail = async (req, res) => {
+  
+    try {
+  
+      const {id} =req.id
+      const {ProfileID,ChangedEmail,OPT}=req.body
+     
+      const profile =await Profile.findById(ProfileID)
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+      if(ChangedEmail){
+        if(!isValidEmail(ChangedEmail)){
+         return errorResMsg(res, 400, req.t("email_is_not_valid"));
+       
+      }}
+  
+      const searchForEmail =await TempEmails.findOne({
+        email:ChangedEmail
+      })
+      if(!searchForEmail){
+        return errorResMsg(res, 400, req.t("Email_Not_found"));
+      }
+        // check if the OPT is correct
+        if (searchForEmail.verificationCode !== OPT) {
+            return errorResMsg(res, 400, req.t("Invalid_OPT"));
+        }
+        // check if the OPT is expired
+        if (searchForEmail.verificationExpiryDate &lt; Date.now()) {
+            return errorResMsg(res, 400, req.t("OPT_expired"));
+        }
+        //delete the temp user
+        await TempEmails.findByIdAndDelete(searchForEmail._id)
+        // update user email
+        await User.findByIdAndUpdate(id,{
+            email:ChangedEmail
+        })
+      
+        return successResMsg(res, 200, {message:req.t("Email_changed")});
+     
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  
+  
+  }
+
+  exports.ResendActivationOPTForTempEmail = async (req, res) => {
+  
+    try {
+  
+      const {id} =req.id
+      const {ProfileID,newEmail}=req.body
+     
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+    
+      
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+
+      if(newEmail){
+        if(!isValidEmail(newEmail)){
+         return errorResMsg(res, 400, req.t("email_is_not_valid"));
+       
+      }}
+  
+      let searchForEmail =await TempEmails.findOne({
+        email:newEmail
+      })
+      if(!searchForEmail){
+      searchForEmail= new TempEmails({
+            email:newEmail,
+            profile:ProfileID,
+        })
+        
+       
+      }
+        //send OTP to verify email
+        const verificationCode = await GenerateRandomCode(2);
+        const verificationExpiryDate =  Date.now()  + 600000 ;
+         let verificationMessage;
+         if(profile.lang==="en"){
+           verificationMessage = messages.verifyAccount_EN(verificationCode);
+         }else{
+           verificationMessage = messages.verifyAccount_AR(verificationCode);
+         }
+        
+    
+    
+         searchForEmail.verificationCode=verificationCode;
+         searchForEmail.verificationExpiryDate=verificationExpiryDate;
+       await searchForEmail.save();
+    
+       await SendEmailToUser(searchForEmail.email,verificationMessage)
+     
+      return successResMsg(res, 200, {message:req.t("OPT_has_sent")});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  
+  
+  }
+
+  exports.DeleteAccount = async (req, res) => {
+ 
+    try {
+  
+      const {id} =req.id
+      const {ProfileID}=req.body
+      const profile =await Profile.findById(ProfileID)
+
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+
+      if(profile.Deleted){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+        // delete user
+        await User.findOneAndDelete({
+          profile:ProfileID
+        })
+        // delete profile
+        profile.Deleted=true
+        profile.NotificationInfo=null
+        await profile.save()
+        await Occurrence.deleteMany({
+          ProfileID:ProfileID,
+          PlannedDateTime:{$gte:new Date()}
+        
+        })
+        await UserMedication.updateMany({
+          ProfileID:ProfileID,
+
+        },{
+          $set:{
+            isDeleted:true,
+    
+          }
+        })
+        await SchedulerSchema.updateMany({
+          ProfileID:ProfileID,
+        },{
+          $set:{
+            isDeleted:true,
+          }
+        })
+        await Occurrence.updateMany({
+          ProfileID:ProfileID,
+
+        },{
+          $set:{
+            isSuspended:true,
+          }
+        })
+     await Invitation.deleteMany({ From: ProfileID })
+      await Invitation.deleteMany({ To: ProfileID })
+      return successResMsg(res, 200, {message:req.t("Profile_Deleted")});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+  exports.CreateFeedBack = async (req, res) => {
+ 
+    try {
+  
+      const {id} =req.id
+      const {
+        Type,
+        Description,
+      }=req.body
+ 
+      // get the viewer permissions
+
+      const userInfo=await User.findById(id)
+      if(!userInfo){
+        return errorResMsg(res, 400, req.t("User_not_found"));
+      }
+      let img
+      // store the image to azure
+      if(req.files.img&amp;&amp;req.files.img[0]){
+         img = await UploadFileToAzureBlob(req.files.img[0])
+      }
+      // store voice record to azure
+      let voice
+      if(req.files.voice&amp;&amp;req.files.voice[0]){
+        voice = await UploadFileToAzureBlob(req.files.voice[0])
+      }
+     
+  
+      // create new feedback
+      const newFeedBack = new FeedBack({
+        img,
+        User:id,
+        Type,
+        Description,
+        VoiceRecord:voice,
+       
+  
+      })
+      
+      await newFeedBack.save()
+    const responseData={
+      ...newFeedBack._doc,
+    }
+    const emailData={
+      firstName:userInfo.firstName,
+      lastName:userInfo.lastName,
+      email:userInfo.email,
+      CountryCode:userInfo.mobileNumber.countryCode?userInfo.mobileNumber.countryCode:'',
+      phoneNumber:userInfo.mobileNumber.phoneNumber?userInfo.mobileNumber.phoneNumber:'',
+      type:Type,
+      Description:Description?Description:'',
+      img:img?img:false,
+      voice:voice?voice:false,
+    }
+    const feedbackEmail = messages.NewFeedBack_EN(emailData);
+    await SendEmailToUser('info@voithy.com',feedbackEmail)
+      // return successful response
+      return successResMsg(res, 200, {message:req.t("FeedBack_Created"),data:responseData});
+      
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+  
+  exports.GetUserFeedBacks = async (req, res) => {
+ 
+    try {
+  
+     const {id} =req.id
+      const page=req.query.page||1
+      const itemPerPage = 10 ;
+      let totalItems;
+     
+  
+  
+          totalItems = await FeedBack.find().countDocuments();
+      
+            const feedbacks = await FeedBack.find({User:id})
+              .sort({createdAt: -1})
+              .skip((page - 1) * itemPerPage)
+              .limit(itemPerPage)
+              .populate({
+                path: "User",
+                select: "firstName lastName email"
+  
+              })
+             
+           
+             const results= {
+                  total:totalItems,
+                  feedbacks
+                }
+      
+      // return successful response
+         
+      return successResMsg(res, 200, {data:results});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+  };
+
+/**
+ * Get notification settings
+ * @async
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {string} req.id - User ID
+ * @param {string} req.query.ProfileID - Profile ID
+ * @param {string} req.query.DependentProfileID - Dependent Profile ID
+ * @returns {Object} - Returns notification settings of a viewer (caregiver/dependent)
+ */
+  exports.getNotificationSettings= async (req,res)=>{
+    try {
+      const {id}=req.id
+      const {ProfileID,DependentProfileID}=req.query
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+      const viewer =await Viewer.findOne({
+        ViewerProfile:ProfileID,
+        DependentProfile:DependentProfileID
+      })
+      if(!viewer){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      return successResMsg(res, 200, {data:viewer.NotificationSettings});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+
+
+  }
+
+
+  /**
+ * Edit notification settings
+ * @async
+ * @function
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {string} req.id - User ID
+ * @param {string} req.body.ProfileID - Profile ID
+ * @param {string} req.body.DependentProfileID - Dependent Profile ID
+ * @param {Object} req.body.NotificationSettings - Notification settings object
+ * @returns {Object} - Returns updated notification settings of a viewer (caregiver/dependent)
+ *
+ * @description This API allows you to edit the notification settings of a viewer (caregiver/dependent). The `ProfileID` parameter is used to identify the profile of the viewer, and the `DependentProfileID` parameter is used to identify the dependent profile of the viewer. The `NotificationSettings` parameter is an object containing the updated notification settings of the viewer. The function returns a promise that resolves with an object containing the updated notification settings of the viewer.
+ *
+ * @example
+ * // Request body
+ * {
+  "ProfileID":"63f612e311bbf29952f1cf0f",
+   "DependentProfileID":"63f64d946d3833e2b435776c",
+   "NotificationSettings":{
+        "DoseNotify30m": true,
+            "DoseNotify60m": true,
+            "MedRefile": true,
+            "NewSymptom": false,
+            "NewBloodGlucoseReading": true,
+            "BloodGlucoseReminder30m": true,
+            "BloodGlucoseReminder60m": true,
+            "NewBloodPressureReading": true,
+            "BloodPressureReminder30m": true,
+            "BloodPressureReminder60m": true
+   }
+}
+ *
+ * // Response body
+ * {
+ *   ""data": {
+            "DoseNotify30m": true,
+            "DoseNotify60m": true,
+            "MedRefile": true,
+            "NewSymptom": false,
+            "NewBloodGlucoseReading": true,
+            "BloodGlucoseReminder30m": true,
+            "BloodGlucoseReminder60m": true,
+            "NewBloodPressureReading": true,
+            "BloodPressureReminder30m": true,
+            "BloodPressureReminder60m": true
+        }
+ * }
+ */
+
+
+  exports.EditNotificationSettings= async (req,res)=>{
+    try {
+      const {id}=req.id
+      const {ProfileID,DependentProfileID,NotificationSettings}=req.body
+      const profile =await Profile.findById(ProfileID)
+      if(!profile){
+        return errorResMsg(res, 400, req.t("Profile_not_found"));
+      }
+      const IsMaster=await IsMasterOwnerToThatProfile(id,profile)
+      if(profile.Owner.User._id.toString()!==id&amp;&amp;!IsMaster){
+        return errorResMsg(res, 400, req.t("Unauthorized"));
+      }
+      if(profile.Owner.User._id.toString() === id){
+        if(!CheckProfilePermissions(profile,'CanEditProfile')){
+          return errorResMsg(res, 400, req.t("Unauthorized"));
+        }
+      }
+      const viewer =await Viewer.findOne({
+        ViewerProfile:ProfileID,
+        DependentProfile:DependentProfileID
+      })
+      viewer.NotificationSettings=NotificationSettings
+      await viewer.save()
+      if(!viewer){
+        return errorResMsg(res, 400, req.t("relationship_not_found"));
+      }
+      return successResMsg(res, 200, {data:viewer.NotificationSettings});
+    } catch (err) {
+      // return error response
+      console.log(err)
+      return errorResMsg(res, 500, err);
+    }
+
+
+  }</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.0</a> on Wed Apr 05 2023 14:22:31 GMT+0200 (Eastern European Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

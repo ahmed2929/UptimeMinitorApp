@@ -14,23 +14,18 @@ var ViewerSchema = new Schema({
         type:Boolean,
         default:true,
     },
-    CanReadDoses:{
+    //permissions
+
+    //Medication
+    CanDeleteAllMeds:{
         type:Boolean,
         default:true,
     },
-    CanReadRefile:{
+    CanEditAllMeds:{
         type:Boolean,
         default:true,
     },
     CanReadAllMeds:{
-        type:Boolean,
-        default:true,
-    },
-    CanReadSymptoms:{
-        type:Boolean,
-        default:true,
-    },
-    CanWriteSymptoms:{
         type:Boolean,
         default:true,
     },
@@ -39,60 +34,80 @@ var ViewerSchema = new Schema({
         default:true,
     },
 
-    CanReadSpacificMeds:[{
-        Med:{
-            type:Schema.Types.ObjectId,
-             ref:"UserMedication",
-        },
-        CanRead:{
-            type:Boolean,
-            default:true,
-        },
-        CanWrite:{
-            type:Boolean,
-            default:true,
-        },
-        CanReadDoses:{
-            type:Boolean,
-            default:true,
-        },
-        CanReadRefile:{
-            type:Boolean,
-            default:true,
-        },
-        CanWriteRefile:{
-            type:Boolean,
-            default:false,
-        },
-        CanWriteDoses:{
-            type:Boolean,
-            default:false,
-        }
-        
-    }],
-    CanWriteDoses:{
+    //Symptom
+
+     CanWriteSymptoms:{
+        type:Boolean,
+        default:true,
+    },
+    CanReadSymptoms:{
+        type:Boolean,
+        default:true,
+    },
+    CanDeleteSymptoms:{
+        type:Boolean,
+        default:true,
+    },
+    CanEditSymptoms:{
+        type:Boolean,
+        default:true,
+    },
+    CanAddSymptoms:{
+        type:Boolean,
+        default:true,
+    },
+   /////////////Doses////////////
+ 
+
+    CanWriteDoses:{//deprecated
+        type:Boolean,
+       
+    },
+    CanSuspendDoses:{
         type:Boolean,
         default:false,
     },
-    notify:{
+    CanReadDoses:{
         type:Boolean,
-        default:true
+        default:true,
     },
-    IsDeleted:{
+    CanAddNewDose:{
         type:Boolean,
-        default:false
+        default:true,
     },
-    DependentProfileNickName:{
-        type:String,
-        default:null
+    CanEditDoses:{
+        type:Boolean,
+        default:true,
     },
-    CareGiverNickName:{
-        type:String,
-        default:null
+    CanChangeDoseStatus:{
+        type:Boolean,
+        default:true,
     },
-    Invitation:{
-        type:Schema.Types.ObjectId,
-        ref:"Invitation",
+
+
+
+   ///////////Refile////////////////
+   CanReadRefile:{
+    type:Boolean,
+   
+    },
+
+    /////////Share/////////////////
+    CanShareAllMeds:{
+        type:Boolean,
+        default:false,
+    },
+    CanShareAllSymptoms:{
+        type:Boolean,
+        default:false,
+    },
+    CanShareAllDoses:{
+        type:Boolean,
+        default:false,
+    },
+    CanShareAllInfo:{
+        type:Boolean,
+        default:false,
     },
     // Measurements permissions
     CanReadBloodGlucoseMeasurement:{
@@ -128,8 +143,137 @@ var ViewerSchema = new Schema({
         default:true,
     },
 
- 
- 
+    CanReadSpacificMeds:[{
+        Med:{
+            type:Schema.Types.ObjectId,
+             ref:"UserMedication",
+        },
+        //MED
+        CanWrite:{
+            type:Boolean,
+       
+        },
+        CanRead:{
+            type:Boolean,
+            default:true,
+        },
+        CanEdit:{
+            type:Boolean,
+            default:true,
+        },
+        CanDelete:{
+            type:Boolean,
+            default:true,
+        },
+///////////////Doses////////////////     
+        CanWriteDoses:{ //deprecated
+            type:Boolean,
+        },
+        CanSuspendDoses:{
+            type:Boolean,
+            default:false,
+        },
+
+        CanAddNewDose:{
+            type:Boolean,
+            default:true,
+        },
+        CanEditDoses:{
+            type:Boolean,
+            default:true,
+        },
+        CanChangeDoseStatus:{
+            type:Boolean,
+            default:true,
+        },
+
+        CanReadDoses:{
+            type:Boolean,
+            default:true,
+        },
+        //////Refile/////
+        CanReadRefile:{//deprecated
+            type:Boolean,
+        
+        },
+        CanWriteRefile:{
+            type:Boolean,
+        },
+        //////Share/////
+        CanShareMedInfo:{
+            type:Boolean,
+            default:false,
+        },
+        CanShareDosesInfo:{
+            type:Boolean,
+            default:false,
+        }
+      
+        
+    }],
+    notify:{
+        type:Boolean,
+        default:true
+    },
+    IsDeleted:{
+        type:Boolean,
+        default:false
+    },
+    DependentProfileNickName:{
+        type:String,
+        default:null
+    },
+    CareGiverNickName:{
+        type:String,
+        default:null
+    },
+    Invitation:{
+        type:Schema.Types.ObjectId,
+        ref:"Invitation",
+    },
+    NotificationSettings:{
+    DoseNotify30m:{
+        type:Boolean,
+        default:true
+    },
+    DoseNotify60m:{
+        type:Boolean,
+        default:true
+    },
+    MedRefile:{
+        type:Boolean,
+        default:true
+    },
+    NewSymptom:{
+        type:Boolean,
+        default:true
+    },
+    NewBloodGlucoseReading:{
+        type:Boolean,
+        default:true
+    },
+    BloodGlucoseReminder30m:{
+        type:Boolean,
+        default:true
+    },
+    BloodGlucoseReminder60m:{
+        type:Boolean,
+        default:true
+    },
+    NewBloodPressureReading:{
+        type:Boolean,
+        default:true
+    },
+    BloodPressureReminder30m:{
+        type:Boolean,
+        default:true
+    },
+    BloodPressureReminder60m:{
+        type:Boolean,
+        default:true
+    },
+
+ }
 
  
  

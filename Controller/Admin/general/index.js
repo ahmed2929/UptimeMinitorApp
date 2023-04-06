@@ -86,7 +86,7 @@ exports.AddMedRecommendation = async (req, res) => {
     console.log("batch started")
     const resultt=await batch.execute();
     console.log(resultt)
-    delete file
+    //delete file
 
     fs.unlinkSync(req.file.path);
     // return successful response
@@ -153,7 +153,7 @@ exports.AddMedRecommendationUS = async (req, res) => {
     console.log("batch started")
     const resultt=await batch.execute();
     console.log(resultt)
-    delete file
+    //delete file
 
     fs.unlinkSync(req.file.path);
     // return successful response
