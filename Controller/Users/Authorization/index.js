@@ -200,10 +200,10 @@ exports.logIn = async (req, res) => {
         // assign the new device to the user profile 
         if(DeviceOs==="IOS"){
           userProfile.NotificationInfo.IOS=true
-          NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
+          //NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
         }else if(DeviceOs==="Android"){
           userProfile.NotificationInfo.Android=true
-          NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
+         // NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
         }else{
           return errorResMsg(res, 401, req.t("Invalid_os_type"));
         }
@@ -522,10 +522,10 @@ exports.VerifyAccount = async (req, res) => {
         // assign the new device to the user profile 
         if(DeviceOs==="IOS"){
           userProfile.NotificationInfo.IOS=true
-          NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
+          //NotificationRegister= await RegisterIOSDevice(user.profile,DeviceToken)
         }else if(DeviceOs==="Android"){
           userProfile.NotificationInfo.Android=true
-          NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
+          //NotificationRegister= await RegisterAndroidDevice(user.profile,DeviceToken)
         }else{
           return errorResMsg(res, 401, req.t("Invalid_os_type"));
         }
@@ -594,7 +594,7 @@ exports.ResendVerificationCode = async (req, res) => {
   
     const {email} = req.body;
     if (!email) {
-      return    errorResMsg(res, 406, req.t("Email_is_required"));
+      return  errorResMsg(res, 406, req.t("Email_is_required"));
 
     }
 
@@ -728,15 +728,12 @@ exports.GenerateAccessToken = async (req, res) => {
           const index = profile.NotificationInfo.DevicesTokens.findIndex((elem)=>{
             return elem.DeviceToken===DeviceToken
           })
-          const RegistrationObject= profile.NotificationInfo.DevicesTokens[index]?profile.NotificationInfo.DevicesTokens[index].NotificationRegister:null
+         // const RegistrationObject= profile.NotificationInfo.DevicesTokens[index]?profile.NotificationInfo.DevicesTokens[index].NotificationRegister:null
           if(index!==-1){
             profile.NotificationInfo.DevicesTokens.splice(index,1)
             await profile.save()
           }
           // unregister user profile id from azure notification hub
-          const result=await DeleteRegistration(RegistrationObject.RegistrationId,profile._id)
-
-          console.log(result)
          
           return successResMsg(res, 200, {message:req.t("user_logged_out")});
         } catch (err) {

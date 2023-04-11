@@ -448,232 +448,85 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
         let payload;
         // notification prepare device type
         // switch based on notificationMessage
+        let notification;
+
         switch (notificationMessage) {
+
             case "NewInvitationFromCareGiver":
                  //i case of only IOS
-                    if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                         //save notification in db
-                        const notification = new Notification({
+                         notification = new Notification({
                             ProfileID:userprofile._id,
                             data:payloadData,
                             action:0
                             
                         })
                         await notification.save()
-                        payload=NotificationMessages.NewInvitationFromCareGiver_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
+                        payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
                         await sendNotification(userprofile._id,payload,"IOS",0,payloadData)
 
-                    }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                        //save notification in db
-                        const notification = new Notification({
-                            ProfileID:userprofile._id,
-                            data:payloadData,
-                            action:0
-                            
-                        })
-                        await notification.save()
-                    payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
-                        //case of only android
-                        await sendNotification(userprofile._id,payload,"Android",0,payloadData)
-
-                    }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                     //save notification in db
-                     const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:0
-                        
-                    })
-                    await notification.save()   
-                    const IOS_payload=  NotificationMessages.NewInvitationFromCareGiver_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
-                    const Android_payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
-                    //case of both
-                        await sendNotification(userprofile._id,IOS_payload,"IOS",0,payloadData)
-                        await sendNotification(userprofile._id,Android_payload,"Android",0,payloadData)
-                    } 
+                   
                 break;
             case "DependentAcceptedInvitation":
-                 //i case of only IOS
-                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
+            
+                     notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:2
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.DependentAcceptedInvitation_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
+                    payload=NotificationMessages.DependentAcceptedInvitation_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",2,payloadData)
 
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                      //save notification in db
-                      const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:2
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.DependentAcceptedInvitation_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",2,payloadData)
 
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                      //save notification in db
-                      const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:2
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.DependentAcceptedInvitation_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
-                const Android_payload=NotificationMessages.DependentAcceptedInvitation_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",2,payloadData)
-                    await sendNotification(userprofile._id,Android_payload,"Android",2,payloadData)
-                } 
+                
             break;
             case "NewInvitationFromDependent":
-                 //i case of only IOS
-                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                       //save notification in db
-                      const notification = new Notification({
+                       notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:1
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.NewInvitationFromDependent_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
+                    payload=NotificationMessages.NewInvitationFromDependent_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",1,payloadData)
-
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                      //save notification in db
-                      const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:1
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.NewInvitationFromDependent_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",1,payloadData)
-
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:1
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.NewInvitationFromDependent_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
-                const Android_payload=NotificationMessages.NewInvitationFromDependent_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",1,payloadData)
-                    await sendNotification(userprofile._id,Android_payload,"Android",1,payloadData)
-                } 
+              
             break;
             case "CareGiverAcceptedInvitation":
                  //i case of only IOS
-                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
+                     notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:3
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.CareGiverAcceptedInvitation_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
+                    payload=NotificationMessages.CareGiverAcceptedInvitation_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",3,payloadData)
 
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:3
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.CareGiverAcceptedInvitation_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",3,payloadData)
-
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:3
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.CareGiverAcceptedInvitation_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
-                const Android_payload=NotificationMessages.CareGiverAcceptedInvitation_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",3,payloadData)
-                    await sendNotification(userprofile._id,Android_payload,"Android",3,payloadData)
-                } 
+      
             break;
             case "RefileAlert":
                 //i case of only IOS
-                if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
+                     notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:6
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.RefileAlert_EN_APNS(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
+                    payload=NotificationMessages.RefileAlert_EN_GCM(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",6,payloadData)
 
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:6
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.RefileAlert_EN_GCM(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",6,payloadData)
-
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:6
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.RefileAlert_EN_APNS(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
-                const Android_payload=NotificationMessages.RefileAlert_EN_GCM(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",6,payloadData)
-                    await sendNotification(userprofile._id,Android_payload,"Android",6,payloadData)
-                } 
+           
             break;
             case "NewSymptom":
-                 //i case of only IOS
-                    if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
+                       //i case of only IOS
                         //save notification in db
-                        const notification = new Notification({
-                            ProfileID:userprofile._id,
-                            data:payloadData,
-                            action:8
-                            
-                        })
-                        await notification.save()
-                        payload=NotificationMessages.NewSymptom_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                        await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
-
-                    }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                        //save notification in db
-                        const notification = new Notification({
+                         notification = new Notification({
                             ProfileID:userprofile._id,
                             data:payloadData,
                             action:8
@@ -681,42 +534,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                         })
                         await notification.save()
                         payload=NotificationMessages.NewSymptom_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                        await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+                        await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
 
-                    }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                     //save notification in db
-                     const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:8
-                        
-                    })
-                    await notification.save()   
-                    const IOS_payload=NotificationMessages.NewSymptom_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-
-                    const Android_payload=NotificationMessages.NewSymptom_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                    //case of both
-                        await sendNotification(userprofile._id,IOS_payload,"IOS",8,payloadData)
-                        await sendNotification(userprofile._id,Android_payload,"Android",8,payloadData)
-                    } 
+                
                 break;
             case "NewSymptomAddToMe":
                   //i case of only IOS
-                     if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                          //save notification in db
-                         const notification = new Notification({
-                             ProfileID:userprofile._id,
-                             data:payloadData,
-                             action:10
-                             
-                         })
-                         await notification.save()
-                         payload=NotificationMessages.NewSymptomAddedToMe_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                         await sendNotification(userprofile._id,payload,"IOS",10,payloadData)
- 
-                     }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                         //save notification in db
-                         const notification = new Notification({
+                          notification = new Notification({
                              ProfileID:userprofile._id,
                              data:payloadData,
                              action:10
@@ -724,85 +549,29 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                          })
                          await notification.save()
                          payload=NotificationMessages.NewSymptomAddedToMe_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                         await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+                         await sendNotification(userprofile._id,payload,"Android",10,payloadData)
  
-                     }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                      //save notification in db
-                      const notification = new Notification({
-                         ProfileID:userprofile._id,
-                         data:payloadData,
-                         action:10
-                         
-                     })
-                     await notification.save()   
-                     const IOS_payload=NotificationMessages.NewSymptomAddedToMe_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
- 
-                     const Android_payload=NotificationMessages.NewSymptomAddedToMe_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                     //case of both
-                         await sendNotification(userprofile._id,IOS_payload,"IOS",10,payloadData)
-                         await sendNotification(userprofile._id,Android_payload,"Android",10,payloadData)
-                     } 
+  
                  break;    
             case "NewInvitationToBeMasterUser":
                     //i case of only IOS
-                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
-                           const notification = new Notification({
+                            notification = new Notification({
                                ProfileID:userprofile._id,
                                data:payloadData,
                                action:9
                                
                            })
                            await notification.save()
-                           payload=NotificationMessages.NewInvitationFromCareGiver_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
+                           payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
                            await sendNotification(userprofile._id,payload,"IOS",9,payloadData)
    
-                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                           //save notification in db
-                           const notification = new Notification({
-                               ProfileID:userprofile._id,
-                               data:payloadData,
-                               action:9
-                               
-                           })
-                           await notification.save()
-                       payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
-                           //case of only android
-                           await sendNotification(userprofile._id,payload,"Android",9,payloadData)
-   
-                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                        //save notification in db
-                        const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:9
-                           
-                       })
-                       await notification.save()   
-                       const IOS_payload=  NotificationMessages.NewInvitationFromCareGiver_EN_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
-                       const Android_payload=NotificationMessages.NewInvitationFromCareGiver_EN_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,9,notification._id)
-                       //case of both
-                           await sendNotification(userprofile._id,IOS_payload,"IOS",9,payloadData)
-                           await sendNotification(userprofile._id,Android_payload,"Android",9,payloadData)
-                       } 
+                   
                    break;
             case "BloodGlucoseMeasurement":
                     //i case of only IOS
-                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
-                           const notification = new Notification({
-                               ProfileID:userprofile._id,
-                               data:payloadData,
-                               action:15
-                               
-                           })
-                           await notification.save()
-                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"IOS",15,payloadData)
-   
-                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                           //save notification in db
-                           const notification = new Notification({
+                           notification = new Notification({
                                ProfileID:userprofile._id,
                                data:payloadData,
                                action:15
@@ -810,42 +579,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            })
                            await notification.save()
                            payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"Android",15,payloadData)
+                           await sendNotification(userprofile._id,payload,"IOS",15,payloadData)
    
-                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                        //save notification in db
-                        const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:15
-                           
-                       })
-                       await notification.save()   
-                       const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-   
-                       const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       //case of both
-                           await sendNotification(userprofile._id,IOS_payload,"IOS",15,payloadData)
-                           await sendNotification(userprofile._id,Android_payload,"Android",15,payloadData)
-                       } 
+            
                    break;
             case "BloodGlucoseMeasurementAddToMe":
                     //i case of only IOS
-                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
-                           const notification = new Notification({
-                               ProfileID:userprofile._id,
-                               data:payloadData,
-                               action:16
-                               
-                           })
-                           await notification.save()
-                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"IOS",16,payloadData)
-   
-                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                           //save notification in db
-                           const notification = new Notification({
+                            notification = new Notification({
                                ProfileID:userprofile._id,
                                data:payloadData,
                                action:16
@@ -853,42 +594,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            })
                            await notification.save()
                            payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"Android",16,payloadData)
+                           await sendNotification(userprofile._id,payload,"IOS",16,payloadData)
    
-                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                        //save notification in db
-                        const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:16
-                           
-                       })
-                       await notification.save()   
-                       const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-   
-                       const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       //case of both
-                           await sendNotification(userprofile._id,IOS_payload,"IOS",16,payloadData)
-                           await sendNotification(userprofile._id,Android_payload,"Android",16,payloadData)
-                       } 
+                    
                    break;
             case "BloodPressureMeasurement":
                     //i case of only IOS
-                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
-                           const notification = new Notification({
-                               ProfileID:userprofile._id,
-                               data:payloadData,
-                               action:17
-                               
-                           })
-                           await notification.save()
-                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"IOS",17,payloadData)
-   
-                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                           //save notification in db
-                           const notification = new Notification({
+                            notification = new Notification({
                                ProfileID:userprofile._id,
                                data:payloadData,
                                action:17
@@ -896,42 +609,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            })
                            await notification.save()
                            payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"Android",17,payloadData)
+                           await sendNotification(userprofile._id,payload,"IOS",17,payloadData)
    
-                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                        //save notification in db
-                        const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:17
-                           
-                       })
-                       await notification.save()   
-                       const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-   
-                       const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       //case of both
-                           await sendNotification(userprofile._id,IOS_payload,"IOS",17,payloadData)
-                           await sendNotification(userprofile._id,Android_payload,"Android",17,payloadData)
-                       } 
+                 
                    break;
             case "BloodPressureMeasurementAddToMe":
                     //i case of only IOS
-                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
-                           const notification = new Notification({
-                               ProfileID:userprofile._id,
-                               data:payloadData,
-                               action:18
-                               
-                           })
-                           await notification.save()
-                           payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"IOS",18,payloadData)
-   
-                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                           //save notification in db
-                           const notification = new Notification({
+                            notification = new Notification({
                                ProfileID:userprofile._id,
                                data:payloadData,
                                action:18
@@ -939,43 +624,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            })
                            await notification.save()
                            payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                           await sendNotification(userprofile._id,payload,"Android",18,payloadData)
+                           await sendNotification(userprofile._id,payload,"IOS",18,payloadData)
    
-                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                        //save notification in db
-                        const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:18
-                           
-                       })
-                       await notification.save()   
-                       const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-   
-                       const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       //case of both
-                           await sendNotification(userprofile._id,IOS_payload,"IOS",18,payloadData)
-                           await sendNotification(userprofile._id,Android_payload,"Android",18,payloadData)
-                       } 
-                   break;
-            
+                     
+                   break;  
              case "GeneralNotification":
                     //i case of only IOS
-                       if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                            //save notification in db
-                           const notification = new Notification({
-                               ProfileID:userprofile._id,
-                               data:payloadData,
-                               action:50
-                               
-                           })
-                           await notification.save()
-                           payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_en,payloadData.body_en,payloadData,50)
-                           await sendNotification(userprofile._id,payload,"IOS",50,payloadData)
-   
-                       }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                           //save notification in db
-                           const notification = new Notification({
+                            notification = new Notification({
                                ProfileID:userprofile._id,
                                data:payloadData,
                                action:50
@@ -983,24 +639,9 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                            })
                            await notification.save()
                            payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_en,payloadData.body_en,payloadData,50)
-                           await sendNotification(userprofile._id,payload,"Android",50,payloadData)
+                           await sendNotification(userprofile._id,payload,"IOS",50,payloadData)
    
-                       }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                        //save notification in db
-                        const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:50
-                           
-                       })
-                       await notification.save()   
-                       const IOS_payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_en,payloadData.body_en,payloadData,50)
-   
-                       const Android_payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_en,payloadData.body_en,payloadData,50)
-                       //case of both
-                           await sendNotification(userprofile._id,IOS_payload,"IOS",50,payloadData)
-                           await sendNotification(userprofile._id,Android_payload,"Android",50,payloadData)
-                       } 
+                
                    break;
                    
                    default:
@@ -1015,232 +656,82 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
         let payload;
         // notification prepare device type
         // switch based on notificationMessage
+        let notification
         switch (notificationMessage) {
             case "NewInvitationFromCareGiver":
                  //i case of only IOS
-                    if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                        const notification = new Notification({
+                         notification = new Notification({
                             ProfileID:userprofile._id,
                             data:payloadData,
                             action:0
                             
                         })
                         await notification.save()
-                        payload=NotificationMessages.NewInvitationFromCareGiver_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
+                        payload=NotificationMessages.NewInvitationFromCareGiver_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
                         await sendNotification(userprofile._id,payload,"IOS",0,payloadData)
 
-                    }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                        const notification = new Notification({
-                            ProfileID:userprofile._id,
-                            data:payloadData,
-                            action:0
-                            
-                        })
-                        await notification.save()
-                    
-                        payload=NotificationMessages.NewInvitationFromCareGiver_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
-                        //case of only android
-                        await sendNotification(userprofile._id,payload,"Android",0,payloadData)
-
-                    }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                        const notification = new Notification({
-                            ProfileID:userprofile._id,
-                            data:payloadData,
-                            action:0
-                            
-                        })
-                        await notification.save()
-                    
-                        const IOS_payload=  NotificationMessages.NewInvitationFromCareGiver_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
-                    const Android_payload=NotificationMessages.NewInvitationFromCareGiver_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,0,notification._id)
-                    //case of both
-                        await sendNotification(userprofile._id,IOS_payload,"IOS",0,payloadData)
-                        await sendNotification(userprofile._id,Android_payload,"Android",0,payloadData)
-                    } 
+               
                 break;
             case "DependentAcceptedInvitation":
                  //i case of only IOS
-                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
+                     notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:2
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.DependentAcceptedInvitation_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
+                    payload=NotificationMessages.DependentAcceptedInvitation_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",2,payloadData)
 
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:2
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.DependentAcceptedInvitation_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",2,payloadData)
-
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:2
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.DependentAcceptedInvitation_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
-                const Android_payload=NotificationMessages.DependentAcceptedInvitation_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,2,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",2,payloadData)
-                    await sendNotification(userprofile._id,Android_payload,"Android",2,payloadData)
-                } 
+          
             break;
             case "NewInvitationFromDependent":
                  //i case of only IOS
-                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
+                     notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:1
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.NewInvitationFromDependent_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
+                    payload=NotificationMessages.NewInvitationFromDependent_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",1,payloadData)
 
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:1
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.NewInvitationFromDependent_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",1,payloadData)
-
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:1
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.NewInvitationFromDependent_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
-                const Android_payload=NotificationMessages.NewInvitationFromDependent_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,1,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",1,{
-                        payloadData
-
-                    })
-                    await sendNotification(userprofile._id,Android_payload,"Android",1,payloadData)
-                } 
+              
             break;
             case "CareGiverAcceptedInvitation":
                  //i case of only IOS
-                 if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
+                     notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:3
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.CareGiverAcceptedInvitation_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
+                    payload=NotificationMessages.CareGiverAcceptedInvitation_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",3,payloadData)
 
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:3
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.CareGiverAcceptedInvitation_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",3,{
-                        payloadData
-
-                    })
-
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:3
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.CareGiverAcceptedInvitation_AR_APNS(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
-                const Android_payload=NotificationMessages.CareGiverAcceptedInvitation_AR_GCM(profile.Owner.User.firstName,payloadData.Invitation._id,3,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",3,payloadData)
-                    await sendNotification(userprofile._id,Android_payload,"Android",3,payloadData)
-                } 
+            
             break;
             case "RefileAlert":
                 //i case of only IOS
-                if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
+                     notification = new Notification({
                         ProfileID:userprofile._id,
                         data:payloadData,
                         action:6
                         
                     })
                     await notification.save()
-                    payload=NotificationMessages.RefileAlert_AR_APNS(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
+                    payload=NotificationMessages.RefileAlert_AR_GCM(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
                     await sendNotification(userprofile._id,payload,"IOS",6,payloadData)
 
-                }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:6
-                        
-                    })
-                    await notification.save()
-                payload=NotificationMessages.RefileAlert_AR_GCM(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
-                    //case of only android
-                    await sendNotification(userprofile._id,payload,"Android",6,payloadData)
-
-                }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    const notification = new Notification({
-                        ProfileID:userprofile._id,
-                        data:payloadData,
-                        action:6
-                        
-                    })
-                    await notification.save()
-                const IOS_payload=  NotificationMessages.RefileAlert_AR_APNS(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
-                const Android_payload=NotificationMessages.RefileAlert_AR_GCM(profile.Owner.User.firstName,newInvitation._id,6,notification._id)
-                //case of both
-                    await sendNotification(userprofile._id,IOS_payload,"IOS",6,payloadData)
-                    await sendNotification(userprofile._id,Android_payload,"Android",6,payloadData)
-                } 
+           
             break;
             case "NewSymptom":
                 //i case of only IOS
-                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                        //save notification in db
-                       const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:8
-                           
-                       })
-                       await notification.save()
-                       payload=NotificationMessages.NewSymptom_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
-
-                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                       //save notification in db
-                       const notification = new Notification({
+                        notification = new Notification({
                            ProfileID:userprofile._id,
                            data:payloadData,
                            action:8
@@ -1248,42 +739,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        })
                        await notification.save()
                        payload=NotificationMessages.NewSymptom_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+                       await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
 
-                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
-                       ProfileID:userprofile._id,
-                       data:payloadData,
-                       action:8
-                       
-                   })
-                   await notification.save()   
-                   const IOS_payload=NotificationMessages.NewSymptom_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-
-                   const Android_payload=NotificationMessages.NewSymptom_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                   //case of both
-                       await sendNotification(userprofile._id,IOS_payload,"IOS",8,payloadData)
-                       await sendNotification(userprofile._id,Android_payload,"Android",8,payloadData)
-                   } 
+               
                break;
             case "NewSymptomAddToMe":
                 //i case of only IOS
-                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                        //save notification in db
-                       const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:10
-                           
-                       })
-                       await notification.save()
-                       payload=NotificationMessages.NewSymptomAddedToMe_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
-
-                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                       //save notification in db
-                       const notification = new Notification({
+                        notification = new Notification({
                            ProfileID:userprofile._id,
                            data:payloadData,
                            action:10
@@ -1291,42 +754,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        })
                        await notification.save()
                        payload=NotificationMessages.NewSymptomAddedToMe_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"Android",8,payloadData)
+                       await sendNotification(userprofile._id,payload,"IOS",8,payloadData)
 
-                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
-                       ProfileID:userprofile._id,
-                       data:payloadData,
-                       action:10
-                       
-                   })
-                   await notification.save()   
-                   const IOS_payload=NotificationMessages.NewSymptomAddedToMe_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-
-                   const Android_payload=NotificationMessages.NewSymptomAddedToMe_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                   //case of both
-                       await sendNotification(userprofile._id,IOS_payload,"IOS",10,payloadData)
-                       await sendNotification(userprofile._id,Android_payload,"Android",10,payloadData)
-                   } 
+               
                break;
             case "BloodGlucoseMeasurement":
                 //i case of only IOS
-                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                        //save notification in db
-                       const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:15
-                           
-                       })
-                       await notification.save()
-                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"IOS",15,payloadData)
-
-                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                       //save notification in db
-                       const notification = new Notification({
+                        notification = new Notification({
                            ProfileID:userprofile._id,
                            data:payloadData,
                            action:15
@@ -1334,42 +769,14 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        })
                        await notification.save()
                        payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"Android",15,payloadData)
+                       await sendNotification(userprofile._id,payload,"IOS",15,payloadData)
 
-                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
-                       ProfileID:userprofile._id,
-                       data:payloadData,
-                       action:15
-                       
-                   })
-                   await notification.save()   
-                   const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-
-                   const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                   //case of both
-                       await sendNotification(userprofile._id,IOS_payload,"IOS",15,payloadData)
-                       await sendNotification(userprofile._id,Android_payload,"Android",15,payloadData)
-                   } 
+                
                break;
             case "BloodGlucoseMeasurementAddToMe":
                 //i case of only IOS
-                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                        //save notification in db
-                       const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:16
-                           
-                       })
-                       await notification.save()
-                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"IOS",16,payloadData)
-
-                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                       //save notification in db
-                       const notification = new Notification({
+                        notification = new Notification({
                            ProfileID:userprofile._id,
                            data:payloadData,
                            action:16
@@ -1377,128 +784,44 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        })
                        await notification.save()
                        payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"Android",16,payloadData)
+                       await sendNotification(userprofile._id,payload,"IOS",16,payloadData)
 
-                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
-                       ProfileID:userprofile._id,
-                       data:payloadData,
-                       action:16
-                       
-                   })
-                   await notification.save()   
-                   const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-
-                   const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_AR_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                   //case of both
-                       await sendNotification(userprofile._id,IOS_payload,"IOS",16,payloadData)
-                       await sendNotification(userprofile._id,Android_payload,"Android",16,payloadData)
-                   } 
+               
                break;
-               case "BloodPressureMeasurement":
+            case "BloodPressureMeasurement":
                 //i case of only IOS
-                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                        //save notification in db
-                       const notification = new Notification({
+                        notification = new Notification({
                            ProfileID:userprofile._id,
                            data:payloadData,
                            action:17
                            
                        })
                        await notification.save()
-                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
                        await sendNotification(userprofile._id,payload,"IOS",17,payloadData)
 
-                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                       //save notification in db
-                       const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:17
-                           
-                       })
-                       await notification.save()
-                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"Android",17,payloadData)
-
-                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
-                       ProfileID:userprofile._id,
-                       data:payloadData,
-                       action:17
-                       
-                   })
-                   await notification.save()   
-                   const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-
-                   const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                   //case of both
-                       await sendNotification(userprofile._id,IOS_payload,"IOS",17,payloadData)
-                       await sendNotification(userprofile._id,Android_payload,"Android",17,payloadData)
-                   } 
+                 
                break;
-        case "BloodPressureMeasurementAddToMe":
+            case "BloodPressureMeasurementAddToMe":
                 //i case of only IOS
-                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                        //save notification in db
-                       const notification = new Notification({
+                        notification = new Notification({
                            ProfileID:userprofile._id,
                            data:payloadData,
                            action:18
                            
                        })
                        await notification.save()
-                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
+                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
                        await sendNotification(userprofile._id,payload,"IOS",18,payloadData)
 
-                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                       //save notification in db
-                       const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:18
-                           
-                       })
-                       await notification.save()
-                       payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                       await sendNotification(userprofile._id,payload,"Android",18,payloadData)
-
-                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
-                       ProfileID:userprofile._id,
-                       data:payloadData,
-                       action:18
-                       
-                   })
-                   await notification.save()   
-                   const IOS_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_APNS(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-
-                   const Android_payload=NotificationMessages.NewMeasurementAddedByMyDependnet_EN_GCM(profile.Owner.User.firstName,payloadData.SymptomId,8,notification._id)
-                   //case of both
-                       await sendNotification(userprofile._id,IOS_payload,"IOS",18,payloadData)
-                       await sendNotification(userprofile._id,Android_payload,"Android",18,payloadData)
-                   } 
+                
                break;
-               case "GeneralNotification":
+            case "GeneralNotification":
                 //i case of only IOS
-                   if(userprofile.NotificationInfo.IOS&&!userprofile.NotificationInfo.Android){
                        //save notification in db
-                       const notification = new Notification({
-                           ProfileID:userprofile._id,
-                           data:payloadData,
-                           action:50
-                           
-                       })
-                       await notification.save()
-                       payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_ar,payloadData.body_ar,payloadData,50)
-                       await sendNotification(userprofile._id,payload,"IOS",50,payloadData)
-
-                   }else if (userprofile.NotificationInfo.Android&&!userprofile.NotificationInfo.IOS) { 
-                       //save notification in db
-                       const notification = new Notification({
+                        notification = new Notification({
                            ProfileID:userprofile._id,
                            data:payloadData,
                            action:50
@@ -1506,24 +829,9 @@ const SendPushNotificationToUserRegardlessLangAndOs=async(FromProfileObj,ToProfi
                        })
                        await notification.save()
                        payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_ar,payloadData.body_ar,payloadData,50)
-                       await sendNotification(userprofile._id,payload,"Android",50,payloadData)
+                       await sendNotification(userprofile._id,payload,"IOS",50,payloadData)
 
-                   }else if (userprofile.NotificationInfo.IOS&&userprofile.NotificationInfo.Android){
-                    //save notification in db
-                    const notification = new Notification({
-                       ProfileID:userprofile._id,
-                       data:payloadData,
-                       action:50
-                       
-                   })
-                   await notification.save()   
-                   const IOS_payload=NotificationMessages.GeneralNotification_APNS(payloadData.title_ar,payloadData.body_ar,payloadData,50)
-
-                   const Android_payload=NotificationMessages.GeneralNotification_GCM(payloadData.title_ar,payloadData.body_ar,payloadData,50)
-                   //case of both
-                       await sendNotification(userprofile._id,IOS_payload,"IOS",50,payloadData)
-                       await sendNotification(userprofile._id,Android_payload,"Android",50,payloadData)
-                   } 
+                  
                break;
                
             

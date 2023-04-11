@@ -916,7 +916,7 @@ exports.EditSingleDose=async (req, res) => {
       }
 
 
-      if(Medication.quantity-dose.PlannedDose<=0){
+      if(Medication.quantity-dose.PlannedDose<0){
         return errorResMsg(res, 400, req.t("Not_enough_medication_Stock"));
       }
 

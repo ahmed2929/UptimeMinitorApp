@@ -14,20 +14,21 @@ const mongoose =require("mongoose")
 //Connect to DB
 
 /// update permissions 
-Viewer.find({_id:mongoose.Types.ObjectId("642966e7b85357b7116c56aa")}, function(err, viewers) {
+Viewer.find().populate('ViewerProfile').populate('DependentProfile').exec(function(err, viewers) {
   if (err) {
     console.log(err);
   } else {
     viewers.forEach(function(viewer) {
+      const IsInternal=viewer.DependentProfile.MasterProfiles.includes(viewer.ViewerProfile._id)
       viewer.CanDeleteAllMeds = viewer.CanWriteMeds === true ? true : false;
       viewer.CanEditAllMeds = viewer.CanWriteMeds === true ? true : false;
       viewer.CanDeleteSymptoms = viewer.CanWriteSymptoms === true ? true : false;
       viewer.CanEditSymptoms = viewer.CanWriteSymptoms === true ? true : false;
       viewer.CanAddSymptoms = viewer.CanWriteSymptoms === true ? true : false;
-      viewer.CanSuspendDoses = true;
+      viewer.CanSuspendDoses = IsInternal;
       viewer.CanAddNewDose = viewer.CanWriteDoses === true ? true : false;
       viewer.CanEditDoses = viewer.CanWriteDoses === true ? true : false;
-      viewer.CanChangeDoseStatus = viewer.CanWriteDoses === true ? true : false;
+      viewer.CanChangeDoseStatus = IsInternal//viewer.CanWriteDoses === true ? true : false;
       viewer.CanShareAllMeds = false;
       viewer.CanShareAllSymptoms = false;
       viewer.CanShareAllDoses = false;
@@ -44,6 +45,12 @@ Viewer.find({_id:mongoose.Types.ObjectId("642966e7b85357b7116c56aa")}, function(
           }
           viewer.CanReadSpacificMeds[i].CanShareMedInfo=false
           viewer.CanReadSpacificMeds[i].CanShareDosesInfo=false
+          //doses
+          viewer.CanReadSpacificMeds[i].CanChangeDoseStatus=IsInternal
+          viewer.CanReadSpacificMeds[i].CanEditDoses=IsInternal
+          viewer.CanReadSpacificMeds[i].CanAddNewDose=true
+          viewer.CanReadSpacificMeds[i].CanSuspendDoses=IsInternal
+          
          
         }
       
@@ -57,9 +64,10 @@ Viewer.find({_id:mongoose.Types.ObjectId("642966e7b85357b7116c56aa")}, function(
   }
 });
 
+
 // update notification
 
-Viewer.find({_id:mongoose.Types.ObjectId("642966e7b85357b7116c56aa")}, function(err, viewers) {
+Viewer.find({}, function(err, viewers) {
   if (err) {
     console.log(err);
   } else {

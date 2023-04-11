@@ -12,49 +12,48 @@ var ViewerSchema = new Schema({
     },
     CanWriteMeds:{
         type:Boolean,
-        default:true,
     },
     //permissions
 
     //Medication
     CanDeleteAllMeds:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanEditAllMeds:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanReadAllMeds:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanAddMeds:{
         type:Boolean,
-        default:true,
+        default:false,
     },
 
     //Symptom
 
      CanWriteSymptoms:{
         type:Boolean,
-        default:true,
+   
     },
     CanReadSymptoms:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanDeleteSymptoms:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanEditSymptoms:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanAddSymptoms:{
         type:Boolean,
-        default:true,
+        default:false,
     },
    /////////////Doses////////////
  
@@ -69,19 +68,19 @@ var ViewerSchema = new Schema({
     },
     CanReadDoses:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanAddNewDose:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanEditDoses:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanChangeDoseStatus:{
         type:Boolean,
-        default:true,
+        default:false,
     },
 
 
@@ -112,35 +111,35 @@ var ViewerSchema = new Schema({
     // Measurements permissions
     CanReadBloodGlucoseMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanEditBloodGlucoseMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanDeleteBloodGlucoseMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanAddBloodGlucoseMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanReadBloodPressureMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanEditBloodPressureMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanDeleteBloodPressureMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
     CanAddBloodPressureMeasurement:{
         type:Boolean,
-        default:true,
+        default:false,
     },
 
     CanReadSpacificMeds:[{
@@ -184,7 +183,7 @@ var ViewerSchema = new Schema({
         },
         CanChangeDoseStatus:{
             type:Boolean,
-            default:true,
+            default:false,
         },
 
         CanReadDoses:{

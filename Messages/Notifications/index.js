@@ -196,6 +196,24 @@ exports.NewSymptomAddedToMe_EN_GCM=(patientName,NewSymptomID,NotificationActionT
     }
     }
 }
+
+exports.NewSymptomAddedToMe_AR_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+    return {
+        "notification":{
+           
+            "title": `أضاف مقدم الرعاية لك أعراضًا جديدة`,
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`,
+            "sound": "default",
+        },
+        "data":{
+            "SymptomID": `${NewSymptomID}`,
+            "NotificationActionType":`${NotificationActionType}`,
+            "NotificationID":`${NotificationID}`
+        
+    }
+    }
+}
+
 exports.NewSymptom_AR_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
     return {
         "notification":{
@@ -448,13 +466,13 @@ exports.NewSymptom_AR_APNS=(patientName,NewSymptomID,NotificationActionType,Noti
 }
 
 
-exports.NewSymptomAddedToMe_EN_APNS=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
+exports.NewSymptomAddedToMe_AR_GCM=(patientName,NewSymptomID,NotificationActionType,NotificationID)=>{
     return {
         "aps":{
             "alert":{
                  
-            "title": `Your caregiver added a new symptom to you`,
-            "body": `Please open Voithy to view the details`
+            "title": `أضاف مقدم الرعاية لك أعراضًا جديدة`,
+            "body": `الرجاء فتح فويثي لعرض التفاصيل`
             },
             "sound": "default",
             "data":{
