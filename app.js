@@ -18,9 +18,4 @@ app.listen(port,()=>{
    
     
 })
-// sendNotification('63f611cc52720e10a0fae03b',message.NewMeasurementAddedByMyDependnet_AR_GCM(),'android')
-// .then(()=>{
-//     console.log("done")
-// }).catch(()=>{
-//     console.log("error")
-// })
+

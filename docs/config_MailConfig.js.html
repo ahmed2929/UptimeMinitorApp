@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>HelperFunctions - Documentation</title>
+    <title>config/MailConfig.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -37,403 +37,35 @@
 
 <div id="main">
     
-    <h1 class="page-title">HelperFunctions</h1>
+    <h1 class="page-title">config/MailConfig.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
-    
-        <h2>
-        
-            Namespace
-        
-        </h2>
-        
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
-        
-            
-
-
-    
-
-    <h4 class="name" id="HelperFunctions">HelperFunctions</h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>HelperFunctions.js</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_HelperFunctions.js.html">utils/HelperFunctions.js</a>, <a href="utils_HelperFunctions.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        </div>
-    
-
-    
-
-    
-
-    
-    
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".GenerateRefreshToken"><span class="type-signature type-signature-static">(static) </span>GenerateRefreshToken<span class="signature">(token)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><ul>
-<li>-1 user access this api to create a dependent who has no phone
--2 email and phone number are optional
--3 if email and phone number are provided make sure that the are unique
--4 link the new dependent to the user profile
--5 user can confirm or reject dependent doses
--6 user has full permissions to mange the dependent
--7 (read/write) medications,schedule,doses and get notifications
--8 create a new profile to that dependent</li>
-</ul></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_HelperFunctions.js.html">utils/HelperFunctions.js</a>, <a href="utils_HelperFunctions.js.html#line56">line 56</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>token</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><ul>
-<li></li>
-</ul></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-throws">Throws:</h5>
-<ul>
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the user does not have a profile</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the user is not the owner of the profile</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the email or mobile number already exist</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    </ul>
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <ul>
-<li>Returns the new dependent user</li>
-</ul>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-
     
-</article>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const nodemailer = require('nodemailer');
+const { EmailClient } = require("@azure/communication-email");
+/**
+ * Import the EmailClient class from the @azure/communication-email package.
+ *
+ */
 
-</section>
+/**
+ * Create a new instance of the EmailClient class using a connection string stored in an environment variable.
+ * 
+ */
+const client = new EmailClient(process.env.COMMUNICATION_SERVICES_CONNECTION_STRING);
+/**
+ * Export the new instance of the EmailClient class as a module.
+ * 
+ */
+module.exports = client;</code></pre>
+        </article>
+    </section>
 
 
 

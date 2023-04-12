@@ -5,86 +5,13 @@ const Notification = require('../DB/Schema/Notifications')
 const FCM = require('fcm-node')
 const serverKey = process.env.FIREBASE_SERVERKEY
 const Profile =require('../DB/Schema/Profile')
-// const admin = require('firebase-admin');
 
-// admin.initializeApp({
-//   credential: admin.credential.applicationDefault(),
-//   databaseURL: 'https://<DATABASE_NAME>.firebaseio.com'
-// });
-
-
-// const sendNotification= async(profileId, message,pns)=>{
-//   console.log("sendNotification",profileId,message,pns);
-//     // pns is device os
-//     profileId=profileId.toString()
-//     console.log("sendNotification",profileId,message,pns);
-
- 
-
-
-
-
-//   // Create a NotificationHubClient
-  
-//   const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
-
-//   // // Build the iOS payload
-//   // const iosPayload = {
-//   //   apns: {
-//   //       aps: {
-//   //           alert: message
-//   //       }
-//   //   }
-//   // };
-
-//   // // Build the Android payload
-//   // const androidPayload = {
-//   //   gcm: {
-//   //       notification: {
-//   //           title: message
-//   //       }
-//   //   }
-//   // };
-//   return new Promise((resolve,reject)=>{
-//     console.log("send notification runs")
-//     const tag = profileId;
-
-//     if(pns==="IOS"){
-    
-//       notificationHubService.apns.send(tag,message, (error,result)=>{
-//         if(!error){
-//         console.log(`iOS Notification sent to ${result} devices`);
-//         resolve(result);
-//         }
-//         else{
-//           console.log(error);
-//           reject(error);
-//         }
-//       });
-//     }else if(pns==="Android"){
-//       console.log("Android tag",tag)
-//       notificationHubService.gcm.send(tag,message,(error,result)=>{
-//         if(!error){
-//         console.log("result",result)
-          
-//         console.log(`Android Notification sent to ${result.targetCount} devices`);
-//         resolve(result);
-//         }
-//         else{
-//           console.log(error);
-//           reject(error);
-//         }
-//       });
-//     }else{
-//         resolve("no device os found")
-//     }
-//   })
-  
-  
-// }
-/************************************** */
-
-const sendNotification= async(profileId, NotificationMessage,pns)=>{
+/**
+ * Sends a notification to a user's device.
+ * @param {string} profileId - The ID of the user's profile.
+ * @param {object} NotificationMessage - The message to send as a notification.
+ */
+const sendNotification= async(profileId, NotificationMessage)=>{
   const fcm =new FCM(serverKey)
   const profile = await Profile.findById(profileId)
   //loop to send notification to all tokens
@@ -114,7 +41,14 @@ const sendNotification= async(profileId, NotificationMessage,pns)=>{
   
 }
 
-/************************************** */
+/**
+ * Registers an Android device with a profile ID.
+ * @deprecated This function is deprecated and should not be used (Only used with azure Notification).
+ * @param {string} profileId - The ID of the user's profile.
+ * @param {string} deviceToken - The token of the Android device to register.
+ * @returns {Promise} A promise that resolves when the device is registered.
+ */
+
 const RegisterAndroidDevice= async (profileId, deviceToken)=>{
   // Create a NotificationHubClient
   const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
@@ -134,6 +68,14 @@ const RegisterAndroidDevice= async (profileId, deviceToken)=>{
       })
   })
 }
+
+/**
+ * Registers an iOS device with a profile ID.
+ * @deprecated This function is deprecated and should not be used (Only used with azure Notification).
+ * @param {string} profileId - The ID of the user's profile.
+ * @param {string} deviceToken - The token of the iOS device to register.
+ * @returns {Promise} A promise that resolves when the device is registered.
+ */
 
   const RegisterIOSDevice= async (profileId, deviceToken)=>{
     // Create a NotificationHubClient
@@ -156,6 +98,15 @@ const RegisterAndroidDevice= async (profileId, deviceToken)=>{
   })
  
   }
+
+
+  /**
+ * @deprecated This function is deprecated and should not be used.
+ * Deletes a registration with the specified ID and tag.
+ * @param {string} registrationId - The ID of the registration to delete.
+ * @param {string} tag - The tag of the registration to delete.
+ * @returns {Promise} A promise that resolves when the registration is deleted.
+ */
 
   const DeleteRegistration= async (registrationId, tag)=>{
     // Create a NotificationHubClient

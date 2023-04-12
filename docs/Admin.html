@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Report - Documentation</title>
+    <title>Admin - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -37,7 +37,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Report</h1>
+    <h1 class="page-title">Admin</h1>
     
 
     
@@ -67,7 +67,7 @@
 
     
 
-    <h4 class="name" id="Report">Report</h4>
+    <h4 class="name" id="Admin">Admin</h4>
 
     
 
@@ -76,14 +76,11 @@
 
 <dl class="details">
     
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>controller/general/index.js</p></li></ul></dd>
-    
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Controller_Users_Reports_index.js.html">Controller/Users/Reports/index.js</a>, <a href="Controller_Users_Reports_index.js.html#line1">line 1</a>
+        <a href="Controller_Admin_general_index.js.html">Controller/Admin/general/index.js</a>, <a href="Controller_Admin_general_index.js.html#line1">line 1</a>
     </li></ul></dd>
     
 
@@ -173,7 +170,7 @@
 
     
 
-    <h4 class="name" id=".exports.getReport"><span class="type-signature type-signature-static">(static) </span>exports.getReport<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id=".Statics"><span class="type-signature type-signature-async, static">(async, static) </span>Statics<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
 
     
 
@@ -183,25 +180,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><ul>
-<li>get the doses which the user has permission to view</li>
-<li>group it with the med
--each med should have
-{
-&quot;confirmed&quot;: ,
-&quot;rejected&quot;: ,
-&quot;ignored&quot;: ,
-&quot;other&quot;: ,
-&quot;total&quot;:
-}
--return the data</li>
-</ul></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>this function is used to get user Statics</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Controller_Users_Reports_index.js.html">Controller/Users/Reports/index.js</a>, <a href="Controller_Users_Reports_index.js.html#line78">line 78</a>
+        <a href="Controller_Admin_general_index.js.html">Controller/Admin/general/index.js</a>, <a href="Controller_Admin_general_index.js.html#line319">line 319</a>
     </li></ul></dd>
     
 
@@ -290,179 +275,7 @@
 
             
 
-            <td class="description last"><p>Express request object</p>
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>user id extracted from authorization header</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>body</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>request body</p>
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>StartDate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>start date in ms</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>EndDate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>EndDate date in ms</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ProfileID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>ProfileID</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><p>Express request object</p></td>
         </tr>
 
     
@@ -506,64 +319,6 @@
 
 
 
-<h5 class="h5-throws">Throws:</h5>
-<ul>
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the user does not have a profile</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the user is not the owner of the profile or has a permission</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    </ul>
 
 
 <h5 class="h5-returns">Returns:</h5>
@@ -571,22 +326,7 @@
         
 <div class="param-desc">
     <ul>
-<li>
-<p>return generated report {</p>
-<pre><code>          &quot;med&quot;: {
-              &quot;_id&quot;: &quot;&quot;,
-              &quot;name&quot;: &quot;&quot;,
-              &quot;strength&quot;: ,
-              &quot;unit&quot;: &quot;&quot;
-          },
-          &quot;confirmed&quot;: ,
-          &quot;rejected&quot;: ,
-          &quot;ignored&quot;:,
-          &quot;other&quot;: ,
-          &quot;total&quot;: 
-      }
-</code></pre>
-</li>
+<li>Returns an object containing statistics</li>
 </ul>
 </div>
 
@@ -614,7 +354,7 @@
 
     
 
-    <h4 class="name" id=".exports.getReportSingleMed"><span class="type-signature type-signature-static">(static) </span>exports.getReportSingleMed<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id=".exports.AddMedRecommendation"><span class="type-signature type-signature-static">(static) </span>exports.AddMedRecommendation<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
@@ -624,14 +364,16 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>check if the user has permission to view this med does
-return med doses</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>Adds meds to the database from UAE drugs excel file exports.</p>
+<ul>
+<li>@memberof Admin</li>
+</ul></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Controller_Users_Reports_index.js.html">Controller/Users/Reports/index.js</a>, <a href="Controller_Users_Reports_index.js.html#line455">line 455</a>
+        <a href="Controller_Admin_general_index.js.html">Controller/Admin/general/index.js</a>, <a href="Controller_Admin_general_index.js.html#line43">line 43</a>
     </li></ul></dd>
     
 
@@ -720,203 +462,7 @@ return med doses</p></li></ul></dd>
 
             
 
-            <td class="description last"><p>Express request object</p>
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>user id extracted from authorization header</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>body</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>request body</p>
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>StartDate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>start date in ms</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>EndDate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>EndDate date in ms</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>ProfileID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>ProfileID</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>MedID</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>MedID</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"><p>The request object.</p></td>
         </tr>
 
     
@@ -940,7 +486,562 @@ return med doses</p></li></ul></dd>
 
             
 
-            <td class="description last"><p>Express response object</p></td>
+            <td class="description last"><p>The response object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves when the meds are added to the database.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.AddMedRecommendationUS"><span class="type-signature type-signature-static">(static) </span>exports.AddMedRecommendationUS<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Adds meds to the database from US drugs excel file exports.</p>
+<ul>
+<li>@memberof Admin</li>
+</ul></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Admin_general_index.js.html">Controller/Admin/general/index.js</a>, <a href="Controller_Admin_general_index.js.html#line123">line 123</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The request object.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The response object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves when the meds are added to the database.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.GenerateApiKeysAndSecrets"><span class="type-signature type-signature-static">(static) </span>exports.GenerateApiKeysAndSecrets<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Generates new access keys and secrets.</p>
+<ul>
+<li>@memberof Admin</li>
+</ul></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Admin_general_index.js.html">Controller/Admin/general/index.js</a>, <a href="Controller_Admin_general_index.js.html#line198">line 198</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The request object.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The response object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves when new access keys and secrets are generated.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.GetFeedBacks"><span class="type-signature type-signature-async, static">(async, static) </span>exports.GetFeedBacks<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Get feedbacks from the database.</p>
+<ul>
+<li>@memberof Admin</li>
+</ul></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Admin_general_index.js.html">Controller/Admin/general/index.js</a>, <a href="Controller_Admin_general_index.js.html#line235">line 235</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express request object.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express response object.</p></td>
         </tr>
 
     
@@ -961,13 +1062,13 @@ return med doses</p></li></ul></dd>
 
 
 <h5 class="h5-throws">Throws:</h5>
-<ul>
-        <li>
+
+        
 
 <dl>
     <dt>
         <div class="param-desc usertext">
-        <p>if the user does not have a profile</p>
+        <p>Returns an error object containing error status and message.</p>
         </div>
     </dt>
     <dd></dd>
@@ -978,7 +1079,7 @@ return med doses</p></li></ul></dd>
             </dt>
             <dd>
                 
-<span class="param-type">Error</span>
+<span class="param-type">Object</span>
 
 
 
@@ -988,45 +1089,227 @@ return med doses</p></li></ul></dd>
     <dd></dd>
 </dl>
 
-</li>
+
     
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the user is not the owner of the profile or has a permission</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    </ul>
 
 
 <h5 class="h5-returns">Returns:</h5>
 
         
 <div class="param-desc">
-    <ul>
-<li>return the doses for that med</li>
-</ul>
+    <p>Returns an object containing total number of feedbacks and feedbacks data.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".exports.SendNotificationToAllUsers"><span class="type-signature type-signature-async, static">(async, static) </span>exports.SendNotificationToAllUsers<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Send push notification to all users regardless of their language and operating system.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Controller_Admin_general_index.js.html">Controller/Admin/general/index.js</a>, <a href="Controller_Admin_general_index.js.html#line285">line 285</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express request object.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Express response object.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-throws">Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>Returns an error object containing error status and message.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Object</span>
+
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Returns an object containing a success message if the notification was sent successfully.</p>
 </div>
 
 

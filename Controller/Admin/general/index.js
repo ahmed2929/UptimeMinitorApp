@@ -1,3 +1,11 @@
+/**
+ * 
+ * @namespace controllers
+ * @namespace Admin
+ * 
+ */
+
+
 const MedRecommendation = require("../../../DB/Schema/MedRecommendation");
 const MedRecommendationUS = require("../../../DB/Schema/MedRecommendationUs");
 const fs  =require("fs");
@@ -23,9 +31,15 @@ const {
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 
+/**
+ * Adds meds to the database from UAE drugs excel file exports.
+ * * @memberof Admin
+ * @memberof Admin
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise} A promise that resolves when the meds are added to the database.
+ */
 
-
-// add medRecommendation
 exports.AddMedRecommendation = async (req, res) => {
   try {
             // Convert the buffer to a typed array
@@ -98,6 +112,14 @@ exports.AddMedRecommendation = async (req, res) => {
   }
 };
 
+/**
+ * Adds meds to the database from US drugs excel file exports.
+ * * @memberof Admin
+ * @memberof Admin
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise} A promise that resolves when the meds are added to the database.
+ */
 exports.AddMedRecommendationUS = async (req, res) => {
   try {
             // Convert the buffer to a typed array
@@ -165,6 +187,14 @@ exports.AddMedRecommendationUS = async (req, res) => {
   }
 };
 
+/**
+ * Generates new access keys and secrets.
+ * * @memberof Admin
+ * @memberof Admin
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise} A promise that resolves when new access keys and secrets are generated.
+ */
 exports.GenerateApiKeysAndSecrets = async (req, res) => {
   try {
     const { NickName } = req.body;
@@ -191,7 +221,17 @@ exports.GenerateApiKeysAndSecrets = async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
-
+/**
+ * Get feedbacks from the database.
+ * * @memberof Admin
+ * @memberof Admin
+ * @async
+ * @function
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} Returns an object containing total number of feedbacks and feedbacks data.
+ * @throws {Object} Returns an error object containing error status and message.
+ */
 exports.GetFeedBacks = async (req, res) => {
  
   try {
@@ -231,7 +271,17 @@ exports.GetFeedBacks = async (req, res) => {
   }
 };
 
-// send notifications to all users
+/**
+ * Send push notification to all users regardless of their language and operating system.
+ * @memberof Admin
+ * @memberof Admin
+ * @async
+ * @function
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} Returns an object containing a success message if the notification was sent successfully.
+ * @throws {Object} Returns an error object containing error status and message.
+ */
 exports.SendNotificationToAllUsers = async (req, res) => {
   try {
 
@@ -266,6 +316,16 @@ exports.SendNotificationToAllUsers = async (req, res) => {
    }
 }
 
+/**
+ * this function is used to get user Statics
+ * @memberof Admin
+ * @memberof Admin
+ * @function Statics
+ * @async
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - Returns an object containing statistics
+ */
 
 exports.Statics = async (req, res) => {
  

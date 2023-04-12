@@ -1,17 +1,17 @@
 const nodemailer = require('nodemailer');
 const { EmailClient } = require("@azure/communication-email");
-//initializing variables for mail sending authentication
-// const GMAIL_USER = process.env.GMAIL_USER;
-// const GMAIL_PASS = process.env.pass;
-// const transporter = nodemailer.createTransport({
-// 	service: 'gmail', 
-//     host:'smtp.gmail.com',
-// 	secure:false,
-// 	auth:{
-// 		user:GMAIL_USER,
-// 		pass:GMAIL_PASS
-// 	}
-	
-// })
+/**
+ * Import the EmailClient class from the @azure/communication-email package.
+ *
+ */
+
+/**
+ * Create a new instance of the EmailClient class using a connection string stored in an environment variable.
+ * 
+ */
 const client = new EmailClient(process.env.COMMUNICATION_SERVICES_CONNECTION_STRING);
+/**
+ * Export the new instance of the EmailClient class as a module.
+ * 
+ */
 module.exports = client;

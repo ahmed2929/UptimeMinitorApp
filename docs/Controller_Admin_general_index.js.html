@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Controller/Users/general/index.js - Documentation</title>
+    <title>Controller/Admin/general/index.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -37,7 +37,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Controller/Users/general/index.js</h1>
+    <h1 class="page-title">Controller/Admin/general/index.js</h1>
     
 
     
@@ -47,168 +47,267 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>
-/**
- * @file controller/general/index.js
+            <pre class="prettyprint source linenums"><code>/**
+ * 
  * @namespace controllers
- * @namespace general
+ * @namespace Admin
  * 
  */
-const bcrypt = require("bcryptjs");
-const User = require("../../../DB/Schema/User");
+
+
 const MedRecommendation = require("../../../DB/Schema/MedRecommendation");
-const NotificationSchema = require("../../../DB/Schema/Notifications");
-const Profile = require("../../../DB/Schema/Profile");
-const {UploadFileToAzureBlob}=require("../../../utils/HelperFunctions")
-const axios = require('axios');
+const MedRecommendationUS = require("../../../DB/Schema/MedRecommendationUs");
+const fs  =require("fs");
+const xlsx =require("xlsx")
+const Access = require("../../../DB/Schema/apiAccess");
+const crypto = require('crypto');
+const FeedBack =require("../../../DB/Schema/Feedback")
+const Profile =require("../../../DB/Schema/Profile")
+const User =require("../../../DB/Schema/User")
+const Notification =require("../../../DB/Schema/Notifications")
+const {SendPushNotificationToUserRegardlessLangAndOs} =require("../../../utils/HelperFunctions")
+const Link = require("../../../DB/Schema/Link");
+const Symptom = require("../../../DB/Schema/Symptoms");
+const Medication = require("../../../DB/Schema/UserMedication");
+const Dose = require("../../../DB/Schema/Occurrences");
+const Notifications =require("../../../DB/Schema/Notifications")
+const BloodPressure = require("../../../DB/Schema/BloodPressureManualMeasurement");
+const BloodGlucose = require("../../../DB/Schema/BloodGlucoseManualMeasurement");
+const mongoose = require("mongoose");
+
 const {
   successResMsg,
   errorResMsg
 } = require("../../../utils/ResponseHelpers");
 
-
-
-function escapeRegex(text) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&amp;");
-};
-
-// change user lang
-exports.ChangeUserDefaultLang = async (req, res) => {
- 
-  try {
-
-    const {lang}=req.body
-    const {id} =req.id
-    // get user with email
-    const user = await User.findById(id);
-    if (!user) {
-      return errorResMsg(res, 404, req.t("user_not_found"));
-    }
-    // get user profile
-    const profile = await Profile.findById(user.profile);
-    user.lang=lang;
-    profile.lang=lang;
-    await profile.save()
-    await user.save()
-
-    // return successful response
-    return successResMsg(res, 200, {message:req.t("lang_has_changed")});
-  } catch (err) {
-    // return error response
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-exports.SearchForMed = async (req, res) => {
- 
-  try {
-
-    let results=[];
-    if (req.query.name) {
-     
-      // autocomplete search ?
-
-      const regex = new RegExp(escapeRegex(req.query.name), 'i');
-      results = await MedRecommendation.find({
-        $or:[{PackageName:regex},{GenericName:regex}]
-       
-        
-      }).limit(5);
-    } 
-    // return successful response
-    return successResMsg(res, 200, {data:results});
-  } catch (err) {
-    // return error response
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-
-
- /**
- * getNotifications
- * 
- * @function
- * @memberof controllers
- * @memberof Notification
- * @param {Object} req - Express request object
- * @param {Object} req.id - user id extracted from authorization header
- * @param {Object} req.body - request body
- * @param {string} req.query.ProfileID - Profile ID of the user
- * @param {number} req.query.page - number of the page (pagination logic)
- * 
- * @throws {Error} if the user does not have a profile
- * @throws {Error} if the user is not the owner of the profile  
- * 
- * 
- * @returns {Object} - Returns notifications from latest to oldest
- * @description 
- *     Returns notifications from latest to oldest
-     * ********************************
-     * logic
-         Returns notifications from latest to oldest with Pagination
-     * 
-     * 
-       
- * 
+/**
+ * Adds meds to the database from UAE drugs excel file exports.
+ * * @memberof Admin
+ * @memberof Admin
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise} A promise that resolves when the meds are added to the database.
  */
 
+exports.AddMedRecommendation = async (req, res) => {
+  try {
+            // Convert the buffer to a typed array
+        const buffer = Buffer.from(req.file.buffer);
+        const typedArray = new Uint8Array(buffer);
+
+        const file = xlsx.read(typedArray, { type: 'array', cellDates: true });
+
+
+    const ws = file.Sheets["Drugs"]
   
+     const medJsonObject=xlsx.utils.sheet_to_json(ws)
+      // Initialize the Ordered Batch
+    // You can use initializeUnorderedBulkOp to initialize Unordered Batch
+    console.log(medJsonObject[0])
+    const col = MedRecommendation.collection;
+
+    var batch = col.initializeUnorderedBulkOp();
 
 
-exports.Notification = async (req, res) => {
+    for(let Med of medJsonObject){
+            var newMedObj={
+                DrugCode:Med['Drug Code'],
+                GreenrainCode:Med['Greenrain Code'],
+                PackageName:Med['Package Name'],
+                GenericCode:Med['Generic Code'],
+                GenericName:Med['Generic Name'],
+                strength:Med['Strength'],
+                DosageForm:Med['Dosage Form'],
+                PackageSize:Med['Package Size'],
+                DispenseMode:Med['Dispense Mode'],
+                PackagePriceToPublic:Med['Package Price to Public'],
+                PackagePriceToPhamacy:Med['Package Price to Pharmacy'],
+                UnitPriceToPublic:Med['Unit Price to Public'],
+                UnitPriceToPharmacy:Med['Unit Price to Pharmacy'],
+                status:Med['Status'],
+                DeleteEffectiveDate:Med['Delete Effective Date'],
+                LastChangeDate:Med['Last Change Date'],
+                AgentName:Med['Agent Name'],
+                ManufacturerName:Med['Manufacturer Name'],
+
+
+                  }
+            batch.insert(newMedObj);
+
+
+
+        
+    }
+
+    console.log("delete old meds db started")
+
+    const result=await MedRecommendation.deleteMany( { } );
+
+    console.log("delete old meds db ended")
+
+    // Execute the Ordered Batch
+    console.log("batch started")
+    const resultt=await batch.execute();
+    console.log(resultt)
+    //delete file
+
+    fs.unlinkSync(req.file.path);
+    // return successful response
+    return successResMsg(res, 200, {message:req.t("Med_Recommendation_List_Has_Been_Created")});
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+/**
+ * Adds meds to the database from US drugs excel file exports.
+ * * @memberof Admin
+ * @memberof Admin
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise} A promise that resolves when the meds are added to the database.
+ */
+exports.AddMedRecommendationUS = async (req, res) => {
+  try {
+            // Convert the buffer to a typed array
+        const buffer = Buffer.from(req.file.buffer);
+        const typedArray = new Uint8Array(buffer);
+
+        const file = xlsx.read(typedArray, { type: 'array', cellDates: true });
+
+
+    const ws = file.Sheets["Sheet1"]
+  
+     const medJsonObject=xlsx.utils.sheet_to_json(ws)
+      // Initialize the Ordered Batch
+    // You can use initializeUnorderedBulkOp to initialize Unordered Batch
+    console.log(medJsonObject[0])
+    const col = MedRecommendationUS.collection;
+
+    var batch = col.initializeUnorderedBulkOp();
+
+
+    for(let Med of medJsonObject){
+      console.log("MEd",Med)
+            var newMedObj={
+              RXCUI:Med['1'],
+              LAT:Med['2'],
+              RXAUI:Med['8'],
+              SAUI:Med['9'],
+              SCUI:Med['10'],
+              SAB:Med['12'],
+              TTY:Med['13'],
+              CODE:Med['14'],
+              STR:Med['15'],
+              SRL:Med['16'],
+              SUPPRESS:Med['17'],
+              
+
+
+                  }
+            batch.insert(newMedObj);
+
+
+
+        
+    }
+
+    console.log("delete old meds db started")
+
+    //const result=await MedRecommendation.deleteMany( { } );
+
+    console.log("delete old meds db ended")
+
+    // Execute the Ordered Batch
+    console.log("batch started")
+    const resultt=await batch.execute();
+    console.log(resultt)
+    //delete file
+
+    fs.unlinkSync(req.file.path);
+    // return successful response
+    return successResMsg(res, 200, {message:req.t("Med_Recommendation_List_Has_Been_Created")});
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+
+/**
+ * Generates new access keys and secrets.
+ * * @memberof Admin
+ * @memberof Admin
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise} A promise that resolves when new access keys and secrets are generated.
+ */
+exports.GenerateApiKeysAndSecrets = async (req, res) => {
+  try {
+    const { NickName } = req.body;
+    const token = crypto.randomBytes(64).toString('hex');
+
+    const newAccess = new Access({
+      NickName,
+      Secret:token
+    });
+
+    const savedAccess = await newAccess.save();
+
+    const Response={
+      secret:savedAccess.Secret,
+      NickName:savedAccess.NickName,
+      Key:savedAccess._id
+    }
+
+    // return successful response
+    return successResMsg(res, 200, Response);
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
+/**
+ * Get feedbacks from the database.
+ * * @memberof Admin
+ * @memberof Admin
+ * @async
+ * @function
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} Returns an object containing total number of feedbacks and feedbacks data.
+ * @throws {Object} Returns an error object containing error status and message.
+ */
+exports.GetFeedBacks = async (req, res) => {
  
   try {
 
-    const {id} =req.id
-    const {ProfileID}=req.query
+   // const {id} =req.id
     const page=req.query.page||1
     const itemPerPage = 10 ;
     let totalItems;
    
 
 
-    const profile =await Profile.findById(ProfileID)
-    if(!profile){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Deleted){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
+        totalItems = await FeedBack.find().countDocuments();
     
-    if(profile.Owner.User._id.toString()!==id){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-
-   
-
-    
-        totalItems = await NotificationSchema.find({
-          ProfileID:ProfileID,
-          isDeleted:false
- 
-          }).countDocuments();
-          const totalNumberOfUnseen = await NotificationSchema.find({
-            ProfileID:ProfileID,
-            isDeleted:false,
-            Seen:false
-            }).countDocuments();
-          const notifications = await NotificationSchema.find({
-            ProfileID:ProfileID,
-            isDeleted:false
-          
-
-          })
+          const feedbacks = await FeedBack.find()
             .sort({createdAt: -1})
             .skip((page - 1) * itemPerPage)
-            .limit(itemPerPage);
+            .limit(itemPerPage)
+            .populate({
+              path: "User",
+              select: "firstName lastName email"
+
+            })
+           
          
            const results= {
                 total:totalItems,
-                unSeen:totalNumberOfUnseen,
-                notifications
+                feedbacks
               }
     
     // return successful response
@@ -221,275 +320,117 @@ exports.Notification = async (req, res) => {
   }
 };
 
-
-
-exports.ClearNotifications = async (req, res) => {
- 
-  try {
-
-    const {id} =req.id
-    const {ProfileID,StartDate,EndDate,Seen}=req.body
-   
-
-
-    const profile =await Profile.findById(ProfileID)
-    if(!profile){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Deleted){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Owner.User._id.toString()!==id){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-    if(StartDate&amp;&amp;EndDate){
-      await NotificationSchema.updateMany({
-        ProfileID: ProfileID,
-        createdAt: { $gte: new Date(+StartDate), $lte: new Date(+EndDate) },
-        Seen:  Seen || {$exists:true} // if Seen is not provided, this condition will be ignored
-      }, {
-        $set: { isDeleted: true }
-      });
-    }else{
-
-      await NotificationSchema.updateMany({
-        ProfileID: ProfileID,
-        Seen: Seen || {$exists:true}// if Seen is not provided, this condition will be ignored
-      }, {
-        $set: { isDeleted: true }
-      });
-
-
-    }
-   
-    //soft delete notifications
-    //await NotificationSchema.updateMany({ProfileID:ProfileID},{$set:{isDeleted:true}})
-       
-    return successResMsg(res, 200, {message:req.t("Notification_Cleared")});
-  } catch (err) {
-    // return error response
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-exports.ClearSingleNotification = async (req, res) => {
- 
-  try {
-
-    const {id} =req.id
-    const {ProfileID,NotificationID}=req.body
-   
-
-
-    const profile =await Profile.findById(ProfileID)
-    if(!profile){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Deleted){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Owner.User._id.toString()!==id){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-    // update notification seen status
-    const notification =await NotificationSchema.findById(NotificationID)
-    if(!notification||notification.isDeleted){
-      return errorResMsg(res, 400, req.t("Notification_not_found"));
-    }
-    if(notification.ProfileID.toString()!=ProfileID.toString()){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-    notification.isDeleted=true;
-    await notification.save()
-       
-    return successResMsg(res, 200, {message:req.t("Notification_Cleared")});
-  } catch (err) {
-    // return error response
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-exports.ClearMultiNotification = async (req, res) => {
- 
-  try {
-
-    const {id} =req.id
-    const {ProfileID,NotificationIDs}=req.body
-   
-
-
-    const profile =await Profile.findById(ProfileID)
-    if(!profile){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Deleted){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Owner.User._id.toString()!==id){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-    // update notification 
-    const notifications =await NotificationSchema.updateMany({
-      _id:{$in:NotificationIDs},
-    },
-    {
-      $set:{isDeleted:true}
-    })
-   
-    return successResMsg(res, 200, {message:req.t("Notification_Cleared")});
-  } catch (err) {
-    // return error response
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-
 /**
- * make notification as seen 
- * 
+ * Send push notification to all users regardless of their language and operating system.
+ * @memberof Admin
+ * @memberof Admin
+ * @async
  * @function
- * @memberof controllers
- * @memberof Notification
- * @param {Object} req - Express request object
- * @param {Object} req.id - user id extracted from authorization header
- * @param {Object} req.body - request body
- * @param {string} req.query.ProfileID - Profile ID of the user
- * @param {number} req.body.NotificationID - number of the page (pagination logic)
- * 
- * @throws {Error} if the user does not have a profile
- * @throws {Error} if the user is not the owner of the profile  
- * 
- * 
- * @returns {Object} - Returns success message
- * @description 
- *     get the notification and make Seen value to true
-       
- * 
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} Returns an object containing a success message if the notification was sent successfully.
+ * @throws {Object} Returns an error object containing error status and message.
  */
+exports.SendNotificationToAllUsers = async (req, res) => {
+  try {
 
+    const {title_ar,body_ar,title_en,body_en,data} =req.body
+    const profiles =await Profile.find({}).populate("Owner.User")
+    const clonedData=JSON.parse(JSON.stringify(data))
+    for await (let profile of profiles) {
 
+      await SendPushNotificationToUserRegardlessLangAndOs(profile,profile,"GeneralNotification",{
+        Data:clonedData,
+        title_ar,
+        body_ar,
+        title_en,
+        body_en
+      
+      })
 
-exports.MakeNotificationSeen = async (req, res) => {
+    }
+
+    // return successful response
+    return successResMsg(res, 200, {message:req.t("Notification_Sent_Successfully")});
+
  
-  try {
-
-    const {id} =req.id
-    const {ProfileID,NotificationID}=req.body
-   
-
-
-    const profile =await Profile.findById(ProfileID)
-    if(!profile){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Deleted){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Owner.User._id.toString()!==id){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-    // update notification seen status
-    const notification =await NotificationSchema.findById(NotificationID)
-    if(!notification){
-      return errorResMsg(res, 400, req.t("Notification_not_found"));
-    }
-    if(notification.ProfileID.toString()!=ProfileID.toString()){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-    notification.Seen=true;
-    await notification.save()
 
    
-
-    
-       
-    return successResMsg(res, 200, {message:req.t("Notification_status_changed")});
-  } catch (err) {
-    // return error response
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-
-exports.MakeMultiNotificationSeen = async (req, res) => {
- 
-  try {
-
-    const {id} =req.id
-    const {ProfileID,NotificationIDs}=req.body
-   
-
-
-    const profile =await Profile.findById(ProfileID)
-    if(!profile){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Deleted){
-      return errorResMsg(res, 400, req.t("Profile_not_found"));
-    }
-    if(profile.Owner.User._id.toString()!==id){
-      return errorResMsg(res, 400, req.t("Unauthorized"));
-    }
-    // update notification seen status
-  await NotificationSchema.updateMany({
-      _id:{$in:NotificationIDs},
-  },{
-    $set:{Seen:true}
-  })
-  
-       
-    return successResMsg(res, 200, {message:req.t("Notifications_status_changed")});
-  } catch (err) {
-    // return error response
-    console.log(err)
-    return errorResMsg(res, 500, err);
-  }
-};
-
-// make api to return Static data to the caller 
-exports.GetStaticData = async (req, res) => {
-   
-  try {
-
-   
-    const {ResourceID}=req.query
-    const BaseResourceURL=process.env.Storage_Resource_Base_URL
-    let url=`${BaseResourceURL}/${ResourceID}`
-    //get the resource from azure blob storage
-    console.log("url :",url)
-
-   
-    const { data, headers } = await axios({
-      url:url ,
-      method: 'GET',
-      responseType: 'stream',
-    });
-
-    // Set the response headers based on the content type of the resource
-    res.set('Content-Type', headers['content-type']);
-    res.set('Content-Length', headers['content-length']);
-
-    // return the data as response
-    data.pipe(res);
-
-
-    
-
-    
-       
-   
-  } catch (err) {
-    // return error response
-    console.log("error is ",err)
-    return errorResMsg(res, 500, err);
-  }
+        
+     
+   } catch (err) {
+     // return error response
+     console.log(err)
+     return errorResMsg(res, 500, err);
+   }
 }
 
+/**
+ * this function is used to get user Statics
+ * @memberof Admin
+ * @memberof Admin
+ * @function Statics
+ * @async
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - Returns an object containing statistics
+ */
 
+exports.Statics = async (req, res) => {
+ 
+  try {
+    const profiles =req.body.profiles
+    // exclude the array of profile ids form the query
+    //convert string in ids array to mongodb id
+   
+    const ids = profiles.map(id => mongoose.Types.ObjectId(id)); 
+
+
+    
+    const Users = await User.find({IsDependent:false,profile:{ $nin: ids }}).count()
+    const VerifiedUsers = await User.find({verified:true,IsDependent:false,profile:{ $nin: ids }}).count()
+    const UnverifiedUsers = await User.find({verified:false,IsDependent:false,profile:{ $nin: ids }}).count()
+    const InternalDependentUsers =await User.find({IsDependent:true}).count()
+    const Symptoms = await Symptom.find({isDeleted:false,Profile:{ $nin: ids }}).count()
+    const Medications = await Medication.find({isDeleted:false,ProfileID:{ $nin: ids }}).count()
+    const ConfirmedDoses = await Dose.find({isDeleted:false,Status:2,ProfileID:{ $nin: ids }}).count()
+    const RejectedDoses = await Dose.find({isDeleted:false,Status:4,ProfileID:{ $nin: ids }}).count()
+    const AllDoses = await Dose.find({isDeleted:false,ProfileID:{ $nin: ids }}).count()
+    const notifications = await Notifications.find({ProfileID:{ $nin: ids }}).count()
+    const Links = await Link.find({ProfileID:{ $nin: ids }}).count()
+    const BloodGlucoseReadings = await BloodGlucose.find({Status:2,ProfileID:{ $nin: ids }}).count()
+    const BloodPressureReadings = await BloodPressure.find({Status:2,ProfileID:{ $nin: ids }}).count()
+
+    const statistics = {
+      verifiedUsers: VerifiedUsers,
+      unverifiedUsers: UnverifiedUsers,
+      InternalDependentUsers,
+      users: Users,
+      symptoms: Symptoms,
+      medications: Medications,
+      confirmedDoses: ConfirmedDoses,
+      rejectedDoses: RejectedDoses,
+      AllDoses: AllDoses,
+      notificationsSent: notifications,
+      SharedLinks:Links,
+      BloodGlucoseReadings,
+      BloodPressureReadings
+    };
+
+   
+
+
+ return successResMsg(res, 200, {data:statistics});
+
+   
+   
+   
+  } catch (err) {
+    // return error response
+    console.log(err)
+    return errorResMsg(res, 500, err);
+  }
+};
 </code></pre>
         </article>
     </section>

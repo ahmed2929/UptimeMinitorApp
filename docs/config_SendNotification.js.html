@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>HelperFunctions - Documentation</title>
+    <title>config/SendNotification.js - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -37,403 +37,162 @@
 
 <div id="main">
     
-    <h1 class="page-title">HelperFunctions</h1>
+    <h1 class="page-title">config/SendNotification.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-        
-            Namespace
-        
-        </h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const azure = require('azure-sb');
+const hubName = process.env.AzureNotificationHubName;
+const connectionString = process.env.AzureNotificationHubConnectionString;
+const Notification = require('../DB/Schema/Notifications')
+const FCM = require('fcm-node')
+const serverKey = process.env.FIREBASE_SERVERKEY
+const Profile =require('../DB/Schema/Profile')
 
-<article>
-    
-        <div class="container-overview">
-        
-            
-
-
-    
-
-    <h4 class="name" id="HelperFunctions">HelperFunctions</h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>HelperFunctions.js</p></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_HelperFunctions.js.html">utils/HelperFunctions.js</a>, <a href="utils_HelperFunctions.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        </div>
-    
-
-    
-
-    
-
-    
-    
-    
-
+/**
+ * Sends a notification to a user's device.
+ * @param {string} profileId - The ID of the user's profile.
+ * @param {object} NotificationMessage - The message to send as a notification.
+ */
+const sendNotification= async(profileId, NotificationMessage)=>{
+  const fcm =new FCM(serverKey)
+  const profile = await Profile.findById(profileId)
+  //loop to send notification to all tokens
+  
+  for await ({DeviceToken} of profile.NotificationInfo.DevicesTokens){
+    console.log(DeviceToken)
+    var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+      to: DeviceToken, 
+     ...NotificationMessage
+      
      
-
+  }
+  console.log(message)
+  
+  fcm.send(message, function(err, response){
+      if (err) {
+          console.log("Something has gone wrong!")
+      } else {
+          console.log("Successfully sent with response: ", response)
+      }
+  })
+  
     
 
+ }
+ 
+  
+}
+
+/**
+ * Registers an Android device with a profile ID.
+ * @deprecated This function is deprecated and should not be used (Only used with azure Notification).
+ * @param {string} profileId - The ID of the user's profile.
+ * @param {string} deviceToken - The token of the Android device to register.
+ * @returns {Promise} A promise that resolves when the device is registered.
+ */
+
+const RegisterAndroidDevice= async (profileId, deviceToken)=>{
+  // Create a NotificationHubClient
+  const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
+
+  // Register the device with the profile ID
+  return new Promise((resolve,reject)=>{
+
+      notificationHubService.gcm.createNativeRegistration(deviceToken,[profileId],(error,result)=>{
+          if(!error){
+          console.log(`Device with token ${deviceToken} registered with profile ID ${profileId}`);
+          resolve(result);
+          }
+          else{
+          console.log(error);
+          reject(error);
+          }
+      })
+  })
+}
+
+/**
+ * Registers an iOS device with a profile ID.
+ * @deprecated This function is deprecated and should not be used (Only used with azure Notification).
+ * @param {string} profileId - The ID of the user's profile.
+ * @param {string} deviceToken - The token of the iOS device to register.
+ * @returns {Promise} A promise that resolves when the device is registered.
+ */
+
+  const RegisterIOSDevice= async (profileId, deviceToken)=>{
+    // Create a NotificationHubClient
+   
+
+    const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
     
+  // Register the device with the profile ID
+  return new Promise((resolve,reject)=>{
+    notificationHubService.apns.createNativeRegistration(deviceToken, [profileId],(error,result)=>{
+      if(!error){
+        console.log(`Device with token ${deviceToken} registered with profile ID ${profileId}`);
+        resolve(result);
+      }
+      else{
+        console.log(error);
+        reject(error);
+      }
+    })
+  })
+ 
+  }
 
+
+  /**
+ * @deprecated This function is deprecated and should not be used.
+ * Deletes a registration with the specified ID and tag.
+ * @param {string} registrationId - The ID of the registration to delete.
+ * @param {string} tag - The tag of the registration to delete.
+ * @returns {Promise} A promise that resolves when the registration is deleted.
+ */
+
+  const DeleteRegistration= async (registrationId, tag)=>{
+    // Create a NotificationHubClient
+   
+
+    const notificationHubService = azure.createNotificationHubService(hubName, connectionString);
     
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".GenerateRefreshToken"><span class="type-signature type-signature-static">(static) </span>GenerateRefreshToken<span class="signature">(token)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><ul>
-<li>-1 user access this api to create a dependent who has no phone
--2 email and phone number are optional
--3 if email and phone number are provided make sure that the are unique
--4 link the new dependent to the user profile
--5 user can confirm or reject dependent doses
--6 user has full permissions to mange the dependent
--7 (read/write) medications,schedule,doses and get notifications
--8 create a new profile to that dependent</li>
-</ul></li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_HelperFunctions.js.html">utils/HelperFunctions.js</a>, <a href="utils_HelperFunctions.js.html#line56">line 56</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5 class="h5-parameters">Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>token</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><ul>
-<li></li>
-</ul></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5 class="h5-throws">Throws:</h5>
-<ul>
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the user does not have a profile</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the user is not the owner of the profile</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    
-        <li>
-
-<dl>
-    <dt>
-        <div class="param-desc usertext">
-        <p>if the email or mobile number already exist</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl class="param-type">
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-</li>
-    </ul>
-
-
-<h5 class="h5-returns">Returns:</h5>
-
-        
-<div class="param-desc">
-    <ul>
-<li>Returns the new dependent user</li>
-</ul>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+  // Register the device with the profile ID
+  return new Promise((resolve,reject)=>{
+  
+
+notificationHubService.deleteRegistration(registrationId, tag, function (error,result) {
+  if (!error) {
+    console.log(`Tag "${tag}" successfully unregistered`);
+    resolve(result);
+  }else{
+    console.log(error);
+    reject(error);
+  }
+});
+
+
+  })
+ 
+  }
+
+
+
+module.exports = {
+sendNotification,
+RegisterAndroidDevice,
+RegisterIOSDevice,
+DeleteRegistration
+
+};</code></pre>
+        </article>
+    </section>
 
 
 

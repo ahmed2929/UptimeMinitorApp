@@ -1760,9 +1760,6 @@ Add a new caregiver to a user's profile
   }; 
 
 
-
-
-
   /**
 
 @function

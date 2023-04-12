@@ -28,7 +28,7 @@ const Profile = require("../../../DB/Schema/Profile")
  * 
  * @function
  * @memberof controllers
- * @memberof Symptom
+ * @memberof Measurement
  * @param {Object} req - Express request object
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
@@ -216,7 +216,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
  * 
  * @function
  * @memberof controllers
- * @memberof controllers
+ * @memberof Measurement
  * @param {Object} req - Express request object
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
@@ -368,7 +368,7 @@ exports.BloodGlucoseMeasurement = async (req, res) => {
  * 
  * @function
  * @memberof controllers
- * @memberof BloodGlucoseMeasurement
+ * @memberof Measurement
  * @param {Object} req - Express request object
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
@@ -563,11 +563,11 @@ console.log("will update")
  * 
  * @function
  * @memberof controllers
- * @memberof Symptom
+ * @memberof Measurement
  * @param {Object} req - Express request object
  * @param {Object} req.id - user id extracted from authorization header
  * @param {Object} req.body - request body
- * @param {string} req.body.SymptomID - SymptomID
+ * @param {string} req.body.BloodGlucoseMeasurementID - BloodGlucoseMeasurementID
  * @param {string} req.body.ProfileID - ProfileID
  
  * @param {Object} res - Express response object
@@ -668,18 +668,37 @@ exports.DeleteBloodGlucoseMeasurement = async (req, res) => {
   }
 };
 
+/**
+ * getAllBloodGlucoseMeasurement
+ * 
+ * @function
+ * @memberof controllers
+ * @memberof Measurement
+ * @param {Object} req - Express request object
+ * @param {Object} req.id - user id extracted from authorization header
+ * @param {Object} req.body - request body
+ * @param {string} req.body.StartDate - StartDate
+ * @param {string} req.body.EndDate - EndDate
+ *  @param {string} req.body.Status - Status
+ * 
+ * @param {string} req.body.ProfileID - ProfileID
+ 
+ * @param {Object} res - Express response object
+ * 
+ * @throws {Error} if the user does not have a profile
+ * @throws {Error} if the user is not the owner of the profile or has a permission 
+ * @throws {Error} if the BloodGlucose does not exist
+ * 
+ * @returns {Object} - Returns success message
+ * @description 
+ * -  check if the caller is the profile owner or has permission
+ * -  flag the BloodGlucose as delete
+       
+ * 
+ */
+
+
 exports.getAllBloodGlucoseMeasurement=async (req, res) => {
-  /**
-   * get my doses and my dependents doses
-   * 
-   * 
-   */
-  /** 
-   * return doses with a spacic date
-   * if no date is provided the default is today
-   * returns not suspended dosages
-   * 
-   */
   try {
 
     const {id} =req.id
@@ -689,8 +708,7 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
     EndDate,
     Status
     }=req.query
-    date=StartDate
-
+   
              /*
     
     check permission 
@@ -722,13 +740,13 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
    
     
     // get Occurrences which equal today
-    if(!date){
-      date=new Date()
+    if(!StartDate){
+      StartDate=new Date()
     }
-    const queryDate =new Date(+date)
+    const queryDate =new Date(+StartDate)
     let nextDay
     if(!EndDate){
-      nextDay=new Date(+date)
+      nextDay=new Date(+StartDate)
       nextDay= new Date(nextDay.setDate(nextDay.getDate()+1))
       }else{
       nextDay=EndDate
@@ -786,6 +804,18 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+
+/**
+ * Creates a new blood glucose measurement scheduler.
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>} - Promise representing the completion of this operation.
+ * @description 
+ * create new scheduler for BloodGlucose reading reminder
+ */
 
 exports.CreateNewBloodGlucoseMeasurementScheduler = async (req, res) => {
  
@@ -878,7 +908,14 @@ exports.CreateNewBloodGlucoseMeasurementScheduler = async (req, res) => {
   }
 };
 
-
+/**
+ * Edits a blood glucose measurement scheduler.
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>} - Promise representing the completion of this operation.
+ */
 exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
   
  
@@ -1025,6 +1062,15 @@ exports.EditBloodGlucoseMeasurementScheduler=async (req, res) => {
   }
 };
 
+
+/**
+ * Deletes a glucose measurement scheduler.
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>} - Promise representing the completion of this operation.
+ */
 exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
   
  
@@ -1127,6 +1173,16 @@ exports.DeleteGlucoseMeasurementScheduler=async (req, res) => {
     return errorResMsg(res, 500, err);
   }
 };
+
+
+/**
+ * get glucose measurement scheduler.
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Promise<void>} - Promise representing the completion of this operation.
+ */
 
 exports.getBloodGlucoseMeasurementScheduler=async (req, res) => {
   
