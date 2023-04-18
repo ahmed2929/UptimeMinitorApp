@@ -55,17 +55,25 @@ exports.signUp = async (req, res) => {
 
  
   try {
+    const {email}=req.body
     // get user with email
-    const user = await User.findOne(
-      {email: req.body.email }
-    );
+    // const user = await User.findOne(
+    //   {email: req.body.email }
+    // );
 
-    const userMobile=await User.findOne({
-       'mobileNumber.phoneNumber':req.body.mobileNumber.phoneNumber,
-        'mobileNumber.countryCode':req.body.mobileNumber.countryCode,
-        verified:true
+    // const userMobile=await User.findOne({
+    //    'mobileNumber.phoneNumber':req.body.mobileNumber.phoneNumber,
+    //     'mobileNumber.countryCode':req.body.mobileNumber.countryCode,
+    //     verified:true
+    // })
+    const users = await User.find({
     })
-    
+    const user = users.find((user) => {
+      return user.email === email;
+    })
+    const userMobile=users.find((user)=>{
+      return user.mobileNumber.phoneNumber===req.body.mobileNumber.phoneNumber&&user.mobileNumber.countryCode===req.body.mobileNumber.countryCode&&user.verified
+    })
     // check if user exists and return error if user already exists
     if (user||userMobile) {
       return errorResMsg(res, 423, req.t("email_is_already_taken_Or_phone"));
@@ -174,11 +182,15 @@ exports.logIn = async (req, res) => {
     } = req.body;
     // check if user exists and select password
     console.log("email is ",email)
-    const user = await User.findOne({
-      email,
+    const users = await User.find({
       IsDependent:false
-    }).select("+password");
-    console.log("user i s ",user)
+    }).select("+password")
+  
+    const user = users.find((user) => {
+      return user.email === email;
+    })
+
+
     if(!user){
       return errorResMsg(res, 401, req.t("User_not_found"));
     }
@@ -290,8 +302,11 @@ exports.SendRestPasswordCode= async (req, res) => {
       return  errorResMsg(res, 406, req.t("Email_is_required"));
     }
 
-    const user = await User.findOne({email:email});
-
+    const users = await User.find();
+    const user = users.find((user) => {
+      return user.email === email;
+    })
+      
      if(!user){
       return  errorResMsg(res, 406, req.t('user_is_not_found'));
      }
@@ -358,8 +373,9 @@ exports.GenerateAccessResetPasswordToken= async (req, res) => {
       email,
       code
     } = req.body;
-    const user = await User.findOne({
-      email,
+    const users= await User.find()
+    const user = users.find((user) => {
+      return user.email === email;
     })
 
     if(!user){
@@ -482,7 +498,10 @@ exports.VerifyAccount = async (req, res) => {
     if(!email){
       return  errorResMsg(res, 406, req.t("Email_is_required"));
     }
-    const user = await User.findOne({email:email});
+    const users = await User.find()
+    const user = users.find((user) => {
+      return user.email === email;
+    })
    
      // check for if the code is correct and has not expired
 
@@ -598,7 +617,10 @@ exports.ResendVerificationCode = async (req, res) => {
 
     }
 
-    const user = await User.findOne({email:email});
+    const users = await User.find();
+    const user = users.find((user) => {
+      return user.email === email;
+    })
     console.log("user is ",email)
      if(!user){
       return  errorResMsg(res, 406, req.t("user_is_not_found"));

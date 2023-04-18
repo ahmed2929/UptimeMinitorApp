@@ -42,6 +42,7 @@
     "localize": "^0.4.7",
     "luxon": "^3.1.1",
     "mongoose": "^6.7.5",
+    "mongoose-encryption": "^2.1.2",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.8.0",
     "nodemailer-smtp-transport": "^2.7.4",

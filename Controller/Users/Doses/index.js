@@ -1254,16 +1254,26 @@ exports.EditSingleDose=async (req, res) => {
       console.log(DependentsSpacificDoses)
       // bind nickname with dependent
       const result=[...DependentsGeneralDoses,...DependentsSpacificDoses]
-      for await (doseObject of result){
+      for await (UserData of result){
+        const userInfo =await User.findById(UserData.owner.id)
+        UserData.owner.firstName=userInfo.firstName
+        UserData.owner.lastName=userInfo.lastName
+        UserData.owner.email=userInfo.email
+        UserData.owner.img=userInfo.img
 
-       for await (SingleDose of doseObject.doses){
-         const medication =await UserMedication.findById(SingleDose.Medication).populate('Scheduler')
-         SingleDose.Medication=medication
 
-       }
+       
      }
 
-     
+     for await (doseObject of result){
+
+      for await (SingleDose of doseObject.doses){
+        const medication =await UserMedication.findById(SingleDose.Medication).populate('Scheduler')
+        SingleDose.Medication=medication
+
+      }
+    }
+
 
       const BindNickNameWithDependentList =await BindNickNameWithDependent(result,NickNameHashTable)
 

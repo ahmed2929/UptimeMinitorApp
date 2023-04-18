@@ -56,7 +56,7 @@ exports.InvitationSentToExistentCareGiverUser_EN = (InvitationFrom,userName) => 
         <h1>Care Circle Invitation</h1>
         <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
         <p>Dear user,</p>
-        <p>hello ${userName} , ${InvitationFrom} sent you invitation to become a caregiver </p>
+        <p>hello , ${InvitationFrom} sent you invitation to become a caregiver </p>
         <p>please open voithy to check that</p>
         <p>Thank you,</p>
         <p>The Voithy Team</p>
@@ -214,7 +214,7 @@ exports.InvitationSentToExistentDependentUser_EN = (InvitationFrom,userName) => 
       <h1>Care Circle Invitation</h1>
       <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
       <p>Dear user,</p>
-      <p>hello ${userName} , ${InvitationFrom} sent you invitation to become a dependent </p>
+      <p>${InvitationFrom} sent you invitation to become a dependent </p>
       <p>please open voithy to check that</p>
       <p>Thank you,</p>
       <p>The Voithy Team</p>
@@ -241,7 +241,7 @@ exports.InvitationSentToCareGiverToBeMaster_EN = (InvitationFrom,userName) => {
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to be your master </p>
+        <p style="margin:0; font-size:20px ">hello, ${InvitationFrom} sent you invitation to be your master </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -262,7 +262,7 @@ exports.InvitationSentToCareGiverToBeMaster_AR = (InvitationFrom,userName) => {
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to be your master (arabic) </p>
+        <p style="margin:0; font-size:20px ">, ${InvitationFrom} sent you invitation to be your master (arabic) </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -335,7 +335,7 @@ exports.InvitationSentToMyDependent_EN = (InvitationFrom,userName) => {
         <h1>Care Circle Invitation</h1>
         <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
         <p>Dear user,</p>
-        <p>hello ${userName} , ${InvitationFrom} sent you invitation to become a dependent </p>
+        <p>hello , ${InvitationFrom} sent you invitation to become a dependent </p>
         <p>please open voithy to check that</p>
         <p>Thank you,</p>
         <p>The Voithy Team</p>
@@ -510,7 +510,7 @@ exports.InvitationSentToDependent_EN = (otp,InvitationFrom,userName) => {
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -531,7 +531,7 @@ exports.InvitationSentToDependent_AR= (otp,InvitationFrom,userName) => {
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">
@@ -607,7 +607,7 @@ exports.InvitationSentToCareGiver_EN = (otp,InvitationFrom,userName) => {
         <h1>Care Circle Invitation</h1>
         <img src="https://i.ibb.co/dr2Mc9J/Voithy-Logo.png" alt="Voithy Logo">
         <p>Dear user,</p>
-        <p>hello ${userName} , ${InvitationFrom} sent you invitation to become a caregiver </p>
+        <p>hello, ${InvitationFrom} sent you invitation to become a caregiver </p>
         <p>please open voithy to check that</p>
         <p>Thank you,</p>
         <p>The Voithy Team</p>
@@ -632,7 +632,7 @@ exports.InvitationSentToCareGiver_AR = (otp,InvitationFrom,userName) => {
     <div style="font-family: sans-serif; margin:0; background-color:rgb(72, 72, 155);">
     <div style=" padding-top:30px; padding-left:40px; width:80%; margin-left:auto; margin-right:auto" >
         
-        <p style="margin:0; font-size:20px ">hello ${userName} , ${InvitationFrom} sent you invitation to join voith </p>
+        <p style="margin:0; font-size:20px ">hello , ${InvitationFrom} sent you invitation to join voith </p>
 
     
         <p style="color:white;padding-top:20px; padding-bottom:20px; line-height: 2em;">

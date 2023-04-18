@@ -1,7 +1,7 @@
 let app =require("express")();
 require('dotenv').config();
-const  {ConnetToDB} =require("./DB/Server/index")
-const SetMiddleWares=require('./Middlewares/index')
+const  {ConnectToDB} =require("./DB/Server/index")
+const SetMiddleWares=require('./Middleware/index')
 const port = process.env.PORT || 3000
 const Viewer =require("./DB/Schema/Viewers")
 const mongoose =require("mongoose")
@@ -9,7 +9,7 @@ const {sendNotification}=require("./config/SendNotification")
 const message =require("./Messages/Notifications/index")
 
 //Connect to DB
-ConnetToDB();
+ConnectToDB();
 app=SetMiddleWares(app)
  
 // Start the server

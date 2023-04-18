@@ -19,7 +19,8 @@ const {
 } = require("../../../utils/ResponseHelpers");
 const BloodGlucose = require("../../../DB/Schema/BloodGlucoseManualMeasurement");
 const MeasurementScheduler=require("../../../DB/Schema/MeasurementScheduler")
-const Profile = require("../../../DB/Schema/Profile")
+const Profile = require("../../../DB/Schema/Profile");
+const User = require("../../../DB/Schema/User");
 
 
 
@@ -777,6 +778,18 @@ exports.getAllBloodGlucoseMeasurement=async (req, res) => {
     console.log(dependentsProfilesIDs)
     //const DependentsSymptoms =await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay) 
     const DependentsBloodGlucoseMeasurement=await GetBloodGlucoseForProfileIDList(dependentsProfilesIDs,queryDate,nextDay,Status)
+
+    for await (UserData of DependentsBloodGlucoseMeasurement){
+      const userInfo =await User.findById(UserData.owner.id)
+      UserData.owner.firstName=userInfo.firstName
+      UserData.owner.lastName=userInfo.lastName
+      UserData.owner.email=userInfo.email
+      UserData.owner.img=userInfo.img
+
+
+     
+    }
+
 
     // bind nickname with dependent
 

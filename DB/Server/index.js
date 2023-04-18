@@ -2,17 +2,17 @@ const mongoose=require('mongoose');
 
 const ConnectString=process.env.DB;
 
-const DBConectionOptions={
+const DBConnectionOptions={
     useNewUrlParser: true,
    
 }
 
 
-const ConnetToDB =async()=>{
+const ConnectToDB =async()=>{
 
     try {
         
-      const DBConnection= await mongoose.connect(ConnectString,DBConectionOptions)
+      const DBConnection= await mongoose.connect(ConnectString,DBConnectionOptions)
       console.log("DB connected")
      
       return DBConnection
@@ -30,6 +30,6 @@ const CloseDBConnection=async ()=>{
 
 }
 module.exports={
-    ConnetToDB,
+    ConnectToDB,
     CloseDBConnection
 }

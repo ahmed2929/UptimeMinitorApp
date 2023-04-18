@@ -52,8 +52,9 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
           return errorResMsg(res, 400, req.t("Unauthorized"));
         }
       }
-      const searchForEmail =await User.findOne({
-        email:newEmail
+      const users = await User.find()
+      const searchForEmail = users.find((user) => {
+        return user.email === email;
       })
       if(searchForEmail){
         return errorResMsg(res, 400, req.t("Email_already_exists"));
@@ -131,11 +132,11 @@ const {GenerateToken,GenerateRandomCode,GenerateRefreshToken,IsMasterOwnerToThat
         }
         //delete the temp user
         // update user email
-        await User.findOneAndUpdate({
-            profile:mongoose.Types.ObjectId(ProfileID)
-        },{
-            email:ChangedEmail
-        })
+        const user = await User.find(
+          { profile: mongoose.Types.ObjectId(ProfileID) },
+        )
+        user.email = ChangedEmail
+        await user.save()
         await TempEmails.findByIdAndDelete(searchForEmail._id)
 
         return successResMsg(res, 200, {message:req.t("Email_changed")});

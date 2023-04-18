@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Schema = mongoose.Schema;
+var encrypt = require('mongoose-encryption');
 
 
 var userSchema = new Schema({
@@ -105,6 +106,12 @@ userSchema.methods.correctPassword = async function (
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
+
+
+//ADD auto encryption 
+const encKey = process.env.SOME_32BYTE_BASE64_STRING;
+const sigKey = process.env.SOME_64BYTE_BASE64_STRING;
+//userSchema.plugin(encrypt, { encryptionKey: encKey, signingKey: sigKey,encryptedFields: ['firstName','lastName','email','mobileNumber.countryCode','mobileNumber.phoneNumber'],requireAuthenticationCode: false });
 
 const User = mongoose.model("User", userSchema);
 

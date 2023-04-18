@@ -135,10 +135,10 @@ exports.CreateDependentA = async (req, res) => {
           if(!isValidEmail(email)){
             return errorResMsg(res, 400, req.t("email_is_not_valid"));
           }
-            const emailExist = await User.findOne({
-                email:email,
-                
-            })
+          const users = await User.find();
+          const emailExist = users.find((user) => {
+            return user.email === email;
+          })
             if(emailExist){
                 return errorResMsg(res, 400, req.t("email_exist"));
             }
@@ -151,9 +151,12 @@ exports.CreateDependentA = async (req, res) => {
             countryCode:countryCode
         }
         if(phoneNumber&&countryCode){
-            const mobileExist = await User.findOne({
-                'mobileNumber.phoneNumber':mobileNumber.phoneNumber
-            })
+          const users = await User.find({
+            IsDependent: false
+          })
+          const mobileExist = users.find((user) => {
+            return user.mobileNumber.phoneNumber === mobileNumber.phoneNumber;
+          })
             if(mobileExist){
                 return errorResMsg(res, 400, req.t("mobile_exist"));
             }
@@ -410,9 +413,11 @@ exports.CreateDependentA = async (req, res) => {
         img = await UploadFileToAzureBlob(req.file)
      }
      
-        const user = await User.findOne(
-            {  email: email } 
-          );
+     const users = await User.find().select("+email");
+     const user = users.find((user) => {
+       return user.email === email;
+     })
+  
             // if the invitation is sent before return 
             
           // check if user exists and send invitation to that user
@@ -1067,9 +1072,36 @@ The filter can be based on the status, sent, and received parameters.
                 }
               })
         }
-        responseData=[
-            ...invitations
-        ]
+        let responseData=[]
+
+        for await(let invitation of invitations){
+          const FromUserID = invitation.From.Owner.User._id
+          const user =await User.findById(FromUserID)
+          const ToUserID = invitation.To.Owner.User._id
+          const ToUser =await User.findById(ToUserID)
+          // get firstName lastName email mobileNumber img
+    
+          //From
+          invitation.From.Owner.User.firstName=user.firstName
+          invitation.From.Owner.User.lastName=user.lastName
+          invitation.From.Owner.User.email=user.email
+          invitation.From.Owner.User.mobileNumber=user.mobileNumber
+          invitation.From.Owner.User.img=user.img
+          //To
+          invitation.To.Owner.User.firstName=ToUser.firstName
+          invitation.To.Owner.User.lastName=ToUser.lastName
+          invitation.To.Owner.User.email=ToUser.email
+          invitation.To.Owner.User.mobileNumber=ToUser.mobileNumber
+          invitation.To.Owner.User.img=ToUser.img
+
+
+          responseData.push(invitation)
+          
+        }
+        
+        // responseData=[
+        //     ...invitations
+        // ]
         // return successful response
         return successResMsg(res, 200, {message:req.t("Invitations"),data:responseData});
       
@@ -1183,9 +1215,28 @@ retrieves the dependents of the user from from the viewer collection which depen
             IsInternalDependent:isFound&&IsInterDependent
           }
         })
+       
+
         responseData=[
-            ...FlaggedResult
         ]
+
+        for await(let data of FlaggedResult){
+          const FromUserID = data.viewer.DependentProfile.Owner.User._id
+          const user =await User.findById(FromUserID)
+      
+          // get firstName lastName email mobileNumber img
+    
+          //From
+          data.viewer.DependentProfile.Owner.User.firstName=user.firstName
+          data.viewer.DependentProfile.Owner.User.lastName=user.lastName
+          data.viewer.DependentProfile.Owner.User.email=user.email
+          data.viewer.DependentProfile.Owner.User.mobileNumber=user.mobileNumber
+          data.viewer.DependentProfile.Owner.User.img=user.img
+          responseData.push(data)
+          
+        }
+
+
         // return successfully response
         return successResMsg(res, 200, {message:req.t("dependent"),data:responseData});
       
@@ -1272,14 +1323,32 @@ retrieves the dependents of the user from from the viewer collection which depen
           }
         })
         responseData=[
-            ...FlaggedResult
         ]
+
+        for await(let data of FlaggedResult){
+          const FromUserID = data.Profile.Owner.User._id
+          const user =await User.findById(FromUserID)
+      
+          // get firstName lastName email mobileNumber img
+    
+          //From
+          data.Profile.Owner.User.firstName=user.firstName
+          data.Profile.Owner.User.lastName=user.lastName
+          data.Profile.Owner.User.email=user.email
+          data.Profile.Owner.User.mobileNumber=user.mobileNumber
+          data.Profile.Owner.User.img=user.img
+          responseData.push(data)
+          
+        }
         const filter =responseData.filter((dependent)=>{
           return dependent.Profile._id.toString()==DependentProfileID
         })
         if(filter.length<1){
           return errorResMsg(res, 400, req.t("dependent_not_found"));
         }
+
+     
+
         // return successfully response
         return successResMsg(res, 200, {message:req.t("dependent"),data:filter[0]});
       
@@ -1427,9 +1496,16 @@ Add a new caregiver to a user's profile
         }
 
           
-        const user = await User.findOne(
-            { "$or": [ { email: email }, { 'mobileNumber.phoneNumber':phoneNumber} ] }
-          );
+        const users = await User.find()
+        const user = users.find((user) => {
+          if (user.email === email) {
+            return true;
+          }
+          if (user.mobileNumber.phoneNumber === phoneNumber) {
+            return true;
+          }
+          return false;
+        })
             // if the invitation is sent before return 
             
           // if no user found return 
@@ -1841,8 +1917,26 @@ retrieves the dependents of the user from the viewer collection which master pro
         })
 
         responseData=[
-            ...filteredData
+         
         ]
+
+        for await(let data of filteredData){
+          const FromUserID = data.viewer.ViewerProfile.Owner.User._id
+          const user =await User.findById(FromUserID)
+      
+          // get firstName lastName email mobileNumber img
+    
+          //From
+          data.viewer.ViewerProfile.Owner.User.firstName=user.firstName
+          data.viewer.ViewerProfile.Owner.User.lastName=user.lastName
+          data.viewer.ViewerProfile.Owner.User.email=user.email
+          data.viewer.ViewerProfile.Owner.User.mobileNumber=user.mobileNumber
+          data.viewer.ViewerProfile.Owner.User.img=user.img
+          responseData.push(data)
+          
+        }
+
+
         // return success response
         return successResMsg(res, 200, {message:req.t("caregivers"),data:responseData});
       
@@ -2199,10 +2293,11 @@ exports.EditDependentInfoFull = async (req, res) => {
  
          // check for  email and mobile if it provided
          if(email){
-             const emailExist = await User.findOne({
-                 email:email,
-                 
-             })
+            const users = await User.find({
+            })
+            const emailExist = users.find((user) => {
+              return user.email === email;
+            })
              if(emailExist){
                  return errorResMsg(res, 400, req.t("email_exist"));
              }
@@ -2212,9 +2307,10 @@ exports.EditDependentInfoFull = async (req, res) => {
              countryCode:countryCode
          }
          if(phoneNumber&&countryCode){
-             const mobileExist = await User.findOne({
-                 'mobileNumber.phoneNumber':mobileNumber.phoneNumber
-             })
+          const users = await User.find()
+          const mobileExist = users.find((user) => {
+          return user.mobileNumber.phoneNumber === phoneNumber&&user.mobileNumber.countryCode===countryCode;
+          })
              if(mobileExist){
                  return errorResMsg(res, 400, req.t("mobile_exist"));
              }

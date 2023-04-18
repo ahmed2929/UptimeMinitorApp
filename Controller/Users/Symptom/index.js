@@ -10,6 +10,7 @@
 
 const {UploadFileToAzureBlob} =require("../../../utils/HelperFunctions")
 const Viewer =require("../../../DB/Schema/Viewers")
+const User = require("../../../DB/Schema/User")
 const {SendPushNotificationToUserRegardlessLangAndOs,
   BindNickNameWithDependentSymptom,
   GetSymptomForProfileID,
@@ -116,9 +117,9 @@ exports.CreateSymptom = async (req, res) => {
   
       if(profile.Owner.User._id.toString()!==id){
         // check if the user has add med permission
-        const hasAddMedPermissonToMeds=viewer.CanAddSymptoms;
+        const CanAddNewSymptom=viewer.CanAddSymptoms;
   
-        if(!hasAddMedPermissonToMeds){
+        if(!CanAddNewSymptom){
           return errorResMsg(res, 401, req.t("Unauthorized"));
         }
         
@@ -149,7 +150,7 @@ exports.CreateSymptom = async (req, res) => {
      
   
       // create new Symptom
-      const newSymton = new Symptom({
+      const newSymptom = new Symptom({
         img,
         Profile:ProfileID,
         User:id,
@@ -162,12 +163,12 @@ exports.CreateSymptom = async (req, res) => {
   
       })
       
-      await newSymton.save()
+      await newSymptom.save()
     const responseData={
-      ...newSymton._doc,
+      ...newSymptom._doc,
     }
     // populated symptom data
-    const populateSymptom=await Symptom.findById(newSymton._id).populate({
+    const populateSymptom=await Symptom.findById(newSymptom._id).populate({
       path:"CreatorProfile EditedBy",
       select:"firstName lastName img",
       populate:{
@@ -192,7 +193,7 @@ exports.CreateSymptom = async (req, res) => {
         continue
       }
       await SendPushNotificationToUserRegardlessLangAndOs(profile,viewer.ViewerProfile,"NewSymptom",{
-        SymptomId:newSymton._id,
+        SymptomId:newSymptom._id,
         Symptom:populatedSymptomClone,
         ProfileInfoOfSender:{
           firstName:profile.Owner.User.firstName,
@@ -207,7 +208,7 @@ exports.CreateSymptom = async (req, res) => {
     // notify profile dependent if the profile.Owner.User._id is not as id
     if(profile.Owner.User._id.toString() !== id){
       await SendPushNotificationToUserRegardlessLangAndOs(viewerProfile,profile,"NewSymptomAddToMe",{
-        SymptomId:newSymton._id,
+        SymptomId:newSymptom._id,
         Symptom:populatedSymptomClone,
         ProfileInfoOfSender:{
           firstName:viewerProfile.Owner.User.firstName,
@@ -220,7 +221,7 @@ exports.CreateSymptom = async (req, res) => {
     }
 
       // return successful response
-      return successResMsg(res, 200, {message:req.t("symtom_created"),data:responseData});
+      return successResMsg(res, 200, {message:req.t("Symptom_created"),data:responseData});
       
     } catch (err) {
       // return error response
@@ -787,6 +788,16 @@ exports.getAllSymptoms=async (req, res) => {
     //const DependentsSymptoms =await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay) 
     const DependentsSymptoms=await GetSymptomForProfileIDList(dependentsProfilesIDs,queryDate,nextDay)
 
+    for await (UserData of DependentsSymptoms){
+      const userInfo =await User.findById(UserData.owner.id)
+      UserData.owner.firstName=userInfo.firstName
+      UserData.owner.lastName=userInfo.lastName
+      UserData.owner.email=userInfo.email
+      UserData.owner.img=userInfo.img
+
+
+     
+   }
     // bind nickname with dependent
 
     const BindNickNameWithDependentList =await BindNickNameWithDependentSymptom(DependentsSymptoms,NickNameHashTable) 

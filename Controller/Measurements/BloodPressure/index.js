@@ -19,7 +19,8 @@ const {
 } = require("../../../utils/ResponseHelpers");
 const BloodPressure = require("../../../DB/Schema/BloodPressureManualMeasurement");
 const MeasurementScheduler=require("../../../DB/Schema/MeasurementScheduler")
-const Profile = require("../../../DB/Schema/Profile")
+const Profile = require("../../../DB/Schema/Profile");
+const User = require("../../../DB/Schema/User");
 
 
 
@@ -761,6 +762,16 @@ exports.getAllBloodPressureMeasurement=async (req, res) => {
     console.log(DependentsBloodPressureMeasurement)
     // bind nickname with dependent
 
+    for await (UserData of DependentsBloodPressureMeasurement){
+      const userInfo =await User.findById(UserData.owner.id)
+      UserData.owner.firstName=userInfo.firstName
+      UserData.owner.lastName=userInfo.lastName
+      UserData.owner.email=userInfo.email
+      UserData.owner.img=userInfo.img
+
+
+     
+    }
     const BindNickNameWithDependentList =await BindNickNameWithDependentMeasurement(DependentsBloodPressureMeasurement,NickNameHashTable) 
 
   

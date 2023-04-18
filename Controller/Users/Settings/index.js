@@ -63,9 +63,9 @@ exports.EditProfile = async (req, res) => {
        
       }
     }
-      const searchForPhone =await User.findOne({
-        "mobileNumber.countryCode":countryCode,
-        "mobileNumber.phoneNumber":phoneNumber,
+         const users = await User.find()
+      const searchForPhone = users.find((user) => {
+        return user.mobileNumber.countryCode === countryCode&&user.mobileNumber.phoneNumber === phoneNumber;
       })
       if(searchForPhone){
         if(searchForPhone._id.toString()!==id){
@@ -197,8 +197,9 @@ exports.EditProfile = async (req, res) => {
   
  
 
-      const searchForEmail =await User.findOne({
-        email:newEmail
+      const users = await User.find()
+      const searchForEmail = users.find((user) => {
+        return user.email === newEmail;
       })
       if(searchForEmail){
         return errorResMsg(res, 400, req.t("Email_already_exists"));

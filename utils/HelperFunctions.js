@@ -1088,7 +1088,8 @@ const GetDosesForListOfProfiles=async(ProfileIDs,startDate,EndDate)=>{
                   firstName: "$owner.firstName",
                   lastName: "$owner.lastName",
                   email: "$owner.email",
-                  img:"$owner.img"
+                  img:"$owner.img",
+                  id:"$owner._id"
                 },
                 dependantName: "$profile.dependantName",
               },
@@ -1182,7 +1183,8 @@ const GetDosesForListOfMedications=async(MedicationIDSList,startDate,EndDate)=>{
                   firstName: "$owner.firstName",
                   lastName: "$owner.lastName",
                   email: "$owner.email",
-                  img:"$owner.img"
+                  img:"$owner.img",
+                  id:"$owner._id"
                 },
                 dependantName: "$profile.dependantName",
               },
@@ -1347,7 +1349,8 @@ const GetSymptomForProfileIDList=async(ProfileIDsList,startDate,EndDate)=>{
               firstName: "$owner.firstName",
               lastName: "$owner.lastName",
               email: "$owner.email",
-              img:"$owner.img"
+              img:"$owner.img",
+              id:"$owner._id"
             },
           },
         },
@@ -1565,7 +1568,8 @@ const GetBloodGlucoseForProfileIDList=async(ProfileIDsList,startDate,EndDate,Sta
               firstName: "$owner.firstName",
               lastName: "$owner.lastName",
               email: "$owner.email",
-              img:"$owner.img"
+              img:"$owner.img",
+              id:"$owner._id"
             },
           },
         },
@@ -1686,7 +1690,8 @@ const GetBloodPressureForProfileIDList=async(ProfileIDsList,startDate,EndDate,St
             firstName: "$owner.firstName",
             lastName: "$owner.lastName",
             email: "$owner.email",
-            img:"$owner.img"
+            img:"$owner.img",
+            id:"$owner._id"
           },
         },
       },
