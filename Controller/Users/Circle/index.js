@@ -2123,7 +2123,8 @@ exports.EditDependentInfoFull = async (req, res) => {
       email,
       phoneNumber,
       countryCode,
-      notify
+      notify,
+      KeepOldImg
 
     }=req.body
 
@@ -2233,7 +2234,7 @@ exports.EditDependentInfoFull = async (req, res) => {
        dependentAUser.firstName=firstName|| dependentAUser.firstName;
        dependentAUser.lastName=lastName|| dependentAUser.lastName;
        dependentAUser.email=email|| dependentAUser.email;
-       dependentAUser.img=img|| dependentAUser.img;
+       dependentAUser.img=KeepOldImg==='true'?dependentAUser.img:img;
        dependentAUser.email=email|| dependentAUser.email;
        dependentAUser.mobileNumber.phoneNumber=phoneNumber|| dependentAUser.mobileNumber.phoneNumber;
        dependentAUser.mobileNumber.countryCode=countryCode|| dependentAUser.mobileNumber.countryCode;
