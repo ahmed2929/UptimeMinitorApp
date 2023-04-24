@@ -1200,9 +1200,13 @@ retrieves the dependents of the user from from the viewer collection which depen
             return errorResMsg(res, 400, req.t("you_are_not_allowed_to_view_this_profile"));
         }
        
-         
+      console.log(profile.Dependents)   
         const filteredData=profile.Dependents.filter((item)=>{
-          return !item.Profile.Deleted
+          if(item.Profile){
+            return !item.Profile.Deleted
+          }else{
+            return false
+          }
         })
         const FlaggedResult=filteredData.map(elem=>{
           const clonedObject = JSON.parse(JSON.stringify(elem));

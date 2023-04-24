@@ -448,8 +448,8 @@ const CreateMeasurementsOccurrences = async (jsonScheduler, newScheduler, Profil
 
 
 const CreateOccurrences = async (jsonScheduler, newScheduler, id, newMed, MedInfo, ProfileID, viewerProfile, req, res, editApi) => {
-  console.log("jsonScheduler", jsonScheduler.dosage)
-  console.log("newScheduler", newScheduler.dosage)
+  // console.log("jsonScheduler", jsonScheduler.dosage)
+  // console.log("newScheduler", newScheduler.dosage)
   // create Occurrences
   /**
    *  -date and time are represented in ms format

@@ -210,8 +210,8 @@ const getUserEmailFromId=async(id)=>{
         var endDayResultWithOneDay = new Date(endDate);
         endDayResultWithOneDay.setDate(endDayResultWithOneDay.getDate() + 1);
         endDate = endDayResultWithOneDay;
-        console.log("startDate is :",startDate)
-        console.log("occurence generation started :",baseDate)
+      //  console.log("startDate is :",startDate)
+       // console.log("occurence generation started :",baseDate)
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
         const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
 

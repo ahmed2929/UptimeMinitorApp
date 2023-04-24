@@ -87,7 +87,11 @@ var userSchema = new Schema({
 MasterProfiles:[{
     type:Schema.Types.ObjectId,
     ref:"Profile",
-}]
+}],
+test:{
+  type:Boolean,
+  default:false
+}
 
 
  
