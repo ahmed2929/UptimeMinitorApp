@@ -71,7 +71,7 @@ exports.CreateDependentA = async (req, res) => {
     try {
   
       const {id} =req.id
-      const {
+      let {
         ProfileID,
         firstName,
         lastName,
@@ -82,7 +82,9 @@ exports.CreateDependentA = async (req, res) => {
        
         
        
-      }=req.body
+      }=req.body  
+
+      nickName=nickName.trim();
   
 
       if(!nickName&&!(firstName&&lastName)){
@@ -342,7 +344,7 @@ exports.CreateDependentA = async (req, res) => {
     try {
   
       const {id} =req.id
-      const {
+      let {
         ProfileID,
         firstName,
         lastName,
@@ -353,7 +355,9 @@ exports.CreateDependentA = async (req, res) => {
         
        
       }=req.body
-      
+
+      nickName=nickName.trim();
+
         // check if the user has a profile
         const profile = await Profile.findById(ProfileID).populate("Owner.User")
         if(!profile){
@@ -744,7 +748,7 @@ exports.CreateDependentA = async (req, res) => {
     try {
   
       const {id} =req.id
-      const {
+      let {
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
         InvitationID,
@@ -755,6 +759,7 @@ exports.CreateDependentA = async (req, res) => {
        
       }=req.body
         // get the invitation
+        nickName=nickName.trim();
     
         const invitation = await Invitation.findById(InvitationID).populate({
           path:"From",
@@ -1170,7 +1175,11 @@ retrieves the dependents of the user from from the viewer collection which depen
        
          
         const filteredData=profile.Dependents.filter((item)=>{
-          return !item.Profile.Deleted
+          if(item.Profile){
+            return !item.Profile.Deleted
+          }else{
+            return false
+          }
         })
         const FlaggedResult=filteredData.map(elem=>{
           const clonedObject = JSON.parse(JSON.stringify(elem));
@@ -1348,7 +1357,7 @@ Add a new caregiver to a user's profile
     try {
   
       const {id} =req.id
-      const {
+      let {
         ProfileID,
         email,
         phoneNumber,
@@ -1358,7 +1367,9 @@ Add a new caregiver to a user's profile
         
        
       }=req.body
-      
+
+      nickName=nickName.trim();
+
         // check if the user has a profile
         const profile = await Profile.findById(ProfileID).populate("Owner.User")
         if(!profile){
@@ -1619,7 +1630,7 @@ Add a new caregiver to a user's profile
     try {
   
       const {id} =req.id
-      const {
+      let {
         ProfileID,
         Status,//0 pending , 1 confirmed ,2 rejected
         InvitationID,
@@ -1629,7 +1640,7 @@ Add a new caregiver to a user's profile
        
       }=req.body
         // get the invitation
-       
+        nickName=nickName.trim();
         const invitation = await Invitation.findById(InvitationID).populate({
           path:"From",
             select :'Owner.User',
@@ -1912,13 +1923,13 @@ exports.EditCareGiverPermissions = async (req, res) => {
   try {
 
    const {id} =req.id
-    const {
+    let {
       ProfileID,
       ViewerID,
       permissions,
       nickName
     }=req.body
-
+    nickName=nickName.trim();
     /**
      * permissions eg
      * 
@@ -2114,7 +2125,7 @@ exports.EditDependentInfoFull = async (req, res) => {
   try {
 
    const {id} =req.id
-    const {
+    let {
       ProfileID,
       ViewerID,
       nickName,
@@ -2127,6 +2138,7 @@ exports.EditDependentInfoFull = async (req, res) => {
       KeepOldImg
 
     }=req.body
+    nickName=nickName.trim();
 
     console.log("****",req.body)
       // make sure that the api consumer is authorized
