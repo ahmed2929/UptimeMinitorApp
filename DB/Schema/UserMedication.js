@@ -17,12 +17,11 @@ var MedicationSchema = new Schema({
     type:String
   },
   strength:{
-    type:Number
+    type:String
   },
   unit:{
       type: String,
-        enum : ['g','ml','mg'],
-        default: 'g'
+   
 
   },
   quantity:{

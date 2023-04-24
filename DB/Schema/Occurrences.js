@@ -33,7 +33,7 @@ var OccurrencesSchema = new Schema({
   },
   MedInfo:{
     img :{type:String},
-    strength:{type:Number},
+    strength:{type:String},
     unit:{type:String},
     quantity:{type:Number},
     instructions:{type:String},

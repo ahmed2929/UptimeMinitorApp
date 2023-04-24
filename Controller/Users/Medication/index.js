@@ -180,7 +180,7 @@ exports.CreateNewMed = async (req, res) => {
     try {
   
       const {id} =req.id
-      const {
+      let {
         name,
         strength,
         description,
@@ -196,7 +196,12 @@ exports.CreateNewMed = async (req, res) => {
         RefileLevel,
         Ringtone
       }=req.body
-      
+      if(strength==='null'){
+        strength=null
+      }
+      if(unit==='null'){
+        unit=null
+      }
 
       console.log("requestBody **************",req.body)
       console.log("requestBody.Scheduler **************",req.body.Scheduler)
@@ -426,8 +431,12 @@ exports.CreateNewMed = async (req, res) => {
         Ringtone,
         KeepOldImg
       }=req.body
-  
-  
+      if(strength==='null'){
+        strength=null
+      }
+      if(unit==='null'){
+        unit=null
+      }
        /*
       
       check permission 
@@ -535,7 +544,7 @@ exports.CreateNewMed = async (req, res) => {
         // check if the Scheduler sent with the request is the same as the one in the database
         const SchedulerId=editedMed.Scheduler._id
   
-        // edit schdule
+        // edit schduler
       const OldScheduler = await SchedulerSchema.findById(SchedulerId)
       console.log("Scheduler ",Scheduler)
       const jsonScheduler=JSON.parse(Scheduler)

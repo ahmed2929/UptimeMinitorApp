@@ -156,25 +156,25 @@ exports.EditSingleDoseValidation = () => {
        // Validate the MedInfo field if it's present
        if (value) {
          // Make the properties of the MedInfo object optional
-         check('MedInfo.unit').optional(),
+         //check('MedInfo.unit').optional(),
          check('MedInfo.instructions').optional(),
          check('MedInfo.condition').optional(),
          check('MedInfo.type').optional(),
          check('MedInfo.name').optional(),
 
-         check('MedInfo.strength')
-           .optional()
-           .isInt()
-           .custom((strength) => {
-            console.log(strength)
-             if(strength){
-                 if (strength < 1) {
-                     throw new Error('strength must be greater than 0');
-                   }
-             }
+        //  check('MedInfo.strength')
+        //    .optional()
+        //    .isInt()
+        //    .custom((strength) => {
+        //     console.log(strength)
+        //      if(strength){
+        //          if (strength < 1) {
+        //              throw new Error('strength must be greater than 0');
+        //            }
+        //      }
              
-             return true;
-           })
+        //      return true;
+        //    })
            
          // Validate the quantity field if it's present
          check('MedInfo.quantity')
@@ -230,16 +230,16 @@ check('type')
  .notEmpty(),  // Make sure it's not empty
 
 // Validate the strength field
-check('strength')
-.optional()
- .isInt()  // Make sure it's an integer
- ,
+// check('strength')
+// .optional()
+//  .isInt()  // Make sure it's an integer
+//  ,
 
 // Validate the unit field
-check('unit')
-.optional()
- .isString()  // Make sure it's a string
- .notEmpty(),  // Make sure it's not empty
+// check('unit')
+// .optional()
+//  .isString()  // Make sure it's a string
+//  .notEmpty(),  // Make sure it's not empty
 
 // Validate the quantity field
 check('quantity')
@@ -370,21 +370,21 @@ check('type')
  .notEmpty(),  // Make sure it's not empty
 
 // Validate the strength field
-check('strength')
-.optional()
- .isInt()  // Make sure it's an integer
- .custom((strength) => {
-   if (strength < 1) {
-     throw new Error('strength must be greater than 1 or equals');
-   }
-   return true;
- }),
+// check('strength')
+// .optional()
+//  .isInt()  // Make sure it's an integer
+//  .custom((strength) => {
+//    if (strength < 1) {
+//      throw new Error('strength must be greater than 1 or equals');
+//    }
+//    return true;
+//  }),
 
 // Validate the unit field
-check('unit')
-.optional()
- .isString()  // Make sure it's a string
- .notEmpty(),  // Make sure it's not empty
+// check('unit')
+// .optional()
+//  .isString()  // Make sure it's a string
+//  .notEmpty(),  // Make sure it's not empty
 
 // Validate the quantity field
 check('quantity')
