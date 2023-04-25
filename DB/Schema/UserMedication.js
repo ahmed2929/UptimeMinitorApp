@@ -82,6 +82,10 @@ var MedicationSchema = new Schema({
   fhir:{
     type:Boolean,
     default:false
+  },
+  hasSuspendedDoses:{
+    type:Boolean,
+    default:false
   }
  
 

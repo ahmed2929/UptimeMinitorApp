@@ -553,8 +553,8 @@ exports.CreateNewMed = async (req, res) => {
       if(!OldScheduler){
         return errorResMsg(res, 404, req.t("Scheduler_not_found"));
       }
-     
-      const isTheSame=await CompareOldSchedulerWithTheNewScheduler(jsonScheduler,OldScheduler)
+     const jsonSchedulerClone=Object.assign({}, jsonScheduler)
+      const isTheSame=await CompareOldSchedulerWithTheNewScheduler(jsonSchedulerClone,OldScheduler)
       if(isTheSame){
         console.log("is the same runs")
         return successResMsg(res, 200, {message:req.t("Medication_updated"),data:editedMed});
@@ -767,87 +767,34 @@ exports.CreateNewMed = async (req, res) => {
   
     // case general permission
     if(hasGeneralReadPermissions){
-      const Medication =await UserMedication.find({
+      const Medications =await UserMedication.find({
         ProfileID,
         isDeleted:false
   
       })
       .populate("Scheduler")
       
-      const editedMedications=[]
-      for await(const med of Medication){
-        const doses=await Occurrence.find({
-          Medication:med._id.toString(),
-          Scheduler:med.Scheduler._id,
-          PlannedDateTime:{$gte:new Date()},
-          isSuspended:true
-        })
-        if(doses.length>0){
-          
-         
-          editedMedications.push({
-            ...med._doc,
-            hasSuspendedDoses:true
-          })
-        }else{
-         
-          editedMedications.push({
-            
-              ...med._doc,
-              hasSuspendedDoses:false
-            
-          })
-        }
-
-      }
-
+    
       
       
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Success"),data:editedMedications});
+      return successResMsg(res, 200, {message:req.t("Success"),data:Medications});
   
     }else if(hasSpacificReadPermissions.length>0){
       // case spacific permission
-      const Medication =await UserMedication.find({
+      const Medications =await UserMedication.find({
         ProfileID,
         _id:{$in:hasSpacificReadPermissions},
         isDeleted:false
       })
       .populate("Scheduler")
 
-      const editedMedications=[]
-      for await(const med of Medication){
-        const doses=await Occurrence.find({
-          Medication:med._id.toString(),
-          Scheduler:med.Scheduler._id,
-          PlannedDateTime:{$gte:new Date()},
-          isSuspended:true
-        })
-        if(doses.length>0){
-          
-          
-          editedMedications.push({
-            
-            ...med._doc,
-            hasSuspendedDoses:true
-          
-        })
-        }else{
-          
-          editedMedications.push({
-            
-            ...med._doc,
-            hasSuspendedDoses:false
-          
-        })
-        }
-
-      }
+   
 
 
       
       // return successful response
-      return successResMsg(res, 200, {message:req.t("Success"),data:editedMedications});
+      return successResMsg(res, 200, {message:req.t("Success"),data:Medications});
     }else{
       return errorResMsg(res, 401, req.t("Unauthorized"));
     }

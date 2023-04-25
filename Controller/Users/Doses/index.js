@@ -256,9 +256,11 @@ exports.EditSingleDose=async (req, res) => {
 
       // check for permison
       const Scheduler =await SchedulerSchema.findById(SchedulerId)
+
       if(!Scheduler){
         return errorResMsg(res, 400, req.t("Scheduler_not_found"));
       }
+      const medication =await UserMedication.findById(Scheduler.medication)
         /*
 
       check permission
@@ -361,6 +363,11 @@ exports.EditSingleDose=async (req, res) => {
 
         }
       })
+      if(medication){
+        medication.hasSuspendedDoses=true
+        await medication.save()
+      }
+     
       // return successful response
       return successResMsg(res, 200, {message:req.t("Dose_suspended"),data:populatedSuspendedMedication});
 
@@ -517,6 +524,7 @@ exports.EditSingleDose=async (req, res) => {
 
       // check for permison
       const Scheduler =await SchedulerSchema.findById(SchedulerId)
+      const medication =await UserMedication.findById(Scheduler.medication)
       if(!Scheduler){
         return errorResMsg(res, 400, req.t("Scheduler_not_found"));
       }
@@ -628,6 +636,19 @@ exports.EditSingleDose=async (req, res) => {
 
         }
       })
+      // Flag medication if has a suspended doses
+      const dose=await Occurrence.findOne({
+        Medication:medication._id,
+        Scheduler:Scheduler._id,
+        PlannedDateTime:{$gte:new Date()},
+        isSuspended:true
+      })
+      if(dose){
+        medication.hasSuspendedDoses=true
+      }else{
+        medication.hasSuspendedDoses=false
+      }
+      await medication.save()
       // return successful response
       return successResMsg(res, 200, {message:req.t("Dose_suspended"),data:populatedSuspendedMedication});
 
@@ -741,6 +762,23 @@ exports.EditSingleDose=async (req, res) => {
 
         }
       })
+      const medication =await UserMedication.findById(MedID.toString())
+      if(!medication){
+        return errorResMsg(res, 400, req.t("Medication_not_found"));
+      }
+       // Flag medication if has a suspended doses
+       const dose=await Occurrence.findOne({
+        Medication:medication._id,
+        Scheduler:medication.Scheduler,
+        PlannedDateTime:{$gte:new Date()},
+        isSuspended:true
+      })
+      if(dose){
+        medication.hasSuspendedDoses=true
+      }else{
+        medication.hasSuspendedDoses=false
+      }
+      await medication.save()
       // return successful response
       return successResMsg(res, 200, {message:req.t("Doses_UnSuspended"),data:populatedSuspendedMedication});
 
