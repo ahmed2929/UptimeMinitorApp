@@ -8,11 +8,16 @@ const Viewer =require("./DB/Schema/Viewers")
 const mongoose =require("mongoose")
 const {sendNotification}=require("./config/SendNotification")
 const message =require("./Messages/Notifications/index")
+const UserMedications = require("./DB/Schema/UserMedication");
+const Occurrence = require("./DB/Schema/Occurrences");
 
 
 //Connect to DB
 ConnectToDB();
 app=SetMiddleWares(app)
+
+
+  
  
 // Start the server
 app.listen(port,()=>{

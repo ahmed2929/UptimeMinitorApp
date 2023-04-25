@@ -1279,3 +1279,28 @@ const patients = [
 
 
 ]
+/////// HasSuspeneded doses
+const script=async ()=>{
+  const meds= await UserMedications.find()
+  for await (const medication of meds){
+   console.log("med will update med name ",medication.name)
+   console.log("num of meds : ",meds.length)
+
+       // Flag medication if has a suspended doses
+       const dose=await Occurrence.findOne({
+           Medication:medication._id,
+           Scheduler:medication.Scheduler,
+           PlannedDateTime:{$gte:new Date()},
+           isSuspended:true
+         })
+         if(dose){
+           medication.hasSuspendedDoses=true
+         }else{
+           medication.hasSuspendedDoses=false
+         }
+         await medication.save()
+
+  }
+  console.log("done")
+}
+script()
