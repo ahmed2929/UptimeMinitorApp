@@ -1080,6 +1080,7 @@ The filter can be based on the status, sent, and received parameters.
         let responseData=[]
 
         for await(let invitation of invitations){
+          console.log( invitation._id)
           const FromUserID = invitation.From.Owner.User._id
           const user =await User.findById(FromUserID)
           const ToUserID = invitation.To.Owner.User._id

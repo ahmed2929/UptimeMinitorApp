@@ -1,0 +1,101 @@
+//Statement
+effectiveDateTime (when the medication is requested)
+dateAsserted (when the medication is taken)
+Note [{text:''}]
+dosage:[{
+    sequence:1,
+    text:'5ml three times daily',
+    asNeeded:false,
+    route{
+        text:'oral',
+        code:'26643006',//https://build.fhir.org/valueset-route-codes.html
+       
+    },
+    doseAndRate:[{
+        type:{
+            text:'dose',
+            code:'dose'
+        },
+        doseQuantity:{
+            value:5,
+            unit:'ml',
+            system:'http://unitsofmeasure.org',
+            code:'ml'
+        }
+    }]
+
+}]
+//////////////////////////////MedicationRequest///////////////////////////
+{
+        authoredOn:Date,
+        reason[{
+            text:'Traveller's Diarrhea (disorder)',
+            code:'11840006'
+        }],
+      
+     note:[{
+            text:'Patient told to take with food'
+        }],
+
+
+    "dosageInstruction" : [{
+    "text" : "Two tablets at once",
+    "additionalInstruction" : [{
+        "code" : "311504000",
+        "display" : "With or after food"
+      
+    }],
+    "timing" : {
+        "Duration" : {
+          "start":Date,
+          "end":Date
+        },
+        "frequency" : 1,
+        "period" : 1,
+        "periodUnit" : "d"
+      
+    },
+    "route" : {
+        "code" : "26643006",//https://build.fhir.org/valueset-route-codes.html
+        "display" : "Oral Route"
+    },
+      "doseQuantity" : {
+        "value" : 2,
+        "unit" : "TAB",
+        "code" : "TAB"
+      }
+  },
+  {
+    "text" : "One tablet daily for 4 days",
+    "additionalInstruction" : [{
+        "code" : "311504000",
+        "display" : "With or after food"
+      
+    }],
+    "timing" : {
+        "Duration" : {
+          "start":Date,
+            "end":Date
+        },
+        "frequency" : 1,
+        "period" : 1,
+        "periodUnit" : "d"
+      
+    },
+    "route" : {
+        "code" : "26643006",
+        "display" : "Oral Route"
+      
+    },
+
+      "doseQuantity" : {
+        "value" : 1,
+        "unit" : "TAB",
+        "system" : "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+        "code" : "TAB"
+      }
+  }],
+}
+
+
+
