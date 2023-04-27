@@ -81,25 +81,17 @@ var MedicationSchema = new Schema({
   },
   fhir:{
     type:Boolean,
-    default:false
+    default:true
   },
   hasSuspendedDoses:{
     type:Boolean,
     default:false
-  },
-  ePrescriptionID:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'ePrescription'
   }
- 
 
-  
-
- 
  
 },{ timestamps: true });
 
 
-const User = mongoose.model("UserMedication", MedicationSchema);
+const User = mongoose.model("UserMedicationFhir", MedicationSchema);
 
 module.exports = User;

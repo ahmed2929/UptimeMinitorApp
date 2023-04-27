@@ -32,6 +32,23 @@ var ViewerSchema = new Schema({
         type:Boolean,
         default:false,
     },
+    //ePrescription
+    CanDeleteAllEPrescriptions:{
+        type:Boolean,
+        default:true,
+    },
+    CanEditAllEPrescriptions:{
+        type:Boolean,
+        default:true,
+    },
+    CanReadAllEPrescriptions:{
+        type:Boolean,
+        default:true,
+    },
+    CanAddEPrescriptions:{
+        type:Boolean,
+        default:true,
+    },
 
     //Symptom
 

@@ -23,6 +23,7 @@ const OwnerShip =require("../routes/OwnerShip")
 const Share =require("../routes/share")
 const {checkApiKeyAndSecret} =require("../utils/Authorization")
 const Measurement =require("../routes/MeasurementManagement")
+const ePrescription =require("../routes/ePrescription")
 //setup app insights
 let appInsights = require("applicationinsights");
 appInsights.setup(process.env.AzureAppInsights).start();
@@ -133,6 +134,8 @@ app.use((req,res,next)=>{
   app.use("/api/v1/ownership",OwnerShip)
   app.use("/api/v1/share",Share)
   app.use("/api/v1/measurement",Measurement)
+  app.use("/api/v1/ePrescription",ePrescription)
+
   
   //Handling 404 routes
     app.all("*", (req, res, next) => {

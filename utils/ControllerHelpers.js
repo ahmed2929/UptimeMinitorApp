@@ -19,8 +19,11 @@ const CreateNewScheduler = async (jsonScheduler, newMed, id, ProfileID, viewerPr
   try {
 
     // validate schedule data
-    if (!jsonScheduler.StartDate) {
-      return errorResMsg(res, 400, req.t("start_date_required"));
+    if (!jsonScheduler.StartDate&&jsonScheduler.ScheduleType!="4") {
+      //return errorResMsg(res, 400, req.t("start_date_required"));
+      var today = new Date();
+      today.setHours(0,0,0,0);
+      jsonScheduler.StartDate=today
     }
     // check if StartDate in the past 
 
@@ -31,7 +34,7 @@ const CreateNewScheduler = async (jsonScheduler, newMed, id, ProfileID, viewerPr
     //   return errorResMsg(res, 400, req.t("start_date_in_the_past"));
     // }
     if (jsonScheduler.ScheduleType != "1" && jsonScheduler.ScheduleType != "2" &&
-      jsonScheduler.ScheduleType != "3" && jsonScheduler.ScheduleType.toString() != "0") {
+      jsonScheduler.ScheduleType != "3" && jsonScheduler.ScheduleType.toString() != "0"&&jsonScheduler.ScheduleType.toString() != "4") {
       return errorResMsg(res, 400, req.t("invalid_schedule_type"));
     }
 
@@ -47,7 +50,7 @@ const CreateNewScheduler = async (jsonScheduler, newMed, id, ProfileID, viewerPr
 
     }
     // validate dose if its not as needed
-    if (jsonScheduler.ScheduleType != "1") {
+    if (jsonScheduler.ScheduleType != "1"&&jsonScheduler.ScheduleType.toString() != "4") {
       if (!jsonScheduler.dosage) {
         return errorResMsg(res, 400, req.t("no_dosage_provided"));
       }
@@ -87,17 +90,16 @@ const CreateNewScheduler = async (jsonScheduler, newMed, id, ProfileID, viewerPr
 
     }
 
+    
+   
 
-    if (!jsonScheduler.EndDate) {
+
+    if (!jsonScheduler.EndDate&&jsonScheduler.ScheduleType!='4') {
       if (new Date(jsonScheduler.StartDate) < new Date()) {
         var result = new Date();
         result.setMonth(result.getMonth() + 3);
         jsonScheduler.EndDate = result
-      } else {
-        var result = new Date(jsonScheduler.StartDate);
-        result.setMonth(result.getMonth() + 3);
-        jsonScheduler.EndDate = result
-      }
+      } 
 
 
     }
@@ -736,7 +738,7 @@ const getDoseInfoFromFhirPrescription = async (Prescription) => {
 
 
 }
-
+0
 const generateDoseOccurrenceFromFhirInfo = async (MedInfo, DoseInfo) => {
   try {
 
@@ -841,23 +843,49 @@ const createSchedulerFromFhirPrescription = async (doseInfo, MedicationID, Profi
 }
 
 
-function generateOccurrencesFhir(startDate, endDate, medication, ProfileID, medInfo,MedID) {
+async function generateOccurrencesFhir(startDate, endDate, medication, ProfileID, medInfo,MedID,prescriptionDetails) {
   let result = [];
   let currentDate = new Date(startDate);
   currentDate.setHours(7, 0, 0, 0);
   let periodHours;
-  if (medication.periodUnit === 'd') {
-    periodHours = medication.period * 24 / medication.frequency;
-  } else if (medication.periodUnit === 'h') {
-    periodHours = medication.period;
+  if (medication.timing.repeat.periodUnit === 'd') {
+    periodHours = medication.timing.repeat.period * 24 / medication.timing.repeat.frequency;
+  } else if (medication.timing.repeat.periodUnit === 'h') {
+    periodHours = medication.timing.repeat.period;
   }
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+  // Medication regimen information
+const start = new Date(startDate);
+const end = new Date(endDate)
+const totalDurationHours = (end.getTime() - start.getTime()) / 3600000;
+
+
+// Calculate number of occurrences per day
+const numPeriods = totalDurationHours / periodHours;
+const numDays = totalDurationHours / 24;
+const numOccurrencesPerDay = Math.floor(numPeriods / numDays);
+
+if (numOccurrencesPerDay === 1) {
+  periodHours = 24;
+} else if (numOccurrencesPerDay === 2) {
+  periodHours = 12;
+} else if (numOccurrencesPerDay === 3) {
+  periodHours = 8;
+} else if (numOccurrencesPerDay === 4) {
+  periodHours = 4;
+} else if (numOccurrencesPerDay === 5) {
+  periodHours = 4;
+  currentDate.setHours(5, 0, 0, 0); // Set the first dose to 5am
+}
+
+
   while (currentDate <= endDate) {
 
 
 
-    for (let i = 0; i < medication.frequency; i++) {
+    for (let i = 0; i < medication.timing.repeat.frequency; i++) {
       let Status = 0
       if (new Date(currentDate) < new Date(oneHourAgo)) {
         Status = 3
@@ -868,16 +896,15 @@ function generateOccurrencesFhir(startDate, endDate, medication, ProfileID, medI
       }
       result.push({
         PlannedDateTime: new Date(currentDate),
-        PlannedDose: medication.rateQuantity || medication.rateRange,
+        PlannedDose: medication.doseAndRate ? medication.doseAndRate[0].doseQuantity ? medication.doseAndRate[0].doseQuantity.value : '' : ''|| medication.doseAndRate ? medication.doseAndRate[0].doseRange ? medication.doseAndRate[0].doseRange.low.value : '' : '',
         ProfileID,
         Medication:MedID,
         MedInfo: {
-          quantity: medInfo.quantity,
           instructions: medication.text,
-          condition: medInfo.reason,
-          type: medication.rateUnit || medication.rateRangeUnit,
-          name: medInfo.Name,
-          description: medInfo.Note,
+         // condition: medInfo.reason,
+          type: medication.doseAndRate ? medication.doseAndRate[0].doseQuantity ? medication.doseAndRate[0].doseQuantity.unit : '' : ''|| medication.doseAndRate ? medication.doseAndRate[0].doseRange ? medication.doseAndRate[0].doseRange.low.unit : '' : '',
+          name: medInfo.name,
+          description: prescriptionDetails.note[0]? prescriptionDetails.note[0].text : '',
         },
         Status: Status,
 
@@ -886,14 +913,79 @@ function generateOccurrencesFhir(startDate, endDate, medication, ProfileID, medI
       });
       currentDate.setHours(currentDate.getHours() + periodHours);
     }
-    if (medication.periodUnit === 'd') {
-      currentDate.setHours(currentDate.getHours() - periodHours * medication.frequency + 24);
-    }
+    // if (medication.timing.repeat.periodUnit === 'd') {
+    //   currentDate.setHours(currentDate.getHours() - periodHours * medication.timing.repeat.frequency + 24);
+    // }
 
 
   }
   return result;
 }
+
+async function generateOccurrencesFhirWithSpecificTimes(startDate, endDate, medication, ProfileID, medInfo, MedID, prescriptionDetails) {
+  let result = [];
+  let currentDate = new Date(startDate);
+  //currentDate.setHours(7, 0, 0, 0);
+  let periodHours;
+  if (medication.timing.repeat.periodUnit === 'd') {
+    periodHours = medication.timing.repeat.period * 24 / medication.timing.repeat.frequency;
+  } else if (medication.timing.repeat.periodUnit === 'h') {
+    periodHours = medication.timing.repeat.period;
+  }
+  // Calculate the number of doses per day
+  const dosesPerDay = medication.timing.repeat.frequency;
+  if (dosesPerDay === 1) {
+    periodHours = 24;
+  } else if (dosesPerDay === 2) {
+    periodHours = 12;
+  } else if (dosesPerDay === 3) {
+    periodHours = 8;
+  } else if (dosesPerDay === 4) {
+    periodHours = 4;
+  } else if (dosesPerDay === 5) {
+    periodHours = 4;
+    currentDate.setHours(5, 0, 0, 0); // Set the first dose to 5am
+  } else {
+    // Separate the doses across the day
+    periodHours = 24 / dosesPerDay;
+  }
+
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const HalfAnHourAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+  while (currentDate <= endDate) {
+    for (let i = 0; i < dosesPerDay; i++) {
+      let Status = 0
+      if (new Date(currentDate) < new Date(oneHourAgo)) {
+        Status = 3
+      } else if (new Date(currentDate) < new Date(HalfAnHourAgo)) {
+        Status = 5
+      } else if (new Date(currentDate) < new Date()) {
+        Status = 1
+      }
+      result.push({
+        PlannedDateTime: new Date(currentDate),
+        PlannedDose: medication.doseAndRate ? medication.doseAndRate[0].doseQuantity ? medication.doseAndRate[0].doseQuantity.value : '' : '' || medication.doseAndRate ? medication.doseAndRate[0].doseRange ? medication.doseAndRate[0].doseRange.low.value : '' : '',
+        ProfileID,
+        Medication: MedID,
+        MedInfo: {
+          instructions: medication.text,
+          type: medication.doseAndRate ? medication.doseAndRate[0].doseQuantity ? medication.doseAndRate[0].doseQuantity.unit : '' : '' || medication.doseAndRate ? medication.doseAndRate[0].doseRange ? medication.doseAndRate[0].doseRange.low.unit : '' : '',
+          name: medInfo.name,
+          description: prescriptionDetails.note[0] ? prescriptionDetails.note[0].text : '',
+        },
+        Status: Status,
+        fhir: true
+      });
+      currentDate.setHours(currentDate.getHours() + periodHours);
+    }
+    if (medication.timing.repeat.periodUnit === 'd') {
+      currentDate.setHours(currentDate.getHours() - periodHours * dosesPerDay + 24);
+    }
+  }
+  return result;
+}
+
 
 
 module.exports = {
@@ -905,5 +997,6 @@ module.exports = {
   getDoseInfoFromFhirPrescription,
   createMedicationFromFhirPrescription,
   generateOccurrencesFhir,
-  createSchedulerFromFhirPrescription
+  createSchedulerFromFhirPrescription,
+  generateOccurrencesFhirWithSpecificTimes
 }

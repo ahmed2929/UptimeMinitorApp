@@ -70,6 +70,23 @@ var ProfileSchema = new Schema({
         type:Boolean,
         default:true
     },
+    //ePrescription
+    CanDeleteAllEPrescriptions:{
+        type:Boolean,
+        default:true,
+    },
+    CanEditAllEPrescriptions:{
+        type:Boolean,
+        default:true,
+    },
+    CanReadAllEPrescriptions:{
+        type:Boolean,
+        default:true,
+    },
+    CanAddEPrescriptions:{
+        type:Boolean,
+        default:true,
+    }
     },
     Dependents:[{
     
